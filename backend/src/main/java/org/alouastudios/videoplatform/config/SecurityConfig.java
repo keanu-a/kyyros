@@ -45,6 +45,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/videos/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/comments/**").permitAll()
 
+                        // TODO: Need global exception handler, for example to handle `HttpMessageNotReadableException`
+                        .requestMatchers("/error").permitAll()
+
                         // TODO: Potentially add /actuator/health for health checks
 
                         // Everything else requires authentication
