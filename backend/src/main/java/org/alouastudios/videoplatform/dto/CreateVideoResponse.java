@@ -1,6 +1,9 @@
 package org.alouastudios.videoplatform.dto;
 
-public record PresignedUrlResponse(
+import java.util.UUID;
+
+public record CreateVideoResponse(
+        UUID videoId,
         String presignedUrl,
         String s3Key
 ) {
