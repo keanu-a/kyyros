@@ -73,6 +73,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
         } catch (JWTVerificationException | JwkException e) {
+            // TODO: Need to remove sendError so AuthenticationEntryPoint handles error
             // Verification failure results in a 401 status
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or expired token");
             return;

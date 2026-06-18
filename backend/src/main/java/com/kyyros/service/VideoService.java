@@ -2,6 +2,7 @@ package com.kyyros.service;
 
 import com.kyyros.dto.*;
 import com.kyyros.enums.VideoStatus;
+import com.kyyros.exception.ResourceNotFoundException;
 import com.kyyros.model.S3PresignedResult;
 import com.kyyros.repository.VideoRepository;
 import com.mux.sdk.models.Asset;
@@ -100,7 +101,7 @@ public class VideoService {
 
     public GetVideoResponse getVideoById(UUID videoId) {
         Video video = videoRepository.findById(videoId)
-                .orElseThrow(() -> new EntityNotFoundException("Video not found: " + videoId));
+                .orElseThrow(() -> new ResourceNotFoundException("Video not found: " + videoId));
 
         return new GetVideoResponse(
                 video.getId(),
