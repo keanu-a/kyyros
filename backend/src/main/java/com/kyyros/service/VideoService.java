@@ -1,5 +1,6 @@
 package com.kyyros.service;
 
+import com.kyyros.dto.*;
 import com.kyyros.enums.VideoStatus;
 import com.kyyros.model.S3PresignedResult;
 import com.kyyros.repository.VideoRepository;
@@ -8,10 +9,6 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import com.kyyros.dto.CreateVideoRequest;
-import com.kyyros.dto.CreateVideoResponse;
-import com.kyyros.dto.MuxWebhookPayload;
-import com.kyyros.dto.UpdateVideoStatusRequest;
 import com.kyyros.model.Video;
 import org.springframework.stereotype.Service;
 
@@ -99,5 +96,18 @@ public class VideoService {
         }
 
         videoRepository.save(video);
+    }
+
+    public GetVideoResponse getVideoById(UUID videoId) {
+        Video video = videoRepository.findById(videoId)
+                .orElseThrow(() -> new EntityNotFoundException("Video not found: " + videoId));
+
+        return new GetVideoResponse(
+                video.getId(),
+                video.getTitle(),
+                video.getStatus(),
+                video.getMuxPlaybackId(),
+                video.getCreatedAt()
+        );
     }
 }
