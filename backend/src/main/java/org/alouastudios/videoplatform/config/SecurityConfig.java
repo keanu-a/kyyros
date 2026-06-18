@@ -44,6 +44,7 @@ public class SecurityConfig {
                         // Public endpoints
                         .requestMatchers(HttpMethod.GET, "/api/v1/videos/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/comments/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/webhooks/**").permitAll()
 
                         // TODO: Need global exception handler, for example to handle `HttpMessageNotReadableException`
                         .requestMatchers("/error").permitAll()
