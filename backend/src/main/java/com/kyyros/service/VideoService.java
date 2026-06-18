@@ -6,11 +6,11 @@ import com.kyyros.exception.ResourceNotFoundException;
 import com.kyyros.model.S3PresignedResult;
 import com.kyyros.repository.VideoRepository;
 import com.mux.sdk.models.Asset;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.kyyros.model.Video;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -46,10 +46,10 @@ public class VideoService {
     @Transactional
     public void processStatusUpdate(UUID videoId, UpdateVideoStatusRequest request, UUID userId) {
         Video video = videoRepository.findById(videoId)
-                .orElseThrow(() -> new EntityNotFoundException("Video not found: " + videoId));
+                .orElseThrow(() -> new ResourceNotFoundException("Video not found: " + videoId));
 
         if (!video.getUserId().equals(userId)) {
-            throw new SecurityException("You do not have permission to update this video");
+            throw new AccessDeniedException("You do not have permission to update this video");
         }
 
         // TODO: Should the client pass in an arbitrary video status?
