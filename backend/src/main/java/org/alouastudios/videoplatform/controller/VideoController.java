@@ -19,24 +19,24 @@ public class VideoController {
     private final VideoService videoService;
 
     @PostMapping
-    public ResponseEntity<CreateVideoResponse> createVideo(
+    public ResponseEntity<CreateVideoResponse> initiateUpload(
             @Valid @RequestBody CreateVideoRequest request,
             @AuthenticationPrincipal String userId
     ) {
 
-        CreateVideoResponse response = videoService.createVideo(request, UUID.fromString(userId));
+        CreateVideoResponse response = videoService.initiateUpload(request, UUID.fromString(userId));
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PatchMapping("/{id}/status")
-    public ResponseEntity<Void> updateVideo(
+    public ResponseEntity<Void> processStatusUpdate(
             @PathVariable UUID id,
             @Valid @RequestBody UpdateVideoStatusRequest request,
             @AuthenticationPrincipal String userId
     ) {
 
-        videoService.updateVideoStatus(id, request, UUID.fromString(userId));
+        videoService.processStatusUpdate(id, request, UUID.fromString(userId));
 
         return ResponseEntity.noContent().build();
     }

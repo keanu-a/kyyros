@@ -1,11 +1,15 @@
 package org.alouastudios.videoplatform.service;
 
+import com.mux.sdk.models.Asset;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.alouastudios.videoplatform.dto.CreateVideoRequest;
 import org.alouastudios.videoplatform.dto.CreateVideoResponse;
+import org.alouastudios.videoplatform.dto.MuxWebhookPayload;
 import org.alouastudios.videoplatform.dto.UpdateVideoStatusRequest;
+import org.alouastudios.videoplatform.enums.VideoStatus;
 import org.alouastudios.videoplatform.model.S3PresignedResult;
 import org.alouastudios.videoplatform.model.Video;
 import org.alouastudios.videoplatform.repository.VideoRepository;
@@ -15,14 +19,16 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class VideoService {
 
     private final S3Service s3Service;
     private final VideoRepository videoRepository;
+    private final MuxService muxService;
 
     @Transactional
-    public CreateVideoResponse createVideo(CreateVideoRequest request, UUID userId) {
-        S3PresignedResult s3Result = s3Service.generatePresignedUrl(request.fileName());
+    public CreateVideoResponse initiateUpload(CreateVideoRequest request, UUID userId) {
+        S3PresignedResult s3Result = s3Service.generatePresignedPutUrl(request.fileName());
 
         Video video = new Video();
         video.setTitle(request.title());
@@ -40,7 +46,7 @@ public class VideoService {
     }
 
     @Transactional
-    public void updateVideoStatus(UUID videoId, UpdateVideoStatusRequest request, UUID userId) {
+    public void processStatusUpdate(UUID videoId, UpdateVideoStatusRequest request, UUID userId) {
         Video video = videoRepository.findById(videoId)
                 .orElseThrow(() -> new EntityNotFoundException("Video not found: " + videoId));
 
@@ -48,7 +54,50 @@ public class VideoService {
             throw new SecurityException("You do not have permission to update this video");
         }
 
+        // TODO: Should the client pass in an arbitrary video status?
         video.setStatus(request.videoStatus());
+
+        if (request.videoStatus() == VideoStatus.UPLOADED) {
+            String presignedGetUrl = s3Service.generatePresignedGetUrl(video.getS3Key());
+            Asset asset = muxService.createAsset(presignedGetUrl);
+            video.setMuxAssetId(asset.getId());
+            video.setStatus(VideoStatus.PROCESSING);
+        }
+
+        videoRepository.save(video);
+    }
+
+    @Transactional
+    public void handleMuxWebhook(MuxWebhookPayload payload) {
+        String assetId = payload.data().id();
+
+        Video video = videoRepository.findByMuxAssetId(assetId).orElse(null);
+
+        // Using logs instead of throwing so Mux isn't retrying forever
+        if (video == null) {
+            log.warn("Received MuxWebhook but no video found for assetId: {}", assetId);
+            return;
+        }
+
+        switch (payload.type()) {
+            case "video.asset.ready" -> {
+                String playbackId = payload.data().playbackIds().getFirst().id();
+                video.setMuxPlaybackId(playbackId);
+                video.setStatus(VideoStatus.READY);
+                log.info("Video {} is now READY with playback ID {}", video.getId(), playbackId);
+            }
+
+            case "video.asset.errored" -> {
+                video.setStatus(VideoStatus.FAILED);
+                log.error("Mux failed to process video {}", video.getId());
+            }
+
+            default -> {
+                log.debug("Ignoring Mux event type: {}", payload.type());
+                return;
+            }
+        }
+
         videoRepository.save(video);
     }
 }
