@@ -8,10 +8,10 @@
         <version>4.1.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>org.alouastudios</groupId>
-    <artifactId>video-platform</artifactId>
+    <groupId>com.kyyros</groupId>
+    <artifactId>kyyros</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>video-platform</name>
+    <name>kyyros</name>
     <description>video-platform</description>
     <url/>
     <licenses>
