@@ -2,6 +2,7 @@ package com.kyyros.controller;
 
 import com.kyyros.dto.CreateVideoRequest;
 import com.kyyros.dto.CreateVideoResponse;
+import com.kyyros.dto.GetVideoResponse;
 import com.kyyros.dto.UpdateVideoStatusRequest;
 import com.kyyros.service.VideoService;
 import jakarta.validation.Valid;
@@ -41,5 +42,11 @@ public class VideoController {
         videoService.processStatusUpdate(id, request, UUID.fromString(userId));
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<GetVideoResponse> getVideo(@PathVariable UUID id) {
+        GetVideoResponse response = videoService.getVideoById(id);
+        return ResponseEntity.ok(response);
     }
 }
