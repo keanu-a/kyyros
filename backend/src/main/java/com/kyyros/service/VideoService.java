@@ -2,6 +2,7 @@ package com.kyyros.service;
 
 import com.kyyros.dto.*;
 import com.kyyros.enums.VideoStatus;
+import com.kyyros.exception.ForbiddenOperationException;
 import com.kyyros.exception.ResourceNotFoundException;
 import com.kyyros.model.S3PresignedResult;
 import com.kyyros.repository.VideoRepository;
@@ -10,7 +11,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.kyyros.model.Video;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -49,7 +49,7 @@ public class VideoService {
                 .orElseThrow(() -> new ResourceNotFoundException("Video not found: " + videoId));
 
         if (!video.getUserId().equals(userId)) {
-            throw new AccessDeniedException("You do not have permission to update this video");
+            throw new ForbiddenOperationException("You do not have permission to update this video");
         }
 
         // TODO: Should the client pass in an arbitrary video status?

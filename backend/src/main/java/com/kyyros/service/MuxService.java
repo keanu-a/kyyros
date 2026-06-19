@@ -36,7 +36,7 @@ public class MuxService {
             Asset asset = assetResponse.getData();
 
             if (asset == null) {
-                throw new MuxIntegrationException("Mux returned empty response", null);
+                throw new MuxIntegrationException("Mux returned empty response");
             }
 
             log.info("Created Mux asset: {}", asset.getId());
