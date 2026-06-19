@@ -1,5 +1,6 @@
 package com.kyyros.service;
 
+import com.kyyros.exception.MuxIntegrationException;
 import com.mux.ApiClient;
 import com.mux.ApiException;
 import com.mux.sdk.AssetsApi;
@@ -34,11 +35,15 @@ public class MuxService {
             AssetResponse assetResponse = assetsApi.createAsset(createAssetRequest).execute();
             Asset asset = assetResponse.getData();
 
-            log.info("Created Mux asset: {}", asset.getId()); // Potential null pointer exception
+            if (asset == null) {
+                throw new MuxIntegrationException("Mux returned empty response");
+            }
+
+            log.info("Created Mux asset: {}", asset.getId());
             return asset;
         } catch (ApiException e) {
             log.error("Failed to create Mux asset: Status={}, Body={}", e.getCode(), e.getResponseBody());
-            throw new RuntimeException("Failed to create Mux asset.", e);
+            throw new MuxIntegrationException("Failed to create Mux asset.", e);
         }
     }
 }
