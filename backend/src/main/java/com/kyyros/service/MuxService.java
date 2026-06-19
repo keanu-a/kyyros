@@ -39,7 +39,7 @@ public class MuxService {
                 throw new MuxIntegrationException("Mux returned empty response", null);
             }
 
-            log.info("Created Mux asset: {}", asset.getId()); // Potential null pointer exception
+            log.info("Created Mux asset: {}", asset.getId());
             return asset;
         } catch (ApiException e) {
             log.error("Failed to create Mux asset: Status={}, Body={}", e.getCode(), e.getResponseBody());
