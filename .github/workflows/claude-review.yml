@@ -44,6 +44,10 @@ jobs:
             PR NUMBER: ${{ github.event.pull_request.number }}
             SCOPE: backend/ (Spring Boot 3, Java 25)
 
+            Note: The PR branch is already checked out in the working directory.
+            You can read files directly with your built-in tools, or use
+            `gh pr diff` / `gh pr view` for diff/metadata.
+
             This is the Kyrros backend — a video platform with Supabase JWT auth,
             S3 uploads, and (planned) Mux transcoding. Focus your review on files
             under backend/. Look for:
@@ -68,7 +72,7 @@ jobs:
           claude_args: |
             --model claude-sonnet-4-6
             --max-turns 8
-            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*)"
+            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh search:*)"
 
   review-frontend:
     needs: detect-changes
@@ -90,6 +94,10 @@ jobs:
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ github.event.pull_request.number }}
             SCOPE: frontend/ (Next.js, TypeScript, Tailwind CSS)
+
+            Note: The PR branch is already checked out in the working directory.
+            You can read files directly with your built-in tools, or use
+            `gh pr diff` / `gh pr view` for diff/metadata.
 
             This is the Kyrros frontend — a Next.js app talking to a Spring Boot
             backend and Supabase. Focus your review on files under frontend/.
@@ -115,4 +123,4 @@ jobs:
           claude_args: |
             --model claude-sonnet-4-6
             --max-turns 8
-            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*)"
+            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh search:*)"
