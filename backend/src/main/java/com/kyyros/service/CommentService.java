@@ -44,9 +44,9 @@ public class CommentService {
         comment.setContent(request.content());
         comment.setTimestampSeconds(request.timestampSeconds());
 
-        Comment savedComment = commentRepository.save(comment);
+        Comment savedComment = commentRepository.saveAndFlush(comment);
 
-        return toResponse(comment, savedComment.getTimestampSeconds());
+        return toResponse(savedComment, savedComment.getTimestampSeconds());
     }
 
     @Transactional
@@ -67,9 +67,10 @@ public class CommentService {
         reply.setVideo(parent.getVideo());
         reply.setUser(user);
         reply.setContent(request.content());
+        reply.setParentComment(parent);
 
-        Comment savedComment = commentRepository.save(reply);
-        return toResponse(reply, savedComment.getTimestampSeconds());
+        Comment savedComment = commentRepository.saveAndFlush(reply);
+        return toResponse(savedComment, savedComment.getTimestampSeconds());
     }
 
     @Transactional(readOnly = true)
@@ -96,7 +97,7 @@ public class CommentService {
         }
 
         comment.setContent(request.content());
-        Comment savedComment = commentRepository.save(comment);
+        Comment savedComment = commentRepository.saveAndFlush(comment);
 
         return toResponse(savedComment, savedComment.getTimestampSeconds());
     }
