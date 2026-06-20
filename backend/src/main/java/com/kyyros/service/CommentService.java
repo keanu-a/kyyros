@@ -74,6 +74,10 @@ public class CommentService {
 
     @Transactional
     public List<CommentResponse> getVideoComments(UUID videoId) {
+        if (!videoRepository.existsById(videoId)) {
+            throw new ResourceNotFoundException("Video not found: " + videoId);
+        }
+
         List<Comment> rootComments = commentRepository
                 .findCommentByVideoIdWithRepliesAndUsers(videoId);
 
