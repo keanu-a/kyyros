@@ -2,6 +2,8 @@ package com.kyyros.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -24,9 +26,9 @@ public class Comment {
     @JoinColumn(name = "video_id", nullable = false)
     private Video video;
 
-/*    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;*/
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "comment_id", nullable = false)
@@ -47,12 +49,12 @@ public class Comment {
     @Column(name = "updated_at")
     private Instant updatedAt;
 
-    @PrePersist
+    @CreationTimestamp
     protected void onCreate() {
         this.createdAt = Instant.now();
     }
 
-    @PrePersist
+    @UpdateTimestamp
     protected void onUpdate() {
         this.updatedAt = Instant.now();
     }
