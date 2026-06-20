@@ -30,9 +30,9 @@ public class Comment {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "comment_id", nullable = false)
-    private Comment comment;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_comment_id")
+    private Comment parentComment;
 
     @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> replies = new ArrayList<>();
@@ -43,19 +43,11 @@ public class Comment {
     @Column(name = "timestamp_seconds")
     private Double timestampSeconds;
 
+    @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
-    @Column(name = "updated_at")
-    private Instant updatedAt;
-
-    @CreationTimestamp
-    protected void onCreate() {
-        this.createdAt = Instant.now();
-    }
-
     @UpdateTimestamp
-    protected void onUpdate() {
-        this.updatedAt = Instant.now();
-    }
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
 }
