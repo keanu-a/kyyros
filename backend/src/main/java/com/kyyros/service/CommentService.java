@@ -12,10 +12,10 @@ import com.kyyros.model.Video;
 import com.kyyros.repository.CommentRepository;
 import com.kyyros.repository.UserRepository;
 import com.kyyros.repository.VideoRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -72,7 +72,7 @@ public class CommentService {
         return toResponse(reply, savedComment.getTimestampSeconds());
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<CommentResponse> getVideoComments(UUID videoId) {
         if (!videoRepository.existsById(videoId)) {
             throw new ResourceNotFoundException("Video not found: " + videoId);
