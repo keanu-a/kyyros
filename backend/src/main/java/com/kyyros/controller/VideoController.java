@@ -1,9 +1,7 @@
 package com.kyyros.controller;
 
-import com.kyyros.dto.CreateVideoRequest;
-import com.kyyros.dto.CreateVideoResponse;
-import com.kyyros.dto.GetVideoResponse;
-import com.kyyros.dto.UpdateVideoStatusRequest;
+import com.kyyros.dto.*;
+import com.kyyros.service.CommentService;
 import com.kyyros.service.VideoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -20,6 +19,7 @@ import java.util.UUID;
 public class VideoController {
 
     private final VideoService videoService;
+    private final CommentService commentService;
 
     @PostMapping
     public ResponseEntity<CreateVideoResponse> initiateUpload(
@@ -48,5 +48,21 @@ public class VideoController {
     public ResponseEntity<GetVideoResponse> getVideo(@PathVariable UUID id) {
         GetVideoResponse response = videoService.getVideoById(id);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{videoId}/comments")
+    public ResponseEntity<CommentResponse> createComment(
+            @PathVariable UUID videoId,
+            @Valid @RequestBody CreateCommentRequest request,
+            @AuthenticationPrincipal String userId
+    ) {
+        CommentResponse response = commentService.createComment(videoId, request, UUID.fromString(userId));
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @GetMapping("/{videoId}/comments")
+    public ResponseEntity<List<CommentResponse>> getVideoComments(@PathVariable UUID videoId) {
+        List<CommentResponse> comments = commentService.getVideoComments(videoId);
+        return ResponseEntity.ok(comments);
     }
 }

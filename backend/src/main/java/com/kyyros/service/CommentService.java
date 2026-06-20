@@ -73,6 +73,16 @@ public class CommentService {
     }
 
     @Transactional
+    public List<CommentResponse> getVideoComments(UUID videoId) {
+        List<Comment> rootComments = commentRepository
+                .findCommentByVideoIdWithRepliesAndUsers(videoId);
+
+        return rootComments.stream()
+                .map(c -> toResponse(c, c.getTimestampSeconds()))
+                .toList();
+    }
+
+    @Transactional
     public CommentResponse updateComment(UUID commentId, UpdateCommentRequest request, UUID userId) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Comment not found: " + commentId));
