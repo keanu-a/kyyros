@@ -1,9 +1,7 @@
 package com.kyyros.service;
 
-import com.kyyros.dto.CommentResponse;
-import com.kyyros.dto.CreateCommentRequest;
-import com.kyyros.dto.CreateReplyRequest;
-import com.kyyros.dto.UpdateCommentRequest;
+import com.kyyros.dto.*;
+import com.kyyros.exception.BadRequestException;
 import com.kyyros.exception.ForbiddenOperationException;
 import com.kyyros.exception.ResourceNotFoundException;
 import com.kyyros.model.Comment;
@@ -57,7 +55,7 @@ public class CommentService {
 
         // Enforce one-level nesting
         if (parent.getParentComment() != null) {
-            throw new ForbiddenOperationException("Cannot reply to a reply. Replies can only be made to root comments");
+            throw new BadRequestException("Cannot reply to a reply. Replies can only be made to root comments");
         }
 
         User user = userRepository.findById(userId)
@@ -70,7 +68,7 @@ public class CommentService {
         reply.setParentComment(parent);
 
         Comment savedComment = commentRepository.saveAndFlush(reply);
-        return toResponse(savedComment, savedComment.getTimestampSeconds());
+        return toResponse(savedComment, parent.getTimestampSeconds());
     }
 
     @Transactional(readOnly = true)
@@ -88,7 +86,7 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentResponse updateComment(UUID commentId, UpdateCommentRequest request, UUID userId) {
+    public CommentSummaryResponse updateComment(UUID commentId, UpdateCommentRequest request, UUID userId) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Comment not found: " + commentId));
 
@@ -99,7 +97,20 @@ public class CommentService {
         comment.setContent(request.content());
         Comment savedComment = commentRepository.saveAndFlush(comment);
 
-        return toResponse(savedComment, savedComment.getTimestampSeconds());
+        Double effectiveTimestamp = savedComment.getParentComment() == null
+                ? savedComment.getTimestampSeconds()
+                : savedComment.getParentComment().getTimestampSeconds();
+
+        User user = savedComment.getUser();
+
+        return new CommentSummaryResponse(
+                savedComment.getId(),
+                savedComment.getContent(),
+                effectiveTimestamp,
+                new CommentResponse.UserSummary(user.getId(), user.getUsername(), user.getProfilePictureUrl()),
+                savedComment.getCreatedAt(),
+                savedComment.getUpdatedAt()
+        );
     }
 
     @Transactional

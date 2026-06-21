@@ -1,6 +1,7 @@
 package com.kyyros.controller;
 
 import com.kyyros.dto.CommentResponse;
+import com.kyyros.dto.CommentSummaryResponse;
 import com.kyyros.dto.CreateReplyRequest;
 import com.kyyros.dto.UpdateCommentRequest;
 import com.kyyros.service.CommentService;
@@ -31,17 +32,17 @@ public class CommentController {
     }
 
     @PatchMapping("/{commentId}")
-    public ResponseEntity<CommentResponse> updateComment(
+    public ResponseEntity<CommentSummaryResponse> updateComment(
             @PathVariable UUID commentId,
             @Valid @RequestBody UpdateCommentRequest request,
             @AuthenticationPrincipal String userId
     ) {
-        CommentResponse response = commentService.updateComment(commentId, request, UUID.fromString(userId));
+        CommentSummaryResponse response = commentService.updateComment(commentId, request, UUID.fromString(userId));
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{commentId}")
-    public ResponseEntity<CommentResponse> deleteComment(
+    public ResponseEntity<Void> deleteComment(
             @PathVariable UUID commentId,
             @AuthenticationPrincipal String useId
     ) {
