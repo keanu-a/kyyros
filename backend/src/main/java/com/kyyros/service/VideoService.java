@@ -7,11 +7,11 @@ import com.kyyros.exception.ResourceNotFoundException;
 import com.kyyros.model.S3PresignedResult;
 import com.kyyros.repository.VideoRepository;
 import com.mux.sdk.models.Asset;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.kyyros.model.Video;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
