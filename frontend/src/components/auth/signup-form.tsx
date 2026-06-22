@@ -18,6 +18,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from '../ui/field';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import { createClient } from '@/lib/supabase/client';
+import { GoogleSignInButton } from './google-sign-in-button';
 
 const signupSchema = z
   .object({
@@ -95,7 +96,9 @@ export default function SignupForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Create your account</CardTitle>
+        <CardTitle className="text-xl font-semibold">
+          Create your account
+        </CardTitle>
         <CardDescription>Sign up to get started</CardDescription>
       </CardHeader>
       <CardContent>
@@ -167,13 +170,23 @@ export default function SignupForm() {
             <p className="text-sm text-destructive">{submitError}</p>
           )}
 
-          <Button
-            type="submit"
-            disabled={form.formState.isSubmitting}
-            className="w-full cursor-pointer"
-          >
-            {form.formState.isSubmitting ? 'Creating account...' : 'Sign up'}
-          </Button>
+          <div className="space-y-2">
+            <Button
+              type="submit"
+              disabled={form.formState.isSubmitting}
+              className="w-full cursor-pointer"
+            >
+              {form.formState.isSubmitting ? 'Creating account...' : 'Sign up'}
+            </Button>
+
+            <div className="flex items-center gap-2">
+              <div className="h-px flex-1 bg-border" />
+              <span className="text-xs text-muted-foreground">or</span>
+              <div className="h-px flex-1 bg-border" />
+            </div>
+
+            <GoogleSignInButton mode="signup" />
+          </div>
         </form>
       </CardContent>
 
