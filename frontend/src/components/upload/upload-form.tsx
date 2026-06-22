@@ -169,7 +169,11 @@ export default function UploadForm() {
             <p>Processing... this can take a minute</p>
           )}
 
-          {error && <p className="text-destructive">{error}</p>}
+          {error && (
+            <p role="alert" className="text-destructive">
+              {error}
+            </p>
+          )}
 
           <Button
             type="submit"

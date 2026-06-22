@@ -42,7 +42,7 @@ export interface GetVideoResponse {
   id: string;
   title: string;
   status: VideoStatus;
-  playbackId: string;
+  playbackId: string | null;
   createdAt: string;
 }
 
