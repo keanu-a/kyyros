@@ -26,6 +26,7 @@ interface UploadMetadata {
 }
 
 const POLL_INTERVAL_MS = 2000;
+const MAX_POLL_ATTEMPTS = 150; // ~5 min at 2s
 
 export function useVideoUpload() {
   const [error, setError] = useState<string | null>(null);
@@ -45,9 +46,22 @@ export function useVideoUpload() {
     [],
   );
 
+  // Poll for video processing status to be `READY` or `FAILED`
   const pollUntilReady = useCallback((videoId: string) => {
-    // Poll for video processing status to be `READY` or `FAILED`
+    // Clear any existing interval before starting a new one
+    if (pollRef.current) clearInterval(pollRef.current);
+
+    let attempts = 0; // Bound the number of attempts
+
     pollRef.current = setInterval(async () => {
+      // Setting ERROR if Mux outage or webhook failure
+      if (++attempts > MAX_POLL_ATTEMPTS) {
+        clearInterval(pollRef.current!);
+        setError('Processing timed out. Please try again.');
+        setUploadStatus(UploadStatus.ERROR);
+        return;
+      }
+
       try {
         const video = await getVideo(videoId);
         if (video.status === VideoStatus.READY) {
