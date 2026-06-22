@@ -61,7 +61,7 @@ export function LoginForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Login</CardTitle>
+        <CardTitle className="text-xl font-semibold">Log in</CardTitle>
         <CardDescription>Welcome back!</CardDescription>
       </CardHeader>
       <CardContent>
@@ -119,7 +119,7 @@ export function LoginForm() {
               disabled={form.formState.isSubmitting}
               className="w-full cursor-pointer"
             >
-              {form.formState.isSubmitting ? 'Logging in...' : 'Login'}
+              {form.formState.isSubmitting ? 'Logging in...' : 'Log in'}
             </Button>
 
             <div className="flex items-center gap-2">
@@ -128,7 +128,7 @@ export function LoginForm() {
               <div className="h-px flex-1 bg-border" />
             </div>
 
-            <GoogleSignInButton />
+            <GoogleSignInButton mode="login" />
           </div>
         </form>
       </CardContent>

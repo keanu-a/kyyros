@@ -96,7 +96,9 @@ export default function SignupForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Create your account</CardTitle>
+        <CardTitle className="text-xl font-semibold">
+          Create your account
+        </CardTitle>
         <CardDescription>Sign up to get started</CardDescription>
       </CardHeader>
       <CardContent>
@@ -183,7 +185,7 @@ export default function SignupForm() {
               <div className="h-px flex-1 bg-border" />
             </div>
 
-            <GoogleSignInButton />
+            <GoogleSignInButton mode="signup" />
           </div>
         </form>
       </CardContent>
