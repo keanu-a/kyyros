@@ -12,6 +12,9 @@ public record CreateVideoRequest(
         String description,
 
         @NotBlank(message = "Video file name is required")
-        String fileName
+        String fileName,
+
+        @NotBlank(message = "Content type is required")
+        String contentType
 ) {
 }

@@ -26,7 +26,7 @@ public class VideoService {
 
     @Transactional
     public CreateVideoResponse initiateUpload(CreateVideoRequest request, UUID userId) {
-        S3PresignedResult s3Result = s3Service.generatePresignedPutUrl(request.fileName());
+        S3PresignedResult s3Result = s3Service.generatePresignedPutUrl(request.fileName(), request.contentType());
 
         Video video = new Video();
         video.setTitle(request.title());
@@ -56,8 +56,12 @@ public class VideoService {
         video.setStatus(request.videoStatus());
 
         if (request.videoStatus() == VideoStatus.UPLOADED) {
+            // Get the presigned GET url for the video
             String presignedGetUrl = s3Service.generatePresignedGetUrl(video.getS3Key());
+
+            // Tell Mux to grab this video from S3
             Asset asset = muxService.createAsset(presignedGetUrl);
+
             video.setMuxAssetId(asset.getId());
             video.setStatus(VideoStatus.PROCESSING);
         }
