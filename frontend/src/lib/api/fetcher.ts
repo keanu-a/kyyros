@@ -27,6 +27,7 @@ export async function apiFetch<T>(
     },
   });
 
+  // TODO: Send better error messages to the client since body is not used
   if (!res.ok) {
     throw new Error(`Request failed: ${res.status}`);
   }
