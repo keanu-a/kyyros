@@ -56,7 +56,7 @@ public class VideoService {
         video.setStatus(request.videoStatus());
 
         if (request.videoStatus() == VideoStatus.UPLOADED) {
-            // Get the presigned GET url for the video
+            // Get presigned GET url for the video
             String presignedGetUrl = s3Service.generatePresignedGetUrl(video.getS3Key());
 
             // Tell Mux to grab this video from S3
