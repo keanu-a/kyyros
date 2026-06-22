@@ -37,7 +37,9 @@ public class S3Service {
     public S3PresignedResult generatePresignedPutUrl(String fileName, String contentType) {
         // Validating if video is in supported format
         if (contentType == null || !ALLOWED_VIDEO_TYPES.contains(contentType)) {
-            throw new BadRequestException("Unsupported content type: " + contentType);
+            throw new BadRequestException(
+                    "Unsupported video content type. Allowed: " + String.join(", ", ALLOWED_VIDEO_TYPES)
+            );
         }
 
         String safeFileName = sanitizeFileName(fileName);
@@ -90,6 +92,6 @@ public class S3Service {
             safe = safe.substring(0, 100);
         }
 
-        return safe.isBlank() ? "video" : safe;
+        return safe;
     }
 }

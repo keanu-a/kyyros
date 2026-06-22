@@ -12,9 +12,11 @@ public record CreateVideoRequest(
         String description,
 
         @NotBlank(message = "Video file name is required")
+        @Size(max = 255, message = "Video file name must be 255 characters or less")
         String fileName,
 
         @NotBlank(message = "Content type is required")
+        @Size(max = 100, message = "Content type must be 100 characters or less")
         String contentType
 ) {
 }
