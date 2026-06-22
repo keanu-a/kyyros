@@ -2,6 +2,7 @@ package com.kyyros.service;
 
 import com.kyyros.dto.*;
 import com.kyyros.enums.VideoStatus;
+import com.kyyros.exception.BadRequestException;
 import com.kyyros.exception.ForbiddenOperationException;
 import com.kyyros.exception.ResourceNotFoundException;
 import com.kyyros.model.S3PresignedResult;
@@ -43,6 +44,7 @@ public class VideoService {
         );
     }
 
+    // Update status from PENDING to UPLOADED
     @Transactional
     public void processStatusUpdate(UUID videoId, UpdateVideoStatusRequest request, UUID userId) {
         Video video = videoRepository.findById(videoId)
@@ -52,19 +54,27 @@ public class VideoService {
             throw new ForbiddenOperationException("You do not have permission to update this video");
         }
 
-        // TODO: Should the client pass in an arbitrary video status?
-        video.setStatus(request.videoStatus());
-
-        if (request.videoStatus() == VideoStatus.UPLOADED) {
-            // Get presigned GET url for the video
-            String presignedGetUrl = s3Service.generatePresignedGetUrl(video.getS3Key());
-
-            // Tell Mux to grab this video from S3
-            Asset asset = muxService.createAsset(presignedGetUrl);
-
-            video.setMuxAssetId(asset.getId());
-            video.setStatus(VideoStatus.PROCESSING);
+        if (request.videoStatus() != VideoStatus.UPLOADED) {
+            throw new BadRequestException("Invalid status transition");
         }
+
+        if (video.getStatus() != VideoStatus.PENDING) {
+            throw new BadRequestException("Video is not in PENDING state");
+        }
+
+        // Verify the file actually exists in S3 before triggering Mux
+        if (!s3Service.objectExists(video.getS3Key())) {
+            throw new ResourceNotFoundException("Upload not found");
+        }
+
+        // Get presigned GET url for the video
+        String presignedGetUrl = s3Service.generatePresignedGetUrl(video.getS3Key());
+
+        // Tell Mux to grab this video from S3
+        Asset asset = muxService.createAsset(presignedGetUrl);
+
+        video.setMuxAssetId(asset.getId());
+        video.setStatus(VideoStatus.PROCESSING);
 
         videoRepository.save(video);
     }
