@@ -10,12 +10,20 @@ export const VideoStatus = {
 
 export type VideoStatus = (typeof VideoStatus)[keyof typeof VideoStatus];
 
-export type ContentType =
-  | 'video/mp4'
-  | 'video/quicktime'
-  | 'video/webm'
-  | 'video/x-matroska'
-  | 'video/x-msvideo';
+export const CONTENT_TYPES = [
+  'video/mp4',
+  'video/quicktime',
+  'video/webm',
+  'video/x-matroska',
+  'video/x-msvideo',
+] as const;
+
+export type ContentType = (typeof CONTENT_TYPES)[number];
+
+// Checks if provided string is a valid content type
+export function isContentType(value: string): value is ContentType {
+  return (CONTENT_TYPES as readonly string[]).includes(value);
+}
 
 export interface CreateVideoRequest {
   title: string;
@@ -49,11 +57,11 @@ export function createVideo(
 
 export function updateVideoStatus(
   id: string,
-  status: VideoStatus,
+  videoStatus: VideoStatus,
 ): Promise<void> {
-  return apiFetch(`/api/v1/videos/${id}`, {
+  return apiFetch(`/api/v1/videos/${id}/status`, {
     method: 'PATCH',
-    body: JSON.stringify({ status }),
+    body: JSON.stringify({ videoStatus }),
   });
 }
 

@@ -8,13 +8,16 @@ import {
 import { uploadToS3 } from '@/lib/upload/s3';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-export type UploadStatus =
-  | 'idle'
-  | 'creating'
-  | 'uploading'
-  | 'processing'
-  | 'ready'
-  | 'error';
+export const UploadStatus = {
+  IDLE: 'idle',
+  CREATING: 'creating',
+  UPLOADING: 'uploading',
+  PROCESSING: 'processing',
+  READY: 'ready',
+  ERROR: 'error',
+} as const;
+
+export type UploadStatus = (typeof UploadStatus)[keyof typeof UploadStatus];
 
 interface UploadMetadata {
   title: string;
@@ -27,7 +30,9 @@ const POLL_INTERVAL_MS = 2000;
 export function useVideoUpload() {
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState<number>(0);
-  const [status, setStatus] = useState<UploadStatus>('idle');
+  const [uploadStatus, setUploadStatus] = useState<UploadStatus>(
+    UploadStatus.IDLE,
+  );
   const [playbackId, setPlaybackId] = useState<string | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -48,16 +53,16 @@ export function useVideoUpload() {
         if (video.status === VideoStatus.READY) {
           clearInterval(pollRef.current!);
           setPlaybackId(video.playbackId);
-          setStatus('ready');
+          setUploadStatus(UploadStatus.READY);
         } else if (video.status === VideoStatus.FAILED) {
           clearInterval(pollRef.current!);
           setError('Error occurred while processing video');
-          setStatus('error');
+          setUploadStatus(UploadStatus.ERROR);
         }
       } catch (e) {
         clearInterval(pollRef.current!);
         setError('Error occurred while polling video status');
-        setStatus('error');
+        setUploadStatus(UploadStatus.ERROR);
       }
     }, POLL_INTERVAL_MS);
   }, []);
@@ -69,7 +74,7 @@ export function useVideoUpload() {
 
       try {
         // Initiate upload and get presigned PUT url
-        setStatus('creating');
+        setUploadStatus(UploadStatus.CREATING);
         const { videoId, presignedUrl } = await createVideo({
           title: metadata.title,
           description: metadata.description,
@@ -78,23 +83,22 @@ export function useVideoUpload() {
         });
 
         // Upload the file to S3
-        setStatus('uploading');
+        setUploadStatus(UploadStatus.UPLOADING);
         await uploadToS3(presignedUrl, file, setProgress);
 
         // Update video status for Mux
         await updateVideoStatus(videoId, VideoStatus.UPLOADED);
-        setStatus('processing');
+        setUploadStatus(UploadStatus.PROCESSING);
 
         // Poll for video processing status `READY` set by Mux
         pollUntilReady(videoId);
       } catch (e) {
-        console.error(e); // TODO: For dev purposes only
         setError('Error occurred while uploading video');
-        setStatus('error');
+        setUploadStatus(UploadStatus.ERROR);
       }
     },
     [pollUntilReady],
   );
 
-  return { status, progress, error, playbackId, upload };
+  return { uploadStatus, progress, error, playbackId, upload };
 }
