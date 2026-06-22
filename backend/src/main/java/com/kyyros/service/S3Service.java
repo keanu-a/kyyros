@@ -5,8 +5,8 @@ import com.kyyros.model.S3PresignedResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
@@ -25,6 +25,7 @@ public class S3Service {
     private String bucketName;
 
     private final S3Presigner presigner;
+    private final S3Client s3Client;
 
     private static final Set<String> ALLOWED_VIDEO_TYPES = Set.of(
             "video/mp4",
@@ -73,6 +74,22 @@ public class S3Service {
         PresignedGetObjectRequest presignedGetObjectRequest = presigner.presignGetObject(presignedRequest);
 
         return presignedGetObjectRequest.url().toString();
+    }
+
+    /**
+     * Checks whether an object exists in the S3 bucket.
+     * Uses a HEAD request — cheap, no body transfer.
+     */
+    public boolean objectExists(String s3Key) {
+        try {
+            s3Client.headObject(HeadObjectRequest.builder()
+                            .bucket(bucketName)
+                            .key(s3Key)
+                    .build());
+            return true;
+        } catch (NoSuchKeyException e) {
+            return false;
+        }
     }
 
     /**
