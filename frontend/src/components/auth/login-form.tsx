@@ -19,6 +19,7 @@ import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Button } from '../ui/button';
 import { createClient } from '@/lib/supabase/client';
+import { GoogleSignInButton } from './google-sign-in-button';
 
 const loginSchema = z.object({
   email: z.email('Enter a valid email address'),
@@ -112,15 +113,26 @@ export function LoginForm() {
             <p className="text-sm text-destructive">{submitError}</p>
           )}
 
-          <Button
-            type="submit"
-            disabled={form.formState.isSubmitting}
-            className="w-full cursor-pointer"
-          >
-            {form.formState.isSubmitting ? 'Logging in...' : 'Login'}
-          </Button>
+          <div className="space-y-2">
+            <Button
+              type="submit"
+              disabled={form.formState.isSubmitting}
+              className="w-full cursor-pointer"
+            >
+              {form.formState.isSubmitting ? 'Logging in...' : 'Login'}
+            </Button>
+
+            <div className="flex items-center gap-2">
+              <div className="h-px flex-1 bg-border" />
+              <span className="text-xs text-muted-foreground">or</span>
+              <div className="h-px flex-1 bg-border" />
+            </div>
+
+            <GoogleSignInButton />
+          </div>
         </form>
       </CardContent>
+
       <CardFooter>
         <p className="text-sm text-muted-foreground mx-auto">
           Don&apos;t have an account?{' '}
