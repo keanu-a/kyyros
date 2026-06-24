@@ -6,11 +6,15 @@ import com.kyyros.exception.BadRequestException;
 import com.kyyros.exception.ForbiddenOperationException;
 import com.kyyros.exception.ResourceNotFoundException;
 import com.kyyros.model.S3PresignedResult;
+import com.kyyros.model.User;
+import com.kyyros.repository.UserRepository;
 import com.kyyros.repository.VideoRepository;
 import com.mux.sdk.models.Asset;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.kyyros.model.Video;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,17 +26,22 @@ import java.util.UUID;
 public class VideoService {
 
     private final S3Service s3Service;
-    private final VideoRepository videoRepository;
     private final MuxService muxService;
+
+    private final VideoRepository videoRepository;
+    private final UserRepository userRepository;
 
     @Transactional
     public CreateVideoResponse initiateUpload(CreateVideoRequest request, UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found" + userId));
+
         S3PresignedResult s3Result = s3Service.generatePresignedPutUrl(request.fileName(), request.contentType());
 
         Video video = new Video();
         video.setTitle(request.title());
         video.setDescription(request.description());
-        video.setUserId(userId);
+        video.setUploader(user);
         video.setS3Key(s3Result.s3Key());
 
         Video savedVideo = videoRepository.save(video);
@@ -50,7 +59,7 @@ public class VideoService {
         Video video = videoRepository.findById(videoId)
                 .orElseThrow(() -> new ResourceNotFoundException("Video not found: " + videoId));
 
-        if (!video.getUserId().equals(userId)) {
+        if (!video.getUploader().getId().equals(userId)) {
             throw new ForbiddenOperationException("You do not have permission to update this video");
         }
 
@@ -111,6 +120,18 @@ public class VideoService {
         }
 
         videoRepository.save(video);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<VideoSummaryResponse> getVideos(Pageable pageable) {
+        return videoRepository.findReadyVideos(pageable)
+                .map(video -> new VideoSummaryResponse(
+                        video.getId(),
+                        video.getTitle(),
+                        "https://image.mux.com/" + video.getMuxPlaybackId() + "/thumbnail.jpg",
+                        video.getUploader().getUsername(),
+                        video.getCreatedAt()
+                ));
     }
 
     public GetVideoResponse getVideoById(UUID videoId) {

@@ -5,6 +5,9 @@ import com.kyyros.service.CommentService;
 import com.kyyros.service.VideoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -32,6 +35,20 @@ public class VideoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @GetMapping
+    public ResponseEntity<Page<VideoSummaryResponse>> getAllVideos(
+            @PageableDefault(size = 10) Pageable pageable
+    ) {
+        Page<VideoSummaryResponse> response = videoService.getVideos(pageable);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<GetVideoResponse> getVideo(@PathVariable UUID id) {
+        GetVideoResponse response = videoService.getVideoById(id);
+        return ResponseEntity.ok(response);
+    }
+
     @PatchMapping("/{id}/status")
     public ResponseEntity<Void> processStatusUpdate(
             @PathVariable UUID id,
@@ -42,12 +59,6 @@ public class VideoController {
         videoService.processStatusUpdate(id, request, UUID.fromString(userId));
 
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<GetVideoResponse> getVideo(@PathVariable UUID id) {
-        GetVideoResponse response = videoService.getVideoById(id);
-        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/{videoId}/comments")
