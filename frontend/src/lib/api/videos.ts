@@ -1,3 +1,4 @@
+import type { PagedResponse } from '@/types/api';
 import { apiFetch } from './fetcher';
 
 export const VideoStatus = {
@@ -46,6 +47,14 @@ export interface GetVideoResponse {
   createdAt: string;
 }
 
+export type VideoSummaryResponse = {
+  id: string;
+  title: string;
+  thumbnailUrl: string;
+  uploaderUsername: string;
+  createdAt: string;
+};
+
 export function createVideo(
   request: CreateVideoRequest,
 ): Promise<CreateVideoResponse> {
@@ -69,4 +78,22 @@ export function getVideo(id: string): Promise<GetVideoResponse> {
   return apiFetch(`/api/v1/videos/${id}`, {
     method: 'GET',
   });
+}
+
+export function getVideos(
+  page: number,
+  size: number,
+): Promise<PagedResponse<VideoSummaryResponse>> {
+  const params = new URLSearchParams({
+    page: page.toString(),
+    size: size.toString(),
+  });
+
+  return apiFetch(
+    `/api/v1/videos?${params}`,
+    {
+      method: 'GET',
+    },
+    { requireAuth: false },
+  );
 }
