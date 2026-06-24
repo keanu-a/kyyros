@@ -11,7 +11,10 @@ type VideoCardProps = {
 
 export function VideoCard({ video }: VideoCardProps) {
   return (
-    <Link href={`/videos/${video.id}`}>
+    <Link
+      href={`/videos/${video.id}`}
+      className="hover:bg-muted transition-all p-2 rounded-lg"
+    >
       {/* Thumbnail */}
       <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-muted">
         <Image
@@ -24,7 +27,7 @@ export function VideoCard({ video }: VideoCardProps) {
       </div>
 
       {/* Title + metadata */}
-      <div className="flex items-center">
+      <div className="flex flex-col px-1 py-2">
         <h3 className="line-clamp-2 font-medium leading-tight">
           {video.title}
         </h3>
