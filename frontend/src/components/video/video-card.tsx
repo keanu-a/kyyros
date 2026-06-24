@@ -9,15 +9,7 @@ type VideoCardProps = {
   video: VideoSummaryResponse;
 };
 
-const testVideo: VideoSummaryResponse = {
-  id: '1',
-  title: 'Test Video',
-  thumbnailUrl: '/test-thumbnail.jpg',
-  uploaderUsername: 'Test User',
-  createdAt: new Date().toISOString(),
-};
-
-export default function VideoCard({ video }: VideoCardProps) {
+export function VideoCard({ video }: VideoCardProps) {
   return (
     <Link href={`/videos/${video.id}`}>
       {/* Thumbnail */}
