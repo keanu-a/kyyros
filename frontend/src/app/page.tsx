@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 
 import { createClient } from '@/lib/supabase/server';
 import { signOut } from '@/actions/actions';
+import VideoCardSkeleton from '@/components/video/video-card-skeleton';
 
 export default async function Home() {
   const supabase = await createClient();
@@ -25,6 +26,10 @@ export default async function Home() {
         ) : (
           <p>Not logged in</p>
         )}
+      </div>
+
+      <div className="min-w-4xl">
+        <VideoCardSkeleton />
       </div>
     </div>
   );
