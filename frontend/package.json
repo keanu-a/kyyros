@@ -17,6 +17,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^4.4.0",
     "lucide-react": "^1.21.0",
+    "media-chrome": "^4.19.2",
     "next": "16.2.9",
     "radix-ui": "^1.6.0",
     "react": "19.2.4",
