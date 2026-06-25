@@ -74,10 +74,14 @@ export function updateVideoStatus(
   });
 }
 
-export function getVideo(id: string): Promise<GetVideoResponse> {
-  return apiFetch(`/api/v1/videos/${id}`, {
-    method: 'GET',
-  });
+export function getVideo(videoId: string): Promise<GetVideoResponse> {
+  return apiFetch(
+    `/api/v1/videos/${videoId}`,
+    {
+      method: 'GET',
+    },
+    { requireAuth: false },
+  );
 }
 
 export function getVideos(
