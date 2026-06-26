@@ -1,0 +1,43 @@
+.player {
+  --media-primary-color: #ffffff;
+  --media-secondary-color: transparent;
+
+  --media-control-background: transparent;
+  --media-control-hover-background: rgb(255 255 255 / 0.12);
+
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+
+.player media-control-bar {
+    padding: 0 8px 4px;
+}
+
+/* Play button */
+.player media-play-button {
+    background: var(--media-control-background);
+}
+
+/* Time range */
+.player media-time-range {
+    background: none;
+}
+
+.player media-time-range::part(thumb) {
+    height: 20px;
+    width: 12px;
+}
+
+.player media-time-range::part(progress) {
+    background: #12a3d4;
+}
+
+.player media-time-range::part(preview-box) {
+  border-radius: 6px;
+}
+
+/* Volume range */
+.player media-volume-range {
+  --media-range-track-height: 4px;
+}

@@ -16,6 +16,8 @@ import {
 
 import { useIsHydrated } from '@/hooks/use-is-hydrated';
 
+import styles from './video-player.module.css';
+
 type VideoPlayerProps = {
   playbackId: string | null;
   title: string;
@@ -41,7 +43,7 @@ export default function VideoPlayer({ playbackId, title }: VideoPlayerProps) {
   }
 
   return (
-    <MediaController style={{ width: '100%', aspectRatio: '16/9' }}>
+    <MediaController className={styles.player}>
       <MuxVideo
         slot="media"
         playbackId={playbackId ?? undefined}
@@ -52,8 +54,6 @@ export default function VideoPlayer({ playbackId, title }: VideoPlayerProps) {
       />
       <MediaControlBar>
         <MediaPlayButton />
-        <MediaSeekBackwardButton seekOffset={10} />
-        <MediaSeekForwardButton seekOffset={10} />
         <MediaTimeRange />
         <MediaTimeDisplay showDuration />
         <MediaMuteButton />
