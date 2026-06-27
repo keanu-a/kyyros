@@ -17,7 +17,7 @@
 /*** TIME RANGE BAR ***/
 
 .player .timeRangeBar {
-    padding: 4px 12px;
+    padding: 12px 12px;
     background: transparent;
 }
 
@@ -63,14 +63,11 @@
   --media-control-hover-background: rgb(72 72 74 / 0.7);
   border-radius: 999px;
   padding: 4px 6px;
+  transition: all 0.1s ease-in-out;
 }
 
 .player media-time-display {
-  --media-control-background: rgb(28 28 30 / 0.6);
-  --media-control-hover-background: rgb(72 72 74 / 0.7);
-  border-radius: 999px;
-  padding: 4px 6px;
-  transition: all 0.1s ease-in-out;
+  padding: 4px 10px;
 }
 
 /* Volume Controls */
