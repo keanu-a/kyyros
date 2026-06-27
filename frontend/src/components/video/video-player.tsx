@@ -7,8 +7,6 @@ import {
   MediaFullscreenButton,
   MediaMuteButton,
   MediaPlayButton,
-  MediaSeekBackwardButton,
-  MediaSeekForwardButton,
   MediaTimeDisplay,
   MediaTimeRange,
   MediaVolumeRange,
@@ -17,6 +15,7 @@ import {
 import { useIsHydrated } from '@/hooks/use-is-hydrated';
 
 import styles from './video-player.module.css';
+import { cn } from '@/lib/utils';
 
 type VideoPlayerProps = {
   playbackId: string | null;
@@ -52,12 +51,20 @@ export default function VideoPlayer({ playbackId, title }: VideoPlayerProps) {
         playsInline
         style={{ width: '100%', height: '100%' }}
       />
-      <MediaControlBar>
-        <MediaPlayButton />
+
+      <MediaControlBar className={styles.timeRangeBar}>
         <MediaTimeRange />
-        <MediaTimeDisplay showDuration />
-        <MediaMuteButton />
-        <MediaVolumeRange />
+      </MediaControlBar>
+
+      <MediaControlBar className={styles.controlBar}>
+        <div className={styles.leftControls}>
+          <MediaPlayButton />
+          <MediaTimeDisplay showDuration />
+          <div className={styles.volumeControls}>
+            <MediaMuteButton />
+            <MediaVolumeRange />
+          </div>
+        </div>
         <MediaFullscreenButton />
       </MediaControlBar>
     </MediaController>
