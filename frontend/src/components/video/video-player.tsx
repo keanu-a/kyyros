@@ -15,7 +15,6 @@ import {
 import { useIsHydrated } from '@/hooks/use-is-hydrated';
 
 import styles from './video-player.module.css';
-import { cn } from '@/lib/utils';
 
 type VideoPlayerProps = {
   playbackId: string | null;
