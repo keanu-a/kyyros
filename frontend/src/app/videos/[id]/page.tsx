@@ -15,7 +15,9 @@ export default async function VideoPage({
 
   return (
     <main>
-      <VideoPlayer playbackId={video.playbackId} title={video.title} />
+      <div className='w-full md:w-3/4'>
+        <VideoPlayer playbackId={video.playbackId} title={video.title} />
+      </div>
       <h1>Video: {video.title}</h1>
     </main>
   );

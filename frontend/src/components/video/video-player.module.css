@@ -1,0 +1,104 @@
+.player {
+  --brand: #06D6C4;
+  --media-primary-color: #f5f5f7;
+  --media-secondary-color: transparent;
+
+  --media-control-padding: 0;
+  --media-control-height: 24px;
+
+  --media-font-size: 12px;
+
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+
+
+/*** TIME RANGE BAR ***/
+
+.player .timeRangeBar {
+    padding: 4px 12px;
+    background: transparent;
+}
+
+.player .timeRangeBar media-time-range {
+  --media-range-track-height: 4px;
+  --media-range-bar-color: var(--brand);
+  --media-range-track-background: rgb(255 255 255 / 0.25);
+  width: 100%;
+}
+
+.player media-time-range::part(thumb) {
+  background: #fff;
+  width: 16px;
+  height: 12px;
+  border: none;
+  border-radius: 50px;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  margin-bottom: 8px;
+}
+
+
+/*** CONTROL BAR ***/
+
+.player .controlBar {
+  padding: 0 12px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  --media-control-height: 24px;      /* uniform pill height */
+  --media-button-icon-width: 24px;   /* uniform icon size */
+  --media-button-icon-height: 24px;
+  --media-font-size: 12px;
+}
+
+.player .leftControls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.player :is(media-play-button, media-time-display, media-fullscreen-button) {
+  --media-control-background: rgb(28 28 30 / 0.6);
+  --media-control-hover-background: rgb(72 72 74 / 0.7);
+  border-radius: 999px;
+  padding: 4px 6px;
+}
+
+.player media-time-display {
+  --media-control-background: rgb(28 28 30 / 0.6);
+  --media-control-hover-background: rgb(72 72 74 / 0.7);
+  border-radius: 999px;
+  padding: 4px 6px;
+  transition: all 0.1s ease-in-out;
+}
+
+/* Volume Controls */
+
+.player .volumeControls {
+  background: rgb(28 28 30 / 0.6);
+  border-radius: 999px;
+  overflow: hidden;
+  padding: 4px 6px;
+  transition: all 0.1s ease-in-out;
+}
+.player .volumeControls:hover { 
+  background: rgb(72 72 74 / 0.7); 
+}
+
+/* Mute is transparent so the group pill shows through */
+.player .volumeControls media-mute-button {
+  --media-control-background: transparent;
+  --media-control-hover-background: transparent;
+}
+
+.player .volumeControls media-volume-range {
+  width: 0;
+  transition: width 0.2s ease;
+  --media-control-background: transparent;
+  gap: 12px;  /* gap between the volume icon and the range slider */
+}
+.player .volumeControls:hover media-volume-range,
+.player .volumeControls:focus-within media-volume-range {
+  width: 90px;
+}
