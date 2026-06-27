@@ -73,6 +73,8 @@
   transition: all 0.1s ease-in-out;
 }
 
+/* Volume Controls */
+
 .player .volumeControls {
   background: rgb(28 28 30 / 0.6);
   border-radius: 999px;
