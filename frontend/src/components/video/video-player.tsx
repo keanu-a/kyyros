@@ -1,7 +1,6 @@
 'use client';
 
-import { useRef, type ComponentRef } from 'react';
-
+import { ComponentRef, useRef } from 'react';
 import MuxVideo from '@mux/mux-video-react';
 import {
   MediaControlBar,
@@ -16,7 +15,6 @@ import {
 
 import type { Comment } from '@/lib/api/comments';
 import { useIsHydrated } from '@/hooks/use-is-hydrated';
-import { useVideoTime } from '@/hooks/use-video-time';
 
 import styles from './video-player.module.css';
 import CommentMarkers from './comment-markers';
@@ -33,9 +31,7 @@ export default function VideoPlayer({
   comments,
 }: VideoPlayerProps) {
   const videoRef = useRef<ComponentRef<typeof MuxVideo>>(null);
-
   const isHydrated = useIsHydrated();
-  const { duration, seekTo } = useVideoTime(videoRef, isHydrated);
 
   // Placeholder reserves layout so theres no shift when the player swaps i
   if (!isHydrated) {
@@ -68,11 +64,7 @@ export default function VideoPlayer({
       <MediaControlBar className={styles.timeRangeBar}>
         <div className={styles.timeline}>
           <div className={styles.commentStrip}>
-            <CommentMarkers
-              comments={comments}
-              duration={duration}
-              onSeek={seekTo}
-            />
+            <CommentMarkers comments={comments} videoRef={videoRef} />
           </div>
           <MediaTimeRange />
         </div>

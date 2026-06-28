@@ -24,11 +24,11 @@
 
 .player .commentStrip {
   position: absolute;
-  left: 8px;
-  right: 8px;
+  left: 0;
+  right: 0;
   bottom: 100%;            /* sit above the scrubber line */
   height: 20px;            /* room for avatar markers */
-  pointer-events: none;    /* empty strip ignores clicks; markers opt back in */
+  pointer-events: auto;    /* empty strip ignores clicks; markers opt back in */
 }
 
 .player .timeRangeBar {

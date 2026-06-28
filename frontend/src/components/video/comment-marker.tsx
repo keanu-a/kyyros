@@ -1,42 +1,58 @@
 import { memo } from 'react';
 import Image from 'next/image';
 
-import { Button } from '../ui/button';
 import type { Comment } from '@/lib/api/comments';
-
-import styles from './comment-marker.module.css';
+import { cn } from '@/lib/utils';
 
 type CommentMarkerProps = {
   comment: Comment;
   position: number;
-  onSeek: (seconds: number) => void;
+  isActive: boolean;
 };
 
 function CommentMarkerComponent({
   comment,
   position,
-  onSeek,
+  isActive,
 }: CommentMarkerProps) {
-  const handleOnClick = () => {
-    console.log(comment.timestampSeconds);
-    onSeek(comment.timestampSeconds);
-  };
+  const isLeftHalf = position < 50;
+
+  const sideStyle = isLeftHalf
+    ? { left: `${position}%` }
+    : { right: `${100 - position}%` };
 
   return (
-    <Button
-      className={styles.marker}
-      style={{ left: `${position}%` }}
-      aria-label={`Jump to comment by ${comment.user.username}`}
-      onClick={handleOnClick}
-    >
-      <Image
-        src={'/default-profile-picture.svg'}
-        alt={comment.user.username}
-        width={24}
-        height={24}
-        className={styles.avatar}
-      />
-    </Button>
+    <div className='group absolute bottom-3' style={sideStyle}>
+      {/* Comment bubble */}
+      <div
+        className={cn(
+          'absolute flex space-x-1 items-center bottom-8 text-xs bg-accent-foreground/30 px-2 rounded-2xl py-1',
+          'pointer-events-none transition-opacity',
+          isLeftHalf ? 'left-0' : 'right-0',
+          isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100',
+        )}
+      >
+        <span className='font-bold'>{comment.user.username}</span>
+        <span>{comment.content}</span>
+      </div>
+
+      {/* Avatar button */}
+      <div
+        className={cn(
+          'opacity-30 cursor-pointer rounded-full bg-transparent leading-0',
+          'transition-opacity group-hover:opacity-100',
+        )}
+        aria-label={`Comment by ${comment.user.username}`}
+      >
+        <Image
+          src={'/default-profile-picture.svg'}
+          alt={comment.user.username}
+          width={24}
+          height={24}
+          className='rounded-full'
+        />
+      </div>
+    </div>
   );
 }
 

@@ -1,9 +1,6 @@
 .marker {
-  position: absolute;
-  bottom: 6px;
-  padding: 0;
-  transform: translateX(-50%);
-  border: none;
+  /* padding: 0; */
+  /* border: none; */
   background: transparent;
   cursor: pointer;
   pointer-events: auto;          /* opt back in; strip itself is none */

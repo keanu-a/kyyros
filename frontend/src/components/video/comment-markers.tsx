@@ -1,19 +1,27 @@
+import { ComponentRef, RefObject } from 'react';
+
+import MuxVideo from '@mux/mux-video-react';
+
 import type { Comment } from '@/lib/api/comments';
+import { useVideoTime } from '@/hooks/use-video-time';
+import { useActiveComment } from '@/hooks/use-active-comment';
+
 import { CommentMarker } from './comment-marker';
 import { getTimelinePosition } from './timeline-position';
 
 type CommentMarkersProps = {
   comments: Comment[];
-  duration: number | null;
-  onSeek: (seconds: number) => void;
+  videoRef: RefObject<ComponentRef<typeof MuxVideo> | null>;
 };
 
 export default function CommentMarkers({
   comments,
-  duration,
-  onSeek,
+  videoRef,
 }: CommentMarkersProps) {
-  if (!duration) return null;
+  const { duration } = useVideoTime(videoRef);
+  const activeId = useActiveComment(videoRef, comments);
+
+  if (duration === null) return null;
 
   return (
     <>
@@ -29,7 +37,7 @@ export default function CommentMarkers({
             key={comment.id}
             comment={comment}
             position={position}
-            onSeek={onSeek}
+            isActive={comment.id === activeId}
           />
         );
       })}
