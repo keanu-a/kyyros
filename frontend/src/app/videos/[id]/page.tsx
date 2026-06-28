@@ -18,8 +18,13 @@ export default async function VideoPage({
   return (
     <main>
       <div className='w-full md:w-3/4'>
-        <VideoPlayer playbackId={video.playbackId} title={video.title} />
+        <VideoPlayer
+          playbackId={video.playbackId}
+          title={video.title}
+          comments={comments}
+        />
       </div>
+
       <h1 className='font-bold text-lg'>{video.title}</h1>
       <div>
         <h2>Comments</h2>
@@ -30,6 +35,7 @@ export default async function VideoPage({
             {comments.map((comment) => (
               <li key={comment.id}>
                 <p>{comment.content}</p>
+                <p>{comment.timestampSeconds}</p>
                 <p>By {comment.user.username}</p>
               </li>
             ))}

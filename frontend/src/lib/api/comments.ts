@@ -6,7 +6,7 @@ type UserSummary = {
   profilePictureUrl: string;
 };
 
-type Comment = {
+export type Comment = {
   id: string;
   content: string;
   timestampSeconds: number;

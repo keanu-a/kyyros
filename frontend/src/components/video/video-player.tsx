@@ -1,5 +1,7 @@
 'use client';
 
+import { useRef, type ComponentRef } from 'react';
+
 import MuxVideo from '@mux/mux-video-react';
 import {
   MediaControlBar,
@@ -12,17 +14,28 @@ import {
   MediaVolumeRange,
 } from 'media-chrome/react';
 
+import type { Comment } from '@/lib/api/comments';
 import { useIsHydrated } from '@/hooks/use-is-hydrated';
+import { useVideoTime } from '@/hooks/use-video-time';
 
 import styles from './video-player.module.css';
+import CommentMarkers from './comment-markers';
 
 type VideoPlayerProps = {
   playbackId: string | null;
   title: string;
+  comments: Comment[];
 };
 
-export default function VideoPlayer({ playbackId, title }: VideoPlayerProps) {
+export default function VideoPlayer({
+  playbackId,
+  title,
+  comments,
+}: VideoPlayerProps) {
+  const videoRef = useRef<ComponentRef<typeof MuxVideo>>(null);
+
   const isHydrated = useIsHydrated();
+  const { duration, seekTo } = useVideoTime(videoRef, isHydrated);
 
   // Placeholder reserves layout so theres no shift when the player swaps i
   if (!isHydrated) {
@@ -43,16 +56,26 @@ export default function VideoPlayer({ playbackId, title }: VideoPlayerProps) {
   return (
     <MediaController className={styles.player}>
       <MuxVideo
-        slot="media"
+        ref={videoRef}
+        slot='media'
         playbackId={playbackId ?? undefined}
         metadata={{ title }}
-        crossOrigin=""
+        crossOrigin=''
         playsInline
         style={{ width: '100%', height: '100%' }}
       />
 
       <MediaControlBar className={styles.timeRangeBar}>
-        <MediaTimeRange />
+        <div className={styles.timeline}>
+          <div className={styles.commentStrip}>
+            <CommentMarkers
+              comments={comments}
+              duration={duration}
+              onSeek={seekTo}
+            />
+          </div>
+          <MediaTimeRange />
+        </div>
       </MediaControlBar>
 
       <MediaControlBar className={styles.controlBar}>
