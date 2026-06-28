@@ -1,0 +1,14 @@
+.marker {
+  /* padding: 0; */
+  /* border: none; */
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;          /* opt back in; strip itself is none */
+  line-height: 0;
+  opacity: 30%;
+}
+
+.avatar {
+  display: block;
+  border-radius: 50%;
+}
