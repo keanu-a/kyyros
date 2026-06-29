@@ -1,6 +1,6 @@
 'use client';
 
-import { ComponentRef, useRef } from 'react';
+import { ComponentRef, useRef, useState } from 'react';
 import MuxVideo from '@mux/mux-video-react';
 import {
   MediaControlBar,
@@ -16,6 +16,7 @@ import {
 import type { Comment } from '@/lib/api/comments';
 import { useIsHydrated } from '@/hooks/use-is-hydrated';
 
+import { Button } from '../ui/button';
 import styles from './video-player.module.css';
 import CommentMarkers from './comment-markers';
 
@@ -30,6 +31,8 @@ export default function VideoPlayer({
   title,
   comments,
 }: VideoPlayerProps) {
+  const [isAutoHideEnabled, setIsAutoHideEnabled] = useState<boolean>(false);
+
   const videoRef = useRef<ComponentRef<typeof MuxVideo>>(null);
   const isHydrated = useIsHydrated();
 
@@ -50,7 +53,10 @@ export default function VideoPlayer({
   }
 
   return (
-    <MediaController className={styles.player}>
+    <MediaController
+      className={styles.player}
+      autohide={isAutoHideEnabled ? '2' : '-1'}
+    >
       <MuxVideo
         ref={videoRef}
         slot='media'
@@ -79,7 +85,15 @@ export default function VideoPlayer({
             <MediaVolumeRange />
           </div>
         </div>
-        <MediaFullscreenButton />
+        <div className='flex space-x-2'>
+          <Button
+            className={styles.autoHideBtn}
+            onClick={() => setIsAutoHideEnabled((prev) => !prev)}
+          >
+            Hide
+          </Button>
+          <MediaFullscreenButton />
+        </div>
       </MediaControlBar>
     </MediaController>
   );
