@@ -124,3 +124,10 @@
 .player .volumeControls:focus-within media-volume-range {
   width: 90px;
 }
+
+.player .commentInput {
+  width: 30%;
+  background: rgb(28 28 30 / 0.6);
+  border-radius: 999px;
+  border: none;
+}

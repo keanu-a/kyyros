@@ -7,8 +7,6 @@ type CommentProps = {
   comment: Comment;
 };
 
-const formatTimestampSeconds = (seconds: string) => {};
-
 export function Comment({ comment }: CommentProps) {
   return (
     <div className='flex space-x-4'>
@@ -25,7 +23,7 @@ export function Comment({ comment }: CommentProps) {
           <span className='text-sm text-muted-foreground'>
             at {formatTimestamp(comment.timestampSeconds)}
           </span>
-          <span>-</span>
+          <span>&middot;</span>
           <span className='text-sm text-muted-foreground'>
             {formatDistanceToNow(new Date(comment.createdAt), {
               addSuffix: true,
