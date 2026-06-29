@@ -37,8 +37,14 @@ export function createComment(
   videoId: string,
   request: CreateCommentRequest,
 ): Promise<Comment> {
-  return apiFetch(`/api/v1/videos/${videoId}/comments`, {
-    method: 'POST',
-    body: JSON.stringify({ request }),
-  });
+  return apiFetch(
+    `/api/v1/videos/${videoId}/comments`,
+    {
+      method: 'POST',
+      body: JSON.stringify(request),
+    },
+    {
+      requireAuth: true,
+    },
+  );
 }

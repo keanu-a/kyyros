@@ -13,31 +13,72 @@ import {
   MediaVolumeRange,
 } from 'media-chrome/react';
 
-import type { Comment } from '@/lib/api/comments';
-import { useIsHydrated } from '@/hooks/use-is-hydrated';
-
-import { Button } from '../ui/button';
-import styles from './video-player.module.css';
 import CommentMarkers from './comment-markers';
-import { Input } from '../ui/input';
+
+import { useIsHydrated } from '@/hooks/use-is-hydrated';
+import { createComment, type Comment } from '@/lib/api/comments';
 import { cn } from '@/lib/utils';
+import { createClient } from '@/lib/supabase/client';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+
+import styles from './video-player.module.css';
 
 type VideoPlayerProps = {
   playbackId: string | null;
+  videoId: string;
   title: string;
   comments: Comment[];
+  onAddComment: (comment: Comment) => void;
 };
 
 export default function VideoPlayer({
   playbackId,
+  videoId,
   title,
   comments,
+  onAddComment,
 }: VideoPlayerProps) {
   const [isAutoHideEnabled, setIsAutoHideEnabled] = useState<boolean>(false);
   const [isTypingComment, setIsTypingComment] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [content, setContent] = useState('');
 
   const videoRef = useRef<ComponentRef<typeof MuxVideo>>(null);
   const isHydrated = useIsHydrated();
+
+  const handleSubmit = async () => {
+    const trimmed = content.trim();
+    if (!trimmed || isSubmitting) return;
+
+    // Check session
+    const supabase = createClient();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session) {
+      // TODO: Create better UX for non-logged in users
+      alert('Log in to comment');
+      return;
+    }
+
+    const el = videoRef.current;
+    const timestampSeconds = el ? el.currentTime : 0;
+
+    setIsSubmitting(true);
+    try {
+      const newComment = await createComment(videoId, {
+        content: trimmed,
+        timestampSeconds,
+      });
+      onAddComment(newComment);
+      setContent('');
+    } catch (e) {
+      console.error('Failed to post comment', e);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   // Placeholder reserves layout so theres no shift when the player swaps i
   if (!isHydrated) {
@@ -92,9 +133,14 @@ export default function VideoPlayer({
 
         <Input
           className={cn(styles.commentInput, 'text-sm px-4')}
-          placeholder='Stamp a comment...'
+          placeholder='Comment...'
+          value={content}
           onFocus={() => setIsTypingComment(true)}
           onBlur={() => setIsTypingComment(false)}
+          onChange={(e) => setContent(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') handleSubmit();
+          }}
         />
 
         <div className='flex space-x-2'>

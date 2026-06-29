@@ -3,11 +3,11 @@ import { formatTimestamp } from '@/lib/format-timestamp';
 import { formatDistanceToNow } from 'date-fns';
 import Image from 'next/image';
 
-type CommentProps = {
+type CommentRowProps = {
   comment: Comment;
 };
 
-export function Comment({ comment }: CommentProps) {
+export function CommentRow({ comment }: CommentRowProps) {
   return (
     <div className='flex space-x-4'>
       <Image
