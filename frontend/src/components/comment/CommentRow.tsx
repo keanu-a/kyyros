@@ -10,13 +10,15 @@ type CommentRowProps = {
 export function CommentRow({ comment }: CommentRowProps) {
   return (
     <div className='flex space-x-4'>
-      <Image
-        src={'/default-profile-picture.svg'}
-        alt={comment.user.username}
-        width={48}
-        height={36}
-        className='rounded-full'
-      />
+      <div className='w-10 sm:w-14'>
+        <Image
+          src='/default-profile-picture.svg'
+          alt={comment.user.username}
+          width={10}
+          height={10}
+          className='rounded-full w-auto h-auto'
+        />
+      </div>
       <div className='flex flex-col'>
         <div className='flex space-x-1 items-center'>
           <h1 className='font-bold'>{comment.user.username}</h1>
