@@ -1,9 +1,11 @@
 import { notFound } from 'next/navigation';
 
 import VideoPlayer from '@/components/video/video-player';
+import { Comment } from '@/components/comment/Comment';
 
 import { getVideo } from '@/lib/api/videos';
 import { getComments } from '@/lib/api/comments';
+import { formatDistanceToNow } from 'date-fns';
 
 export default async function VideoPage({
   params,
@@ -25,22 +27,33 @@ export default async function VideoPage({
         />
       </div>
 
-      <h1 className='font-bold text-lg'>{video.title}</h1>
-      <div>
-        <h2>Comments</h2>
-        {!comments.length ? (
-          <p className='text-sm text-muted-foreground'>No comments yet</p>
-        ) : (
-          <ul>
-            {comments.map((comment) => (
-              <li key={comment.id}>
-                <p>{comment.content}</p>
-                <p>{comment.timestampSeconds}</p>
-                <p>By {comment.user.username}</p>
-              </li>
-            ))}
-          </ul>
-        )}
+      <div className='px-4 mt-4'>
+        <div>
+          <h1 className='font-bold text-xl'>{video.title}</h1>
+          <p className='text-sm'>
+            {formatDistanceToNow(new Date(video.createdAt), {
+              addSuffix: true,
+            })}
+          </p>
+        </div>
+
+        <br />
+
+        {/* Comment Section */}
+        <div>
+          <h2 className='font-semibold mb-4'>Comments</h2>
+          {!comments.length ? (
+            <p className='text-sm text-muted-foreground'>No comments yet</p>
+          ) : (
+            <ul className='flex flex-col space-y-8'>
+              {comments.map((comment) => (
+                <li key={comment.id}>
+                  <Comment comment={comment} />
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
     </main>
   );
