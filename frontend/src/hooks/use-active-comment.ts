@@ -5,8 +5,8 @@ import type { Comment } from '@/lib/api/comments';
 
 type MuxVideoEl = ComponentRef<typeof MuxVideo>;
 
-// How long (seconds) a comment stays active after the playhead crosses it.
-const DISPLAY_WINDOW = 3;
+// How long (seconds) a comment stays active after the playhead crosses it
+const DISPLAY_WINDOW = 2;
 
 export function useActiveComment(
   videoRef: RefObject<MuxVideoEl | null>,

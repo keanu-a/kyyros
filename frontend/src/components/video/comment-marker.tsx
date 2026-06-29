@@ -19,21 +19,27 @@ function CommentMarkerComponent({
 
   const sideStyle = isLeftHalf
     ? { left: `${position}%` }
-    : { right: `${100 - position}%` };
+    : { right: `${98 - position}%` };
+
+  // Shortening long comments (can see full comment if clicked)
+  let commentContent = comment.content;
+  if (commentContent.length > 15) {
+    commentContent = commentContent.slice(0, 15) + '...';
+  }
 
   return (
     <div className='group absolute bottom-3' style={sideStyle}>
       {/* Comment bubble */}
       <div
         className={cn(
-          'absolute flex space-x-1 items-center bottom-8 text-xs bg-accent-foreground/30 px-2 rounded-2xl py-1',
-          'pointer-events-none transition-opacity',
+          'absolute flex space-x-1 items-center bottom-8 text-xs bg-accent-foreground/50 px-2 rounded-2xl py-1',
+          'pointer-events-none transition-opacity w-fit whitespace-nowrap',
           isLeftHalf ? 'left-0' : 'right-0',
           isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100',
         )}
       >
         <span className='font-bold'>{comment.user.username}</span>
-        <span>{comment.content}</span>
+        <span>{commentContent}</span>
       </div>
 
       {/* Avatar button */}
