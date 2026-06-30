@@ -16,9 +16,9 @@ import {
 import CommentMarkers from './comment-markers';
 
 import { useIsHydrated } from '@/hooks/use-is-hydrated';
-import { createComment, type Comment } from '@/lib/api/comments';
+import { usePostComment } from '@/hooks/use-post-comment';
+import type { Comment } from '@/lib/api/comments';
 import { cn } from '@/lib/utils';
-import { createClient } from '@/lib/supabase/client';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 
@@ -41,43 +41,15 @@ export default function VideoPlayer({
 }: VideoPlayerProps) {
   const [isAutoHideEnabled, setIsAutoHideEnabled] = useState<boolean>(false);
   const [isTypingComment, setIsTypingComment] = useState<boolean>(false);
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [content, setContent] = useState('');
 
   const videoRef = useRef<ComponentRef<typeof MuxVideo>>(null);
   const isHydrated = useIsHydrated();
+  const { submit, isSubmitting, error } = usePostComment(videoId, onAddComment);
 
   const handleSubmit = async () => {
-    const trimmed = content.trim();
-    if (!trimmed || isSubmitting) return;
-
-    // Check session
-    const supabase = createClient();
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    if (!session) {
-      // TODO: Create better UX for non-logged in users
-      alert('Log in to comment');
-      return;
-    }
-
-    const el = videoRef.current;
-    const timestampSeconds = el ? el.currentTime : 0;
-
-    setIsSubmitting(true);
-    try {
-      const newComment = await createComment(videoId, {
-        content: trimmed,
-        timestampSeconds,
-      });
-      onAddComment(newComment);
-      setContent('');
-    } catch (e) {
-      console.error('Failed to post comment', e);
-    } finally {
-      setIsSubmitting(false);
-    }
+    const ok = await submit(content, videoRef.current?.currentTime ?? 0);
+    if (ok) setContent('');
   };
 
   // Placeholder reserves layout so theres no shift when the player swaps i
