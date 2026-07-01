@@ -1,6 +1,6 @@
 'use client';
 
-import { ComponentRef, useRef, useState } from 'react';
+import { ComponentRef, useState } from 'react';
 import MuxVideo from '@mux/mux-video-react';
 import {
   MediaControlBar,
@@ -30,6 +30,7 @@ type VideoPlayerProps = {
   title: string;
   comments: Comment[];
   onAddComment: (comment: Comment) => void;
+  videoRef: React.RefObject<ComponentRef<typeof MuxVideo> | null>;
 };
 
 export default function VideoPlayer({
@@ -38,12 +39,12 @@ export default function VideoPlayer({
   title,
   comments,
   onAddComment,
+  videoRef,
 }: VideoPlayerProps) {
   const [isAutoHideEnabled, setIsAutoHideEnabled] = useState<boolean>(false);
   const [isTypingComment, setIsTypingComment] = useState<boolean>(false);
   const [content, setContent] = useState('');
 
-  const videoRef = useRef<ComponentRef<typeof MuxVideo>>(null);
   const isHydrated = useIsHydrated();
   const { submit, isSubmitting, error } = usePostComment(videoId, onAddComment);
 
