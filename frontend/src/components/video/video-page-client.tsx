@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { ComponentRef, useRef, useState } from 'react';
 import Image from 'next/image';
 
+import MuxVideo from '@mux/mux-video-react';
 import { formatDistanceToNow } from 'date-fns';
 
 import { GetVideoResponse } from '@/lib/api/videos';
@@ -22,9 +23,18 @@ export default function VideoPageClient({
   comments: initialComments,
 }: VideoPageClientProps) {
   const [comments, setComments] = useState<Comment[]>(initialComments);
+  const videoRef = useRef<ComponentRef<typeof MuxVideo>>(null);
 
   const handleAddComment = (newComment: Comment) => {
     setComments((prev) => [newComment, ...prev]);
+  };
+
+  // Moves video playback to selected timestamp and plays video
+  const seekToTimestamp = (timestampSeconds: number) => {
+    const el = videoRef.current;
+    if (!el) return;
+    el.currentTime = timestampSeconds;
+    el.play();
   };
 
   return (
@@ -36,6 +46,7 @@ export default function VideoPageClient({
           title={video.title}
           comments={comments}
           onAddComment={handleAddComment}
+          videoRef={videoRef}
         />
       </div>
 
@@ -53,10 +64,10 @@ export default function VideoPageClient({
         <br />
 
         {/* Comment Section */}
-        <div>
+        <div className='w-full md:w-3/4'>
           <h2 className='font-semibold mb-4'>Comments</h2>
 
-          <div className='mb-8 flex space-x-2 w-full'>
+          <div className='mb-18 flex space-x-2 w-full'>
             <div className='flex space-x-4 max-w-10 items-center'>
               <Image
                 src='/default-profile-picture.svg'
@@ -72,10 +83,10 @@ export default function VideoPageClient({
           {!comments.length ? (
             <p className='text-sm text-muted-foreground'>No comments yet</p>
           ) : (
-            <ul className='flex flex-col space-y-8'>
+            <ul className='flex flex-col space-y-10'>
               {comments.map((comment) => (
                 <li key={comment.id}>
-                  <CommentRow comment={comment} />
+                  <CommentRow comment={comment} onSeek={seekToTimestamp} />
                 </li>
               ))}
             </ul>
