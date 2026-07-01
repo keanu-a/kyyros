@@ -9,7 +9,7 @@ type UserSummary = {
 export type Comment = {
   id: string;
   content: string;
-  timestampSeconds: number;
+  timestampSeconds: number | null;
   createdAt: string;
   updatedAt: string;
   replies: Comment[];
@@ -18,7 +18,7 @@ export type Comment = {
 
 export type CreateCommentRequest = {
   content: string;
-  timestampSeconds: number;
+  timestampSeconds: number | null;
 };
 
 export function getComments(videoId: string): Promise<Comment[]> {

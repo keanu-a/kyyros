@@ -10,7 +10,7 @@ export function usePostComment(
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const submit = async (content: string, timestampSeconds: number) => {
+  const submit = async (content: string, timestampSeconds: number | null) => {
     const trimmedContent = content.trim();
     if (!trimmedContent || isSubmitting) return;
 
