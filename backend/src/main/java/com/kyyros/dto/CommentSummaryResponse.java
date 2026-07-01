@@ -7,7 +7,7 @@ public record CommentSummaryResponse(
         UUID id,
         String content,
         Double timestampSeconds,
-        CommentResponse.UserSummary user,
+        UserSummary user,
         Instant createdAt,
         Instant updatedAt
 ) {

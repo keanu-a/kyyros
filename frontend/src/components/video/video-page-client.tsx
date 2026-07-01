@@ -12,6 +12,7 @@ import type { Comment } from '@/lib/api/comments';
 import VideoPlayer from './video-player';
 import { CommentRow } from '../comment/CommentRow';
 import CommentInput from '../comment/CommentInput';
+import { Button } from '../ui/button';
 
 type VideoPageClientProps = {
   video: GetVideoResponse;
@@ -51,18 +52,39 @@ export default function VideoPageClient({
       </div>
 
       <div className='px-4 mt-4'>
-        {/* Video Description */}
-        <div>
-          <h1 className='font-bold text-xl'>{video.title}</h1>
-          <p className='text-sm'>
+        {/* Video Details */}
+        <div className='border rounded-lg p-4 w-full md:w-3/4'>
+          {/* Title + timestamp */}
+          <h1 className='font-bold text-xl mb-1'>{video.title}</h1>
+          <p className='text-sm text-muted-foreground mb-4'>
             {formatDistanceToNow(new Date(video.createdAt), {
               addSuffix: true,
             })}
           </p>
+
+          {/* Byline row */}
+          <div className='flex items-center mb-4 space-x-6'>
+            <div className='flex items-center gap-2'>
+              <Image
+                src='/default-profile-picture.svg'
+                alt={video.uploader?.username ?? 'uploader'}
+                width={32}
+                height={32}
+                className='rounded-full'
+              />
+              <span className='text-sm'>@{video.uploader?.username}</span>
+            </div>
+            <Button className='text-xs px-3 py-1.5 rounded-full'>Follow</Button>
+          </div>
+
+          {/* Description */}
+          <div className='border-t pt-3'>
+            <p className='whitespace-pre-wrap text-sm text-muted-foreground'>
+              {video.description}
+            </p>
+          </div>
         </div>
-
         <br />
-
         {/* Comment Section */}
         <div className='w-full md:w-3/4'>
           <h2 className='font-semibold mb-4'>Comments</h2>

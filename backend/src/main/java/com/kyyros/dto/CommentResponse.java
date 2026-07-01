@@ -12,10 +12,4 @@ public record CommentResponse(
         Instant createdAt,
         Instant updatedAt,
         List<CommentResponse> replies
-) {
-    public record UserSummary(
-            UUID id,
-            String username,
-            String profilePictureUrl
-    ) {}
-}
+) {}

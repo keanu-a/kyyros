@@ -138,9 +138,17 @@ public class VideoService {
         Video video = videoRepository.findById(videoId)
                 .orElseThrow(() -> new ResourceNotFoundException("Video not found: " + videoId));
 
+        User uploader = video.getUploader();
+
         return new GetVideoResponse(
                 video.getId(),
                 video.getTitle(),
+                video.getDescription(),
+                new UserSummary(
+                        uploader.getId(),
+                        uploader.getUsername(),
+                        uploader.getProfilePictureUrl()
+                ),
                 video.getStatus(),
                 video.getMuxPlaybackId(),
                 video.getCreatedAt()
