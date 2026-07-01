@@ -8,6 +8,8 @@ import java.util.UUID;
 public record GetVideoResponse(
         UUID id,
         String title,
+        String description,
+        UserSummary uploader,
         VideoStatus status,
         String playbackId,
         Instant createdAt

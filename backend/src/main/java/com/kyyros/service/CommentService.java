@@ -107,7 +107,7 @@ public class CommentService {
                 savedComment.getId(),
                 savedComment.getContent(),
                 effectiveTimestamp,
-                new CommentResponse.UserSummary(user.getId(), user.getUsername(), user.getProfilePictureUrl()),
+                new UserSummary(user.getId(), user.getUsername(), user.getProfilePictureUrl()),
                 savedComment.getCreatedAt(),
                 savedComment.getUpdatedAt()
         );
@@ -127,7 +127,7 @@ public class CommentService {
 
     private CommentResponse toResponse(Comment comment, Double effectiveTimestamp) {
         User user = comment.getUser();
-        CommentResponse.UserSummary userSummary = new CommentResponse.UserSummary(
+        UserSummary userSummary = new UserSummary(
                 user.getId(),
                 user.getUsername(),
                 user.getProfilePictureUrl()
