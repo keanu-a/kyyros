@@ -22,7 +22,7 @@ export function CommentRow({ comment }: CommentRowProps) {
       <div className='flex flex-col'>
         <div className='flex space-x-1 items-center'>
           <h1 className='font-bold'>{comment.user.username}</h1>
-          {comment.timestampSeconds && (
+          {comment.timestampSeconds !== null && (
             <span className='text-sm text-muted-foreground'>
               at {formatTimestamp(comment.timestampSeconds)}
             </span>
@@ -34,7 +34,7 @@ export function CommentRow({ comment }: CommentRowProps) {
             })}
           </span>
         </div>
-        <p>{comment.content}</p>
+        <p className='whitespace-pre-wrap'>{comment.content}</p>
       </div>
     </div>
   );

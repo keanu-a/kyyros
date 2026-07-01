@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 
 import { formatDistanceToNow } from 'date-fns';
 
@@ -9,9 +10,7 @@ import type { Comment } from '@/lib/api/comments';
 
 import VideoPlayer from './video-player';
 import { CommentRow } from '../comment/CommentRow';
-import { Textarea } from '../ui/textarea';
-import Image from 'next/image';
-import { Button } from '../ui/button';
+import CommentInput from '../comment/CommentInput';
 
 type VideoPageClientProps = {
   video: GetVideoResponse;
@@ -23,10 +22,9 @@ export default function VideoPageClient({
   comments: initialComments,
 }: VideoPageClientProps) {
   const [comments, setComments] = useState<Comment[]>(initialComments);
-  const [content, setContent] = useState<string>('');
 
-  const addComment = (newComment: Comment) => {
-    setComments((prev) => [...prev, newComment]);
+  const handleAddComment = (newComment: Comment) => {
+    setComments((prev) => [newComment, ...prev]);
   };
 
   return (
@@ -37,11 +35,12 @@ export default function VideoPageClient({
           videoId={video.id}
           title={video.title}
           comments={comments}
-          onAddComment={addComment}
+          onAddComment={handleAddComment}
         />
       </div>
 
       <div className='px-4 mt-4'>
+        {/* Video Description */}
         <div>
           <h1 className='font-bold text-xl'>{video.title}</h1>
           <p className='text-sm'>
@@ -57,13 +56,7 @@ export default function VideoPageClient({
         <div>
           <h2 className='font-semibold mb-4'>Comments</h2>
 
-          <div className='mb-8 flex flex-col space-y-2'>
-            <Textarea
-              value={content}
-              placeholder='Comment...'
-              onChange={(e) => setContent(e.target.value)}
-              className='resize-none'
-            />
+          <div className='mb-8 flex space-x-2 w-full'>
             <div className='flex space-x-4 max-w-10 items-center'>
               <Image
                 src='/default-profile-picture.svg'
@@ -72,8 +65,8 @@ export default function VideoPageClient({
                 height={24}
                 className='rounded-full w-auto h-auto'
               />
-              <Button className='cursor-pointer'>Comment</Button>
             </div>
+            <CommentInput videoId={video.id} onAddComment={handleAddComment} />
           </div>
 
           {!comments.length ? (
