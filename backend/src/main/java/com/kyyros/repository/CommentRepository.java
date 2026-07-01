@@ -19,7 +19,7 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
         LEFT JOIN FETCH r.user
         WHERE c.video.id = :videoId
         AND c.parentComment is NULL
-        ORDER BY c.timestampSeconds ASC
+        ORDER BY c.createdAt DESC
         """)
     List<Comment> findCommentByVideoIdWithRepliesAndUsers(@Param("videoId") UUID videoId);
 }
