@@ -1,10 +1,5 @@
 import { apiFetch } from './fetcher';
-
-type UserSummary = {
-  id: string;
-  username: string;
-  profilePictureUrl: string;
-};
+import type { UserSummary } from '@/types/user';
 
 export type Comment = {
   id: string;

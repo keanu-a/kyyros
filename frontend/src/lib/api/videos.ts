@@ -1,5 +1,6 @@
 import type { PagedResponse } from '@/types/api';
 import { apiFetch } from './fetcher';
+import type { UserSummary } from '@/types/user';
 
 export const VideoStatus = {
   PENDING: 'PENDING',
@@ -42,6 +43,8 @@ export interface CreateVideoResponse {
 export interface GetVideoResponse {
   id: string;
   title: string;
+  description: string;
+  uploader: UserSummary;
   status: VideoStatus;
   playbackId: string | null;
   createdAt: string;
