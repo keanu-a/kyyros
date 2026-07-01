@@ -26,9 +26,16 @@ function CommentMarkerComponent({
   if (commentContent.length > 15) {
     commentContent = commentContent.slice(0, 15) + '...';
   }
-
+  <q> </q>;
   return (
-    <div className='group absolute bottom-3' style={sideStyle}>
+    <div
+      className={cn(
+        'group absolute bottom-3',
+        'z-0 hover:z-20',
+        isActive && 'z-10',
+      )}
+      style={sideStyle}
+    >
       {/* Comment bubble */}
       <div
         className={cn(

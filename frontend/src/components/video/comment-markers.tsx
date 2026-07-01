@@ -25,22 +25,24 @@ export default function CommentMarkers({
 
   return (
     <>
-      {comments.map((comment) => {
-        const position = getTimelinePosition(
-          comment.timestampSeconds,
-          duration,
-        );
-        if (!position) return null;
+      {comments
+        .filter((comment) => comment.timestampSeconds !== null)
+        .map((comment) => {
+          const position = getTimelinePosition(
+            comment.timestampSeconds,
+            duration,
+          );
+          if (position === null) return null;
 
-        return (
-          <CommentMarker
-            key={comment.id}
-            comment={comment}
-            position={position}
-            isActive={comment.id === activeId}
-          />
-        );
-      })}
+          return (
+            <CommentMarker
+              key={comment.id}
+              comment={comment}
+              position={position}
+              isActive={comment.id === activeId}
+            />
+          );
+        })}
     </>
   );
 }

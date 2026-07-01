@@ -40,7 +40,7 @@ public class Comment {
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "timestamp_seconds")
+    @Column(name = "timestamp_seconds", nullable = true)
     private Double timestampSeconds;
 
     @CreationTimestamp
