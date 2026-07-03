@@ -48,15 +48,13 @@ export function UserProvider({ children }: { children: ReactNode }) {
       }
     });
 
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (session && event === 'SIGNED_IN') {
-          fetchUser();
-        } else if (event === 'SIGNED_OUT') {
-          setUser(null);
-        }
-      },
-    );
+    const { data: listener } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_IN') {
+        fetchUser();
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null);
+      }
+    });
 
     return () => {
       controller.abort();
