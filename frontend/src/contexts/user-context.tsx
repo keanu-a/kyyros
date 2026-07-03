@@ -27,16 +27,16 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const supabase = createClient();
 
   useEffect(() => {
-    let isMounted = true;
+    const controller = new AbortController();
 
     const fetchUser = async () => {
       try {
-        const userData = await getCurrentUser();
-        if (isMounted) setUser(userData);
+        const userData = await getCurrentUser(controller.signal);
+        setUser(userData);
       } catch {
-        if (isMounted) setUser(null);
+        setUser(null);
       } finally {
-        if (isMounted) setIsLoading(false);
+        setIsLoading(false);
       }
     };
 
@@ -59,7 +59,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     );
 
     return () => {
-      isMounted = false;
+      controller.abort();
       listener.subscription.unsubscribe();
     };
   }, []);
