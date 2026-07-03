@@ -33,7 +33,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
       try {
         const userData = await getCurrentUser(controller.signal);
         setUser(userData);
-      } catch {
+      } catch (error) {
+        console.log('Error fetching user data');
         setUser(null);
       } finally {
         setIsLoading(false);
@@ -49,7 +50,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     });
 
     const { data: listener } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'SIGNED_IN') {
+      if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
         fetchUser();
       } else if (event === 'SIGNED_OUT') {
         setUser(null);
