@@ -1,5 +1,5 @@
 export type UserSummary = {
   id: string;
   username: string;
-  profilePictureUrl: string;
+  profilePictureUrl: string | null;
 };
