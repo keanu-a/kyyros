@@ -1,6 +1,8 @@
 package com.kyyros.service;
 
+import com.kyyros.dto.UpdateUserRequest;
 import com.kyyros.dto.UserSummary;
+import com.kyyros.exception.ForbiddenOperationException;
 import com.kyyros.exception.ResourceNotFoundException;
 import com.kyyros.model.User;
 import com.kyyros.repository.UserRepository;
@@ -25,6 +27,24 @@ public class UserService {
                 user.getId(),
                 user.getUsername(),
                 user.getProfilePictureUrl()
+        );
+    }
+
+    public UserSummary updateUser(UpdateUserRequest request, UUID userId) {
+        // userId is from path variable
+        // currentUserId is from access token
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
+
+        user.setUsername(request.username());
+        user.setProfilePictureUrl(request.profilePictureUrl());
+
+        User savedUser = userRepository.saveAndFlush(user);
+
+        return new UserSummary(
+                savedUser.getId(),
+                savedUser.getUsername(),
+                savedUser.getProfilePictureUrl()
         );
     }
 }
