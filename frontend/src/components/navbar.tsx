@@ -59,7 +59,7 @@ export default function Navbar() {
               <DropdownMenuSeparator />
               <div className='*:cursor-pointer'>
                 <DropdownMenuItem asChild>
-                  <Link href='/'>Profile</Link>
+                  <Link href='/profile'>Profile</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href='/upload'>Upload</Link>
