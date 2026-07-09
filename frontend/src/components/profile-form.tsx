@@ -56,7 +56,7 @@ export default function ProfileForm() {
       setSubmitSuccess(true);
     } catch (error) {
       if (error instanceof Error && error.message.includes('409')) {
-        setSubmitError('That username is alrady taken');
+        setSubmitError('That username is already taken');
       } else {
         setSubmitError('Something went wrong');
       }
