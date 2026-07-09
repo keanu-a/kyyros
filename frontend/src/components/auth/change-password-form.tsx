@@ -1,7 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Controller, useForm } from 'react-hook-form';
 
+import { createClient } from '@/lib/supabase/client';
 import {
   Card,
   CardContent,
@@ -9,13 +13,9 @@ import {
   CardHeader,
   CardTitle,
 } from '../ui/card';
-import { Controller, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect, useState } from 'react';
 import { Field, FieldError, FieldGroup, FieldLabel } from '../ui/field';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
-import { createClient } from '@/lib/supabase/client';
 
 const changePasswordSchema = z
   .object({
