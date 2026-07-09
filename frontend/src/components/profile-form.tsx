@@ -73,7 +73,7 @@ export default function ProfileForm() {
       </CardHeader>
       <CardContent>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <FieldGroup className='pt-2 pb-4'>
+          <FieldGroup className='pt-2'>
             <Controller
               name='username'
               control={form.control}
@@ -128,7 +128,7 @@ export default function ProfileForm() {
           <Button
             type='submit'
             disabled={form.formState.isSubmitting}
-            className='w-full cursor-pointer sm:w-1/2'
+            className='cursor-pointer mt-4'
           >
             {form.formState.isSubmitting ? 'Saving...' : 'Save changes'}
           </Button>
