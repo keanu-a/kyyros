@@ -14,6 +14,7 @@ import { createClient } from '@/lib/supabase/client';
 
 type UserContextType = {
   user: UserSummary | null;
+  setUser: (user: UserSummary | null) => void;
   isLoading: boolean;
   isAuthenticated: boolean;
 };
@@ -64,7 +65,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <UserContext.Provider value={{ user, isLoading, isAuthenticated: !!user }}>
+    <UserContext.Provider
+      value={{ user, setUser, isLoading, isAuthenticated: !!user }}
+    >
       {children}
     </UserContext.Provider>
   );

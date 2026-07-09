@@ -62,6 +62,15 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(HttpStatus.FORBIDDEN.value(), e.getMessage()));
     }
 
+    // 409 - resource already exists / conflict with current state
+    @ExceptionHandler(UsernameAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleUsernameAlreadyExists(UsernameAlreadyExistsException e) {
+        log.info("Username already exists: {}", e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.of(HttpStatus.CONFLICT.value(), e.getMessage()));
+    }
+
     // 502 - bad gateway
     @ExceptionHandler(MuxIntegrationException.class)
     public ResponseEntity<ErrorResponse> handleMuxIntegration(MuxIntegrationException e) {
