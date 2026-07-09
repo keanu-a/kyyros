@@ -1,7 +1,8 @@
 import { redirect } from 'next/navigation';
 
-import ProfileForm from '@/components/profile-form';
 import { createClient } from '@/lib/supabase/server';
+import ProfileForm from '@/components/profile-form';
+import ChangePasswordForm from '@/components/auth/change-password-form';
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -14,8 +15,9 @@ export default async function ProfilePage() {
   }
 
   return (
-    <div className='flex justify-center pt-12 px-4'>
+    <div className='flex flex-col items-center justify-center space-y-4 py-12 px-4'>
       <ProfileForm />
+      <ChangePasswordForm />
     </div>
   );
 }
