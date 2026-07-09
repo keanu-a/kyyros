@@ -14,7 +14,7 @@ export default async function ProfilePage() {
   }
 
   return (
-    <div>
+    <div className='flex justify-center pt-12 px-4'>
       <ProfileForm />
     </div>
   );

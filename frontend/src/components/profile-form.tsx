@@ -64,7 +64,7 @@ export default function ProfileForm() {
   }
 
   return (
-    <Card>
+    <Card className='w-full max-w-md'>
       <CardHeader>
         <CardTitle>Profile</CardTitle>
         <CardDescription>
@@ -73,16 +73,13 @@ export default function ProfileForm() {
       </CardHeader>
       <CardContent>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <FieldGroup className='py-4 px-2'>
+          <FieldGroup className='pt-2 pb-4'>
             <Controller
               name='username'
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field>
-                  <FieldLabel
-                    className='font-bold text-lg'
-                    htmlFor='profile-username'
-                  >
+                  <FieldLabel className='font-bold' htmlFor='profile-username'>
                     Username
                   </FieldLabel>
                   <Input
@@ -102,7 +99,7 @@ export default function ProfileForm() {
               render={({ field, fieldState }) => (
                 <Field>
                   <FieldLabel
-                    className='font-bold text-lg'
+                    className='font-bold'
                     htmlFor='profile-picture-url'
                   >
                     Profile Picture URL
@@ -131,7 +128,7 @@ export default function ProfileForm() {
           <Button
             type='submit'
             disabled={form.formState.isSubmitting}
-            className='w-full cursor-pointer'
+            className='w-full cursor-pointer sm:w-1/2'
           >
             {form.formState.isSubmitting ? 'Saving...' : 'Save changes'}
           </Button>
