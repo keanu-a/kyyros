@@ -45,6 +45,7 @@ export function useActiveComment(
 
     el.addEventListener('timeupdate', computeActive);
     el.addEventListener('seeked', computeActive);
+    computeActive();
 
     return () => {
       el.removeEventListener('timeupdate', computeActive);

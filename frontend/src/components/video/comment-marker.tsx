@@ -17,16 +17,19 @@ function CommentMarkerComponent({
 }: CommentMarkerProps) {
   const isLeftHalf = position < 50;
 
-  const sideStyle = isLeftHalf
-    ? { left: `${position}%` }
-    : { right: `${98 - position}%` };
+  const style = {
+    left: `clamp(12px, ${position}%, calc(100% - 12px))`,
+    // transform: 'translateX(-50%)',
+  };
 
   // Shortening long comments (can see full comment if clicked)
   let commentContent = comment.content;
   if (commentContent.length > 15) {
     commentContent = commentContent.slice(0, 15) + '...';
   }
-  <q> </q>;
+
+  if (isActive) console.log(position);
+
   return (
     <div
       className={cn(
@@ -34,7 +37,7 @@ function CommentMarkerComponent({
         'z-0 hover:z-20',
         isActive && 'z-10',
       )}
-      style={sideStyle}
+      style={style}
     >
       {/* Comment bubble */}
       <div
@@ -62,7 +65,10 @@ function CommentMarkerComponent({
           alt={comment.user.username}
           width={24}
           height={24}
-          className='rounded-full'
+          className={cn(
+            'opacity-30 cursor-pointer rounded-full bg-transparent leading-0',
+            'transition-opacity group-hover:opacity-100',
+          )}
         />
       </div>
     </div>
