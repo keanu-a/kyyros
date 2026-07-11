@@ -16,6 +16,11 @@
 
 /*** TIME RANGE BAR ***/
 
+.player .timeRangeBar {
+    padding: 12px 10px;
+    background: transparent;
+}
+
 .player .timeline {
   position: relative;
   flex: 1;
@@ -29,11 +34,6 @@
   bottom: 100%;            /* sit above the scrubber line */
   height: 20px;            /* room for avatar markers */
   pointer-events: auto;    /* empty strip ignores clicks; markers opt back in */
-}
-
-.player .timeRangeBar {
-    padding: 12px 16px;
-    background: transparent;
 }
 
 .player .timeRangeBar media-time-range {
