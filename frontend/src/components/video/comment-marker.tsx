@@ -10,6 +10,8 @@ type CommentMarkerProps = {
   isActive: boolean;
 };
 
+const AVATAR_SIZE = 24;
+
 function CommentMarkerComponent({
   comment,
   position,
@@ -18,8 +20,7 @@ function CommentMarkerComponent({
   const isLeftHalf = position < 50;
 
   const style = {
-    left: `clamp(12px, ${position}%, calc(100% - 12px))`,
-    // transform: 'translateX(-50%)',
+    left: `clamp(0, ${position}%, calc(100% - ${AVATAR_SIZE}px))`,
   };
 
   // Shortening long comments (can see full comment if clicked)
@@ -63,8 +64,8 @@ function CommentMarkerComponent({
         <Image
           src={'/default-profile-picture.svg'}
           alt={comment.user.username}
-          width={24}
-          height={24}
+          width={AVATAR_SIZE}
+          height={AVATAR_SIZE}
           className={cn(
             'opacity-30 cursor-pointer rounded-full bg-transparent leading-0',
             'transition-opacity group-hover:opacity-100',
