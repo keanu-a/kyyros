@@ -6,7 +6,7 @@ import type { Comment } from '@/lib/api/comments';
 type MuxVideoEl = ComponentRef<typeof MuxVideo>;
 
 const DISPLAY_WINDOW = 2;
-const IDLE_LINGER_MS = 4000; // active clears ~4s after playback stops
+const IDLE_LINGER_MS = 2500;
 
 export function useActiveComment(
   videoRef: RefObject<MuxVideoEl | null>,
