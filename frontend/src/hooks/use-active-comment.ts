@@ -6,7 +6,7 @@ import type { Comment } from '@/lib/api/comments';
 type MuxVideoEl = ComponentRef<typeof MuxVideo>;
 
 const DISPLAY_WINDOW = 2;
-const IDLE_LINGER_MS = 4000; // active clears ~4s after playback stops
+const IDLE_LINGER_MS = 2500;
 
 export function useActiveComment(
   videoRef: RefObject<MuxVideoEl | null>,
@@ -34,8 +34,8 @@ export function useActiveComment(
       let activeTimestamp = -Infinity;
 
       for (const comment of comments) {
-        const timestamp = comment.timestampSeconds;
-        if (timestamp === null) continue;
+        // Comments are filtered and should all have timestamps
+        const timestamp = comment.timestampSeconds as number;
 
         const isInWindow =
           timestamp <= currentTime && currentTime <= timestamp + DISPLAY_WINDOW;

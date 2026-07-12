@@ -1,47 +1,33 @@
 import { memo } from 'react';
 
-import type { CommentCluster } from '@/hooks/use-comment-clusters';
 import { cn } from '@/lib/utils';
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarGroup,
-  AvatarGroupCount,
-  AvatarImage,
-} from '../ui/avatar';
+import { Comment } from '@/lib/api/comments';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 
 const AVATAR_SIZE = 24;
-const MAX_AVATARS_SHOWN = 2;
-const AVATAR_STACK_OVERLAP = 16;
+const MAX_BUBBLE_COMMENT_LENGTH = 30;
 
 type CommentMarkerProps = {
-  commentCluster: CommentCluster;
+  comment: Comment;
+  position: number;
   isActive: boolean;
 };
 
 function CommentMarkerComponent({
-  commentCluster,
+  comment,
+  position,
   isActive,
 }: CommentMarkerProps) {
-  const { position, comments, topComment } = commentCluster;
   const isLeftHalf = position < 50;
-  const overflowCount = Math.max(0, comments.length - MAX_AVATARS_SHOWN);
-  const displayedComments = comments.slice(0, MAX_AVATARS_SHOWN);
 
   // Shortening long comments (can see full comment if clicked)
-  let commentContent = topComment.content;
-  if (commentContent.length > 15) {
-    commentContent = commentContent.slice(0, 15) + '...';
-  }
-
-  // Cluster width so clamp keeps the whole group inside the strip
-  const clusterWidthPx =
-    AVATAR_SIZE +
-    (displayedComments.length - 1) * (AVATAR_SIZE - AVATAR_STACK_OVERLAP) +
-    (overflowCount > 0 ? AVATAR_SIZE - AVATAR_STACK_OVERLAP : 0);
+  const commentContent =
+    comment.content.length > MAX_BUBBLE_COMMENT_LENGTH
+      ? comment.content.slice(0, MAX_BUBBLE_COMMENT_LENGTH) + '...'
+      : comment.content;
 
   const style = {
-    left: `clamp(0px, ${position}%, calc(100% - ${clusterWidthPx}px))`,
+    left: `clamp(0px, ${position}%, calc(100% - ${AVATAR_SIZE}px))`,
   };
 
   return (
@@ -62,40 +48,23 @@ function CommentMarkerComponent({
           isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100',
         )}
       >
-        <span className='font-bold'>{topComment.user.username}</span>
+        <span className='font-bold'>{comment.user.username}</span>
         <span>{commentContent}</span>
       </div>
 
-      <AvatarGroup
-        className={cn(
-          'opacity-20 cursor-pointer transition-opacity group-hover:opacity-100',
-          '-space-x-4 *:data-[slot=avatar]:ring-1 *:data-[slot=avatar]:ring-background',
-        )}
-        aria-label={`${comments.length} comment${comments.length === 1 ? '' : 's'}`}
+      <Avatar
+        style={{ width: AVATAR_SIZE, height: AVATAR_SIZE }}
+        className='opacity-20 cursor-pointer transition-opacity group-hover:opacity-100'
+        aria-label={`Comment by ${comment.user.username}`}
       >
-        {displayedComments.map((comment) => (
-          <Avatar
-            key={comment.id}
-            style={{ width: AVATAR_SIZE, height: AVATAR_SIZE }}
-          >
-            <AvatarImage
-              src={comment.user.profilePictureUrl ?? undefined}
-              alt={comment.user.username}
-            />
-            <AvatarFallback className='text-xs text-background bg-foreground'>
-              {comment.user.username?.charAt(0)}
-            </AvatarFallback>
-          </Avatar>
-        ))}
-        {overflowCount > 0 && (
-          <AvatarGroupCount
-            className='text-xs'
-            style={{ width: AVATAR_SIZE, height: AVATAR_SIZE }}
-          >
-            +{overflowCount}
-          </AvatarGroupCount>
-        )}
-      </AvatarGroup>
+        <AvatarImage
+          src={comment.user.profilePictureUrl ?? undefined}
+          alt={comment.user.username}
+        />
+        <AvatarFallback className='text-xs text-background bg-foreground'>
+          {comment.user.username?.charAt(0)}
+        </AvatarFallback>
+      </Avatar>
     </div>
   );
 }
