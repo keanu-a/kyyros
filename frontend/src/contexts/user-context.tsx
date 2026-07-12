@@ -6,6 +6,7 @@ import {
   useState,
   ReactNode,
   useEffect,
+  useRef,
 } from 'react';
 
 import type { UserSummary } from '@/types/user';
@@ -24,6 +25,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<UserSummary | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const userIdRef = useRef<string | null>(null);
 
   const supabase = createClient();
 
@@ -33,9 +35,11 @@ export function UserProvider({ children }: { children: ReactNode }) {
     const fetchUser = async () => {
       try {
         const userData = await getCurrentUser(controller.signal);
+        userIdRef.current = userData?.id ?? null;
         setUser(userData);
-      } catch (error) {
+      } catch (e) {
         console.log('Error fetching user data');
+        userIdRef.current = null;
         setUser(null);
       } finally {
         setIsLoading(false);
@@ -50,13 +54,20 @@ export function UserProvider({ children }: { children: ReactNode }) {
       }
     });
 
-    const { data: listener } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
-        fetchUser();
-      } else if (event === 'SIGNED_OUT') {
-        setUser(null);
-      }
-    });
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (event === 'SIGNED_OUT') {
+          userIdRef.current = null;
+          setUser(null);
+          return;
+        }
+        if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+          // Skip if already have this user
+          if (session?.user.id === userIdRef.current) return;
+          fetchUser();
+        }
+      },
+    );
 
     return () => {
       controller.abort();
