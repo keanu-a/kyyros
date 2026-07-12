@@ -89,7 +89,7 @@ function CommentMarkerComponent({
         ))}
         {overflowCount > 0 && (
           <AvatarGroupCount
-            className='text-xs ring-1 bg-white/70 text-neutral-900 backdrop-blur-sm'
+            className='text-xs'
             style={{ width: AVATAR_SIZE, height: AVATAR_SIZE }}
           >
             +{overflowCount}
