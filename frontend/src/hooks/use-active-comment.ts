@@ -34,8 +34,8 @@ export function useActiveComment(
       let activeTimestamp = -Infinity;
 
       for (const comment of comments) {
-        const timestamp = comment.timestampSeconds;
-        if (timestamp === null) continue;
+        // Comments are filtered and should all have timestamps
+        const timestamp = comment.timestampSeconds as number;
 
         const isInWindow =
           timestamp <= currentTime && currentTime <= timestamp + DISPLAY_WINDOW;
