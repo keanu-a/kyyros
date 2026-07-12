@@ -49,7 +49,6 @@ export default function VideoPlayer({
   const { submit, isSubmitting, error } = usePostComment(videoId, onAddComment);
 
   const handleSubmit = async () => {
-    console.log(videoRef.current?.currentTime);
     const ok = await submit(content, videoRef.current?.currentTime ?? 0);
     if (ok) setContent('');
   };
