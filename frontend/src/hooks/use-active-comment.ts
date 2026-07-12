@@ -5,8 +5,8 @@ import type { Comment } from '@/lib/api/comments';
 
 type MuxVideoEl = ComponentRef<typeof MuxVideo>;
 
-// How long (seconds) a comment stays active after the playhead crosses it
 const DISPLAY_WINDOW = 2;
+const IDLE_LINGER_MS = 4000; // active clears ~4s after playback stops
 
 export function useActiveComment(
   videoRef: RefObject<MuxVideoEl | null>,
@@ -18,17 +18,24 @@ export function useActiveComment(
     const el = videoRef.current;
     if (!el) return;
 
+    let clearTimer: number | null = null;
+
+    const scheduleClear = () => {
+      if (clearTimer !== null) window.clearTimeout(clearTimer);
+      clearTimer = window.setTimeout(() => {
+        setActiveId(null);
+        clearTimer = null;
+      }, IDLE_LINGER_MS);
+    };
+
     const computeActive = () => {
       const currentTime = el.currentTime;
-
-      // Latest-wins: among comments whose window covers t,
-      // pick the one with the highest timestamp.
       let activeComment: Comment | null = null;
       let activeTimestamp = -Infinity;
 
       for (const comment of comments) {
         const timestamp = comment.timestampSeconds;
-        if (timestamp === null) continue; // Generic comments have no timestamp, so they cant be active
+        if (timestamp === null) continue;
 
         const isInWindow =
           timestamp <= currentTime && currentTime <= timestamp + DISPLAY_WINDOW;
@@ -39,17 +46,19 @@ export function useActiveComment(
         }
       }
 
-      // No-op if unchanged, React skips re-render between transitions.
       setActiveId(activeComment?.id ?? null);
+      scheduleClear(); // resets on every playback tick; only fires when idle
     };
 
     el.addEventListener('timeupdate', computeActive);
     el.addEventListener('seeked', computeActive);
-    computeActive();
+
+    computeActive(); // initial sync on mount
 
     return () => {
       el.removeEventListener('timeupdate', computeActive);
       el.removeEventListener('seeked', computeActive);
+      if (clearTimer !== null) window.clearTimeout(clearTimer);
     };
   }, [videoRef, comments]);
 
