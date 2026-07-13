@@ -78,7 +78,7 @@ public class MuxWebhookController {
             // Step 4: Compare signatures
             return MessageDigest.isEqual(
                     computedSignature.getBytes(StandardCharsets.UTF_8),
-                    signedPayload.getBytes(StandardCharsets.UTF_8)
+                    signature.getBytes(StandardCharsets.UTF_8)
             );
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
             log.error("Error computing Mux webhook signature");
