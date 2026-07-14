@@ -1,6 +1,7 @@
 package com.kyyros.config;
 
 import com.kyyros.filter.JwtAuthFilter;
+import com.kyyros.security.RestAuthenticationEntryPoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -21,9 +22,14 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
+    private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
 
-    public SecurityConfig(final JwtAuthFilter jwtAuthFilter) {
+    public SecurityConfig(
+            final JwtAuthFilter jwtAuthFilter,
+            RestAuthenticationEntryPoint restAuthenticationEntryPoint
+    ) {
         this.jwtAuthFilter = jwtAuthFilter;
+        this.restAuthenticationEntryPoint = restAuthenticationEntryPoint;
     }
 
     @Bean
@@ -36,7 +42,12 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
                 // Stateless sessions
-                .sessionManagement(session -> session.sessionCreationPolicy((SessionCreationPolicy.STATELESS)))
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy((SessionCreationPolicy.STATELESS)))
+
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(restAuthenticationEntryPoint))
+
                 .authorizeHttpRequests(auth -> auth
                         // Browsers send before any non-trivial origin request (CORS preflight)
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
