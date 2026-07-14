@@ -1,5 +1,8 @@
 package com.kyyros.exception;
 
+import lombok.Getter;
+
+@Getter
 public class RateLimitExceedException extends RuntimeException {
 
     private final long retryAfterSeconds;
@@ -7,9 +10,5 @@ public class RateLimitExceedException extends RuntimeException {
     public RateLimitExceedException(String limitName, long retryAfterSeconds) {
         super("Rate limit exceeded for: " + limitName);
         this.retryAfterSeconds = retryAfterSeconds;
-    }
-
-    public long getRetryAfterSeconds() {
-        return retryAfterSeconds;
     }
 }
