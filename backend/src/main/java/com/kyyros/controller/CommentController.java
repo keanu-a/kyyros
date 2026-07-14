@@ -4,6 +4,7 @@ import com.kyyros.dto.CommentResponse;
 import com.kyyros.dto.CommentSummaryResponse;
 import com.kyyros.dto.CreateReplyRequest;
 import com.kyyros.dto.UpdateCommentRequest;
+import com.kyyros.security.ratelimit.RateLimit;
 import com.kyyros.service.CommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping("/{commentId}/replies")
+    @RateLimit(name = "comment-reply", capacity = 20, periodSeconds = 60)
     public ResponseEntity<CommentResponse> createReply(
             @PathVariable UUID commentId,
             @Valid @RequestBody CreateReplyRequest request,

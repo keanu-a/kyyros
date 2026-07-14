@@ -1,6 +1,7 @@
 package com.kyyros.controller;
 
 import com.kyyros.dto.*;
+import com.kyyros.security.ratelimit.RateLimit;
 import com.kyyros.service.CommentService;
 import com.kyyros.service.VideoService;
 import jakarta.validation.Valid;
@@ -25,6 +26,7 @@ public class VideoController {
     private final CommentService commentService;
 
     @PostMapping
+    @RateLimit(name = "upload-init", capacity = 4, periodSeconds = 3600)
     public ResponseEntity<CreateVideoResponse> initiateUpload(
             @Valid @RequestBody CreateVideoRequest request,
             @AuthenticationPrincipal String userId
@@ -62,6 +64,7 @@ public class VideoController {
     }
 
     @PostMapping("/{videoId}/comments")
+    @RateLimit(name = "comment-create", capacity = 10, periodSeconds = 60)
     public ResponseEntity<CommentResponse> createComment(
             @PathVariable UUID videoId,
             @Valid @RequestBody CreateCommentRequest request,
