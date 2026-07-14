@@ -31,9 +31,7 @@ public class VideoController {
             @Valid @RequestBody CreateVideoRequest request,
             @AuthenticationPrincipal String userId
     ) {
-
         CreateVideoResponse response = videoService.initiateUpload(request, UUID.fromString(userId));
-
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

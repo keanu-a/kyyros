@@ -6,11 +6,13 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.kyyros.security.RestAuthenticationEntryPoint;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -26,12 +28,17 @@ import java.util.concurrent.TimeUnit;
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwkProvider jwkProvider;
+    private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
 
-    public JwtAuthFilter(@Value("${supabase.jwks.url}") String jwksUrl) throws Exception {
+    public JwtAuthFilter(
+            @Value("${supabase.jwks.url}") String jwksUrl,
+            RestAuthenticationEntryPoint restAuthenticationEntryPoint
+    ) throws Exception {
         this.jwkProvider = new JwkProviderBuilder(new URL(jwksUrl))
                 .cached(10, 24, TimeUnit.HOURS) // 10 keys for 24 hours
                 .rateLimited(10, 1, TimeUnit.MINUTES) // Rate limiting protection
                 .build();
+        this.restAuthenticationEntryPoint = restAuthenticationEntryPoint;
     }
 
     @Override
@@ -73,9 +80,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
         } catch (JWTVerificationException | JwkException e) {
-            // TODO: Need to remove sendError so AuthenticationEntryPoint handles error
             // Verification failure results in a 401 status
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or expired token");
+            SecurityContextHolder.clearContext();
+            restAuthenticationEntryPoint.commence(
+                    request,
+                    response,
+                    new BadCredentialsException("Invalid or expired token", e)
+            );
             return;
         }
 

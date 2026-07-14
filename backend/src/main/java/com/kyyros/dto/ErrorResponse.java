@@ -1,4 +1,4 @@
-package com.kyyros.exception;
+package com.kyyros.dto;
 
 import java.time.Instant;
 
