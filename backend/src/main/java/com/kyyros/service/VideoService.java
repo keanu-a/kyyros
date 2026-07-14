@@ -25,6 +25,9 @@ import java.util.UUID;
 @Slf4j
 public class VideoService {
 
+    private static final long MAX_UPLOAD_SIZE_BYTES = 2L * 1024 * 1024 * 1024; // 2 GB
+    private static final long MIN_UPLOAD_SIZE_BYTES = 1024; // 1 KB (rejects empty/near-empty files)
+
     private final S3Service s3Service;
     private final MuxService muxService;
 
@@ -74,6 +77,14 @@ public class VideoService {
         // Verify the file actually exists in S3 before triggering Mux
         if (!s3Service.objectExists(video.getS3Key())) {
             throw new ResourceNotFoundException("Upload not found");
+        }
+
+        // Validate file size
+        long fileSize = s3Service.getObjectSize(video.getS3Key());
+        if (fileSize < MIN_UPLOAD_SIZE_BYTES || fileSize > MAX_UPLOAD_SIZE_BYTES) {
+            s3Service.deleteObject(video.getS3Key());
+            videoRepository.delete(video);
+            throw new BadRequestException("Uploaded file size is outside the allowed range");
         }
 
         // Get presigned GET url for the video

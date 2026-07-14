@@ -111,4 +111,23 @@ public class S3Service {
 
         return safe;
     }
+
+    public long getObjectSize(String s3Key) {
+        HeadObjectRequest headRequest = HeadObjectRequest.builder()
+                .bucket(bucketName)
+                .key(s3Key)
+                .build();
+
+        HeadObjectResponse response = s3Client.headObject(headRequest);
+        return response.contentLength();
+    }
+
+    public void deleteObject(String s3Key) {
+        DeleteObjectRequest deleteRequest = DeleteObjectRequest.builder()
+                .bucket(bucketName)
+                .key(s3Key)
+                .build();
+
+        s3Client.deleteObject(deleteRequest);
+    }
 }
