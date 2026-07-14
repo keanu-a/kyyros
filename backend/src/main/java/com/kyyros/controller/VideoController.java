@@ -64,6 +64,7 @@ public class VideoController {
     }
 
     @PostMapping("/{videoId}/comments")
+    @RateLimit(name = "comment-create", capacity = 10, periodSeconds = 60)
     public ResponseEntity<CommentResponse> createComment(
             @PathVariable UUID videoId,
             @Valid @RequestBody CreateCommentRequest request,
