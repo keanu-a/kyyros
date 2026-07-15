@@ -7,6 +7,7 @@ export function uploadToS3(
     const xhr = new XMLHttpRequest();
     xhr.open('PUT', presignedUrl, true);
     xhr.setRequestHeader('Content-Type', file.type);
+    xhr.setRequestHeader('x-amz-tagging', 'pending=true');
 
     xhr.upload.onprogress = (e) => {
       if (onProgress && e.lengthComputable) {
