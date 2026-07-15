@@ -97,6 +97,13 @@ public class VideoService {
         video.setStatus(VideoStatus.PROCESSING);
 
         videoRepository.save(video);
+
+        // Remove pending tag so lifecycle rule doesn't delete this object
+        try {
+            s3Service.removeAllTags(video.getS3Key());
+        } catch (Exception e) {
+            log.error("Failed to remove tags from S3 object {}: {}", video.getId(), e.getMessage());
+        }
     }
 
     @Transactional

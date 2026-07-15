@@ -50,6 +50,7 @@ public class S3Service {
                 .bucket(bucketName)
                 .key(s3Key)
                 .contentType(contentType)
+                .tagging("pending=true")
                 .build();
 
         PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
@@ -129,5 +130,14 @@ public class S3Service {
                 .build();
 
         s3Client.deleteObject(deleteRequest);
+    }
+
+    public void removeAllTags(String s3Key) {
+        DeleteObjectTaggingRequest deleteRequest = DeleteObjectTaggingRequest.builder()
+                .bucket(bucketName)
+                .key(s3Key)
+                .build();
+
+        s3Client.deleteObjectTagging(deleteRequest);
     }
 }
