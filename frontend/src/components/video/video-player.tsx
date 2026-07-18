@@ -17,7 +17,7 @@ import CommentMarkers from './comment-markers';
 
 import { useIsHydrated } from '@/hooks/use-is-hydrated';
 import { usePostComment } from '@/hooks/use-post-comment';
-import type { Comment } from '@/lib/api/comments';
+import { useComments } from '@/contexts/comments-context';
 import { cn } from '@/lib/utils';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -28,8 +28,6 @@ type VideoPlayerProps = {
   playbackId: string | null;
   videoId: string;
   title: string;
-  comments: Comment[];
-  onAddComment: (comment: Comment) => void;
   videoRef: React.RefObject<ComponentRef<typeof MuxVideo> | null>;
 };
 
@@ -37,16 +35,19 @@ export default function VideoPlayer({
   playbackId,
   videoId,
   title,
-  comments,
-  onAddComment,
   videoRef,
 }: VideoPlayerProps) {
+  const { handleAddComment } = useComments();
+
   const [isAutoHideEnabled, setIsAutoHideEnabled] = useState<boolean>(false);
   const [isTypingComment, setIsTypingComment] = useState<boolean>(false);
   const [content, setContent] = useState('');
 
   const isHydrated = useIsHydrated();
-  const { submit, isSubmitting, error } = usePostComment(videoId, onAddComment);
+  const { submit, isSubmitting, error } = usePostComment(
+    videoId,
+    handleAddComment,
+  );
 
   const handleSubmit = async () => {
     const ok = await submit(content, videoRef.current?.currentTime ?? 0);
@@ -88,7 +89,7 @@ export default function VideoPlayer({
       <MediaControlBar className={styles.timeRangeBar}>
         <div className={styles.timeline}>
           <div className={styles.commentStrip}>
-            <CommentMarkers comments={comments} videoRef={videoRef} />
+            <CommentMarkers videoRef={videoRef} />
           </div>
           <MediaTimeRange />
         </div>
