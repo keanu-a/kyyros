@@ -3,8 +3,8 @@
 import { ComponentRef, useRef } from 'react';
 import Image from 'next/image';
 
-import type MuxVideo from '@mux/mux-video-react';
 import type { MediaController } from 'media-chrome/react';
+import type MuxVideo from '@mux/mux-video-react';
 import { formatDistanceToNow } from 'date-fns';
 
 import { GetVideoResponse } from '@/lib/api/videos';
@@ -26,6 +26,7 @@ export default function VideoPageClient({
   comments,
 }: VideoPageClientProps) {
   const videoRef = useRef<ComponentRef<typeof MuxVideo>>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
   // Moves video playback to selected timestamp and plays video
   const seekToTimestamp = (timestampSeconds: number) => {
@@ -39,16 +40,30 @@ export default function VideoPageClient({
     });
   };
 
+  const setMediaControllerRef = (
+    el: ComponentRef<typeof MediaController> | null,
+  ) => {
+    if (el && wrapperRef.current) {
+      el.fullscreenElement = wrapperRef.current;
+    }
+  };
+
   return (
     <CommentsProvider comments={comments} seekToTimestamp={seekToTimestamp}>
       <div className='flex landscape:space-x-2 sm:px-2'>
         <div className='flex flex-col w-full lg:w-3/4'>
-          <VideoPlayer
-            playbackId={video.playbackId}
-            videoId={video.id}
-            title={video.title}
-            videoRef={videoRef}
-          />
+          <div ref={wrapperRef} className='flex landscape:space-x-2'>
+            <VideoPlayer
+              playbackId={video.playbackId}
+              videoId={video.id}
+              title={video.title}
+              videoRef={videoRef}
+              mediaControllerRef={setMediaControllerRef}
+            />
+            <div className='hidden in-fullscreen:flex'>
+              <TimestampCommentSidebar />
+            </div>
+          </div>
 
           <div className='px-4 my-4'>
             {/* Video Details */}

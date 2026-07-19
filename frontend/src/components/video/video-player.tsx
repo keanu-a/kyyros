@@ -29,6 +29,7 @@ type VideoPlayerProps = {
   videoId: string;
   title: string;
   videoRef: React.RefObject<ComponentRef<typeof MuxVideo> | null>;
+  mediaControllerRef: (el: ComponentRef<typeof MediaController> | null) => void;
 };
 
 export default function VideoPlayer({
@@ -36,6 +37,7 @@ export default function VideoPlayer({
   videoId,
   title,
   videoRef,
+  mediaControllerRef,
 }: VideoPlayerProps) {
   const { handleAddComment } = useComments();
 
@@ -72,6 +74,7 @@ export default function VideoPlayer({
 
   return (
     <MediaController
+      ref={mediaControllerRef}
       className={styles.player}
       autohide={isAutoHideEnabled ? '2' : '-1'}
       noHotkeys={isTypingComment || undefined}

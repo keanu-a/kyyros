@@ -16,7 +16,7 @@ export default function TimestampCommentSidebar() {
   if (!isSidebarOpen) return <></>;
 
   return (
-    <div className='hidden landscape:flex sm:flex flex-col h-[75vh] border rounded-md'>
+    <div className='hidden landscape:flex sm:flex flex-col h-[90vh] border rounded-md bg-background'>
       <div>
         <Button
           className='rounded-full cursor-pointer m-2 shrink-0'
