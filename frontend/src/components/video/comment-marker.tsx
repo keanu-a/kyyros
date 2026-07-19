@@ -11,12 +11,14 @@ type CommentMarkerProps = {
   comment: Comment;
   position: number;
   isActive: boolean;
+  onSelect: (id: string) => void;
 };
 
 function CommentMarkerComponent({
   comment,
   position,
   isActive,
+  onSelect,
 }: CommentMarkerProps) {
   const isLeftHalf = position < 50;
 
@@ -56,6 +58,7 @@ function CommentMarkerComponent({
         style={{ width: AVATAR_SIZE, height: AVATAR_SIZE }}
         className='opacity-20 cursor-pointer transition-opacity group-hover:opacity-100'
         aria-label={`Comment by ${comment.user.username}`}
+        onClick={() => onSelect(comment.id)}
       >
         <AvatarImage
           src={comment.user.profilePictureUrl ?? undefined}

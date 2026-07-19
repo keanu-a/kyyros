@@ -1,24 +1,31 @@
+import Image from 'next/image';
+import { formatDistanceToNow } from 'date-fns';
+
 import type { Comment } from '@/lib/api/comments';
 import { formatTimestamp } from '@/lib/format-timestamp';
-import { formatDistanceToNow } from 'date-fns';
-import Image from 'next/image';
-import { Button } from '../ui/button';
+import { cn } from '@/lib/utils';
 
 type CommentRowProps = {
   comment: Comment;
   onSeek: (timestampSeconds: number) => void;
+  isSelected?: boolean;
 };
 
-export function CommentRow({ comment, onSeek }: CommentRowProps) {
+export function CommentRow({ comment, onSeek, isSelected }: CommentRowProps) {
   return (
-    <div className='flex space-x-4'>
+    <div
+      className={cn(
+        isSelected && 'animate-[flash-highlight_4s_ease-out]',
+        'flex space-x-4 sm:space-x-0 px-2 py-4 rounded-md',
+      )}
+    >
       <div className='w-10 sm:w-14'>
         <Image
           src='/default-profile-picture.svg'
           alt={comment.user.username}
           width={10}
           height={10}
-          className='rounded-full w-auto h-auto'
+          className='rounded-full w-10 h-10'
         />
       </div>
       <div className='flex flex-col'>
@@ -29,7 +36,7 @@ export function CommentRow({ comment, onSeek }: CommentRowProps) {
               className='text-sm text-muted-foreground hover:underline cursor-pointer'
               onClick={() => onSeek(comment.timestampSeconds ?? 0)}
             >
-              at {formatTimestamp(comment.timestampSeconds)}
+              {formatTimestamp(comment.timestampSeconds)}
             </span>
           )}
           <span>&middot;</span>
@@ -40,14 +47,16 @@ export function CommentRow({ comment, onSeek }: CommentRowProps) {
           </span>
         </div>
         <p className='whitespace-pre-wrap'>{comment.content}</p>
-        <div className='flex space-x-6 *:mt-4 text-muted-foreground'>
+
+        {/* TODO: Add like and reply comment feature */}
+        {/* <div className='flex space-x-6 *:mt-4 text-muted-foreground'>
           <Button variant='link' className='p-0 mt-2 cursor-pointer'>
             Like
           </Button>
           <Button variant='link' className='p-0 mt-2 cursor-pointer'>
             Reply
           </Button>
-        </div>
+        </div> */}
       </div>
     </div>
   );

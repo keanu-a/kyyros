@@ -55,7 +55,7 @@ export default function CommentInput({
         value={content}
         placeholder='Comment...'
         onChange={handleContentChange}
-        className='resize-none overflow-hidden pb-14 min-h-[70px]'
+        className='resize-none overflow-hidden pb-14 min-h-17.5'
         rows={1}
         onKeyDown={(e) => {
           if (e.key === 'Enter' && !e.shiftKey) {
