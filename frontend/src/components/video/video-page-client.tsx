@@ -1,6 +1,6 @@
 'use client';
 
-import { ComponentRef, useRef } from 'react';
+import { ComponentRef, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 
 import type { MediaController } from 'media-chrome/react';
@@ -26,7 +26,10 @@ export default function VideoPageClient({
   comments,
 }: VideoPageClientProps) {
   const videoRef = useRef<ComponentRef<typeof MuxVideo>>(null);
-  const wrapperRef = useRef<HTMLDivElement>(null);
+  const [wrapperEl, setWrapperEl] = useState<HTMLDivElement | null>(null);
+  const [mediaControllerEl, setMediaControllerEl] = useState<ComponentRef<
+    typeof MediaController
+  > | null>(null);
 
   // Moves video playback to selected timestamp and plays video
   const seekToTimestamp = (timestampSeconds: number) => {
@@ -40,25 +43,27 @@ export default function VideoPageClient({
     });
   };
 
-  const setMediaControllerRef = (
-    el: ComponentRef<typeof MediaController> | null,
-  ) => {
-    if (el && wrapperRef.current) {
-      el.fullscreenElement = wrapperRef.current;
+  // Handles setting fullscreen ref when DOM is ready
+  useEffect(() => {
+    if (wrapperEl && mediaControllerEl) {
+      mediaControllerEl.fullscreenElement = wrapperEl;
     }
-  };
+  }, [wrapperEl, mediaControllerEl]);
 
   return (
     <CommentsProvider comments={comments} seekToTimestamp={seekToTimestamp}>
       <div className='flex landscape:space-x-2 sm:px-2'>
         <div className='flex flex-col w-full lg:w-3/4'>
-          <div ref={wrapperRef} className='flex landscape:space-x-2'>
+          <div
+            ref={setWrapperEl}
+            className='flex landscape:space-x-2 items-center'
+          >
             <VideoPlayer
               playbackId={video.playbackId}
               videoId={video.id}
               title={video.title}
               videoRef={videoRef}
-              mediaControllerRef={setMediaControllerRef}
+              mediaControllerRef={setMediaControllerEl}
             />
             <div className='hidden in-fullscreen:flex'>
               <TimestampCommentSidebar />

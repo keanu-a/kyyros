@@ -37,6 +37,7 @@ export function CommentsProvider({
   );
 
   const openCommentSidebarAt = (id: string) => {
+    console.log('clicked', id);
     setSelectedCommentId(id);
     setIsSidebarOpen(true);
   };
