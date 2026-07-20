@@ -31,8 +31,12 @@ export function CommentsProvider({
   const [selectedCommentId, setSelectedCommentId] = useState<string | null>(
     null,
   );
+
   const timestampedComments = useMemo(
-    () => allComments.filter((c) => c.timestampSeconds !== null),
+    () =>
+      allComments
+        .filter((c) => c.timestampSeconds !== null)
+        .sort((a, b) => (a.timestampSeconds ?? 0) - (b.timestampSeconds ?? 0)),
     [allComments],
   );
 
