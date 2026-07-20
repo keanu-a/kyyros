@@ -1,5 +1,5 @@
 import type { Comment } from '@/lib/api/comments';
-import { CommentRow } from '../comment/CommentRow';
+import { CommentRow } from '../comment/comment-row';
 import { useEffect, useRef } from 'react';
 
 type CommentListProps = {
@@ -22,7 +22,11 @@ export default function CommentList({
   }, [selectedCommentId]);
 
   if (!comments.length)
-    return <p className='text-sm text-muted-foreground'>No comments yet.</p>;
+    return (
+      <p className='text-sm text-muted-foreground pb-6'>
+        Be the first to comment!
+      </p>
+    );
 
   return (
     <ul className='flex flex-col space-y-8'>
