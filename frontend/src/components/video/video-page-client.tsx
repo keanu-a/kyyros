@@ -15,6 +15,7 @@ import { Button } from '../ui/button';
 import VideoPlayer from './video-player';
 import CommentSection from './comment-section';
 import TimestampCommentSidebar from './timestamp-comment-sidebar';
+import FullscreenSidebarSlot from './fullscreen-sidebar-slot';
 
 type VideoPageClientProps = {
   video: GetVideoResponse;
@@ -52,12 +53,9 @@ export default function VideoPageClient({
 
   return (
     <CommentsProvider comments={comments} seekToTimestamp={seekToTimestamp}>
-      <div className='flex landscape:space-x-2 sm:px-2'>
-        <div className='flex flex-col w-full lg:w-3/4'>
-          <div
-            ref={setWrapperEl}
-            className='flex landscape:space-x-2 items-center'
-          >
+      <div className='max-w-[1600px] mx-auto flex space-x-2 sm:px-2'>
+        <div className='flex flex-col w-full flex-1'>
+          <div ref={setWrapperEl} className='flex items-center'>
             <VideoPlayer
               playbackId={video.playbackId}
               videoId={video.id}
@@ -65,9 +63,7 @@ export default function VideoPageClient({
               videoRef={videoRef}
               mediaControllerRef={setMediaControllerEl}
             />
-            <div className='hidden in-fullscreen:flex'>
-              <TimestampCommentSidebar />
-            </div>
+            <FullscreenSidebarSlot />
           </div>
 
           <div className='px-4 my-4'>
@@ -111,7 +107,9 @@ export default function VideoPageClient({
           </div>
         </div>
 
-        <TimestampCommentSidebar />
+        <div className='hidden sm:w-64 md:w-72 lg:w-96 shrink-0 sm:flex flex-col'>
+          <TimestampCommentSidebar />
+        </div>
       </div>
     </CommentsProvider>
   );
