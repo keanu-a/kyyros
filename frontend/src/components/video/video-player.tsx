@@ -22,6 +22,7 @@ import { cn } from '@/lib/utils';
 import { Input } from '../ui/input';
 
 import styles from './video-player.module.css';
+import { useIdleState } from '@/hooks/use-idle-state';
 
 type VideoPlayerProps = {
   playbackId: string | null;
@@ -39,23 +40,12 @@ export default function VideoPlayer({
   mediaControllerRef,
 }: VideoPlayerProps) {
   const { handleAddComment } = useComments();
+  const { isIdle, setIsIdle, resetIdleTimer } = useIdleState();
 
   const [isTypingComment, setIsTypingComment] = useState<boolean>(false);
   const [content, setContent] = useState('');
 
   const commentInputRef = useRef<HTMLInputElement>(null);
-
-  const [isIdle, setIsIdle] = useState(false);
-  const idleTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
-    undefined,
-  );
-
-  const resetIdleTimer = (skipSchedule = false) => {
-    setIsIdle(false);
-    clearTimeout(idleTimeoutRef.current);
-    if (skipSchedule) return;
-    idleTimeoutRef.current = setTimeout(() => setIsIdle(true), 3000);
-  };
 
   const isHydrated = useIsHydrated();
   const { submit, isSubmitting, error } = usePostComment(
@@ -193,8 +183,7 @@ export default function VideoPlayer({
             onClick={(e) => e.stopPropagation()}
             onFocus={() => {
               setIsTypingComment(true);
-              setIsIdle(false);
-              clearTimeout(idleTimeoutRef.current);
+              resetIdleTimer(true);
             }}
             onBlur={() => {
               setIsTypingComment(false);
