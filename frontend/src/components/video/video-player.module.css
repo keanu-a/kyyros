@@ -13,12 +13,11 @@
   overflow: hidden;
 }
 
-
 /*** TIME RANGE BAR ***/
 
 .player .timeRangeBar {
-    padding: 12px 10px;
-    background: transparent;
+  padding: 12px 10px;
+  background: transparent;
 }
 
 .player .timeline {
@@ -50,8 +49,8 @@
   border: none;
   border-radius: 50px;
   clip-path: polygon(0 0, 100% 0, 50% 100%);
+  margin-bottom: 8px;
 }
-
 
 /*** CONTROL BAR ***/
 
@@ -64,6 +63,16 @@
   --media-button-icon-width: 24px;   /* uniform icon size */
   --media-button-icon-height: 24px;
   --media-font-size: 12px;
+}
+
+.controlBar .timeRangeBar {
+  overflow: hidden;
+  transform: translateY(0);
+  transition: transform 2s ease;
+}
+
+.idle {
+  transform: translateY(200%);
 }
 
 .player .leftControls {
