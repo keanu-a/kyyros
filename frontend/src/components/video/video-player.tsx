@@ -1,6 +1,6 @@
 'use client';
 
-import { ComponentRef, useState } from 'react';
+import { ComponentRef, useEffect, useRef, useState } from 'react';
 import MuxVideo from '@mux/mux-video-react';
 import {
   MediaControlBar,
@@ -19,7 +19,6 @@ import { useIsHydrated } from '@/hooks/use-is-hydrated';
 import { usePostComment } from '@/hooks/use-post-comment';
 import { useComments } from '@/contexts/comments-context';
 import { cn } from '@/lib/utils';
-import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 
 import styles from './video-player.module.css';
@@ -41,9 +40,22 @@ export default function VideoPlayer({
 }: VideoPlayerProps) {
   const { handleAddComment } = useComments();
 
-  const [isAutoHideEnabled, setIsAutoHideEnabled] = useState<boolean>(false);
   const [isTypingComment, setIsTypingComment] = useState<boolean>(false);
   const [content, setContent] = useState('');
+
+  const commentInputRef = useRef<HTMLInputElement>(null);
+
+  const [isIdle, setIsIdle] = useState(false);
+  const idleTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
+
+  const resetIdleTimer = (skipSchedule = false) => {
+    setIsIdle(false);
+    clearTimeout(idleTimeoutRef.current);
+    if (skipSchedule) return;
+    idleTimeoutRef.current = setTimeout(() => setIsIdle(true), 3000);
+  };
 
   const isHydrated = useIsHydrated();
   const { submit, isSubmitting, error } = usePostComment(
@@ -53,8 +65,61 @@ export default function VideoPlayer({
 
   const handleSubmit = async () => {
     const ok = await submit(content, videoRef.current?.currentTime ?? 0);
-    if (ok) setContent('');
+    if (ok) {
+      setContent('');
+      setIsTypingComment(false);
+      resetIdleTimer();
+      commentInputRef.current?.blur();
+    }
   };
+
+  const [timeRangeBarEl, setTimeRangeBarEl] = useState<ComponentRef<
+    typeof MediaControlBar
+  > | null>(null);
+  const [controlBarEl, setControlBarEl] = useState<ComponentRef<
+    typeof MediaControlBar
+  > | null>(null);
+  const [timeRangeBarHeight, setTimeRangeBarHeight] = useState(0);
+  const [controlBarHeight, setControlBarHeight] = useState(0);
+
+  useEffect(() => {
+    if (!timeRangeBarEl || !controlBarEl) return;
+
+    const timeRangeObserver = new ResizeObserver(([entry]) => {
+      setTimeRangeBarHeight(entry.target.getBoundingClientRect().height);
+    });
+    const controlObserver = new ResizeObserver(([entry]) => {
+      setControlBarHeight(entry.target.getBoundingClientRect().height - 2);
+    });
+
+    timeRangeObserver.observe(timeRangeBarEl);
+    controlObserver.observe(controlBarEl);
+
+    return () => {
+      timeRangeObserver.disconnect();
+      controlObserver.disconnect();
+    };
+  }, [timeRangeBarEl, controlBarEl]);
+
+  const idleOffset = controlBarHeight + timeRangeBarHeight / 2;
+
+  const [isPaused, setIsPaused] = useState(true);
+  useEffect(() => {
+    if (!isHydrated) return;
+    const el = videoRef.current;
+    if (!el) return;
+
+    const handlePause = () => setIsPaused(true);
+    const handlePlay = () => setIsPaused(false);
+
+    el.addEventListener('pause', handlePause);
+    el.addEventListener('play', handlePlay);
+
+    return () => {
+      el.removeEventListener('pause', handlePause);
+      el.removeEventListener('play', handlePlay);
+    };
+  }, [isHydrated]);
 
   // Placeholder reserves layout so theres no shift when the player swaps i
   if (!isHydrated) {
@@ -75,9 +140,11 @@ export default function VideoPlayer({
   return (
     <MediaController
       ref={mediaControllerRef}
-      className={styles.player}
-      autohide={isAutoHideEnabled ? '2' : '-1'}
+      className={cn(styles.player, isIdle && 'in-fullscreen:cursor-none')}
       noHotkeys={isTypingComment || undefined}
+      onMouseMove={() => resetIdleTimer(isTypingComment)}
+      onMouseLeave={() => setIsIdle(true)}
+      autohide='-1'
     >
       <MuxVideo
         ref={videoRef}
@@ -89,47 +156,61 @@ export default function VideoPlayer({
         style={{ width: '100%', height: '100%' }}
       />
 
-      <MediaControlBar className={styles.timeRangeBar}>
-        <div className={styles.timeline}>
-          <div className={styles.commentStrip}>
-            <CommentMarkers videoRef={videoRef} />
+      <div
+        className='w-full transition-transform duration-300'
+        style={{
+          transform:
+            isIdle && !isPaused ? `translateY(${idleOffset}px)` : undefined,
+        }}
+      >
+        <MediaControlBar
+          ref={setTimeRangeBarEl}
+          className={cn(styles.timeRangeBar, 'w-full')}
+        >
+          <div className={styles.timeline}>
+            <div className={styles.commentStrip}>
+              <CommentMarkers videoRef={videoRef} />
+            </div>
+            <MediaTimeRange />
           </div>
-          <MediaTimeRange />
-        </div>
-      </MediaControlBar>
+        </MediaControlBar>
 
-      <MediaControlBar className={styles.controlBar}>
-        <div className={styles.leftControls}>
-          <MediaPlayButton />
-          <MediaTimeDisplay showDuration />
-          <div className={styles.volumeControls}>
-            <MediaMuteButton />
-            <MediaVolumeRange />
+        <MediaControlBar ref={setControlBarEl} className={styles.controlBar}>
+          <div className={styles.leftControls}>
+            <MediaPlayButton />
+            <MediaTimeDisplay showDuration />
+            <div className={styles.volumeControls}>
+              <MediaMuteButton />
+              <MediaVolumeRange />
+            </div>
           </div>
-        </div>
 
-        <Input
-          className={cn(styles.commentInput, 'text-sm px-4')}
-          placeholder='Comment...'
-          value={content}
-          onFocus={() => setIsTypingComment(true)}
-          onBlur={() => setIsTypingComment(false)}
-          onChange={(e) => setContent(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') handleSubmit();
-          }}
-        />
+          <Input
+            ref={commentInputRef}
+            className={cn(styles.commentInput, 'text-sm px-4')}
+            placeholder='Comment...'
+            value={content}
+            onClick={(e) => e.stopPropagation()}
+            onFocus={() => {
+              setIsTypingComment(true);
+              setIsIdle(false);
+              clearTimeout(idleTimeoutRef.current);
+            }}
+            onBlur={() => {
+              setIsTypingComment(false);
+              resetIdleTimer();
+            }}
+            onChange={(e) => setContent(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleSubmit();
+            }}
+          />
 
-        <div className='flex space-x-2'>
-          <Button
-            className={styles.autoHideBtn}
-            onClick={() => setIsAutoHideEnabled((prev) => !prev)}
-          >
-            Hide
-          </Button>
-          <MediaFullscreenButton />
-        </div>
-      </MediaControlBar>
+          <div className='flex space-x-2'>
+            <MediaFullscreenButton />
+          </div>
+        </MediaControlBar>
+      </div>
     </MediaController>
   );
 }
