@@ -1,6 +1,6 @@
 'use client';
 
-import { ComponentRef, useEffect, useRef, useState } from 'react';
+import { ComponentRef, useRef, useState } from 'react';
 import MuxVideo from '@mux/mux-video-react';
 import {
   MediaControlBar,
@@ -17,12 +17,14 @@ import CommentMarkers from './comment-markers';
 
 import { useIsHydrated } from '@/hooks/use-is-hydrated';
 import { usePostComment } from '@/hooks/use-post-comment';
+import { useIdleState } from '@/hooks/use-idle-state';
+import { useElementSize } from '@/hooks/use-element-size';
+import { useVideoPauseState } from '@/hooks/use-video-pause-state';
 import { useComments } from '@/contexts/comments-context';
 import { cn } from '@/lib/utils';
 import { Input } from '../ui/input';
 
 import styles from './video-player.module.css';
-import { useIdleState } from '@/hooks/use-idle-state';
 
 type VideoPlayerProps = {
   playbackId: string | null;
@@ -40,18 +42,26 @@ export default function VideoPlayer({
   mediaControllerRef,
 }: VideoPlayerProps) {
   const { handleAddComment } = useComments();
-  const { isIdle, setIsIdle, resetIdleTimer } = useIdleState();
-
-  const [isTypingComment, setIsTypingComment] = useState<boolean>(false);
-  const [content, setContent] = useState('');
-
-  const commentInputRef = useRef<HTMLInputElement>(null);
 
   const isHydrated = useIsHydrated();
   const { submit, isSubmitting, error } = usePostComment(
     videoId,
     handleAddComment,
   );
+
+  const { isIdle, setIsIdle, resetIdleTimer } = useIdleState();
+  const { setEl: setTimeRangeBarEl, height: timeRangeBarHeight } =
+    useElementSize<ComponentRef<typeof MediaControlBar>>();
+  const { setEl: setControlBarEl, height: controlBarHeight } =
+    useElementSize<ComponentRef<typeof MediaControlBar>>();
+  const { isPaused } = useVideoPauseState(isHydrated, videoRef);
+
+  const [isTypingComment, setIsTypingComment] = useState<boolean>(false);
+  const [content, setContent] = useState('');
+
+  const commentInputRef = useRef<HTMLInputElement>(null);
+
+  const idleOffset = controlBarHeight - 2 + timeRangeBarHeight / 2;
 
   const handleSubmit = async () => {
     const ok = await submit(content, videoRef.current?.currentTime ?? 0);
@@ -62,54 +72,6 @@ export default function VideoPlayer({
       commentInputRef.current?.blur();
     }
   };
-
-  const [timeRangeBarEl, setTimeRangeBarEl] = useState<ComponentRef<
-    typeof MediaControlBar
-  > | null>(null);
-  const [controlBarEl, setControlBarEl] = useState<ComponentRef<
-    typeof MediaControlBar
-  > | null>(null);
-  const [timeRangeBarHeight, setTimeRangeBarHeight] = useState(0);
-  const [controlBarHeight, setControlBarHeight] = useState(0);
-
-  useEffect(() => {
-    if (!timeRangeBarEl || !controlBarEl) return;
-
-    const timeRangeObserver = new ResizeObserver(([entry]) => {
-      setTimeRangeBarHeight(entry.target.getBoundingClientRect().height);
-    });
-    const controlObserver = new ResizeObserver(([entry]) => {
-      setControlBarHeight(entry.target.getBoundingClientRect().height - 2);
-    });
-
-    timeRangeObserver.observe(timeRangeBarEl);
-    controlObserver.observe(controlBarEl);
-
-    return () => {
-      timeRangeObserver.disconnect();
-      controlObserver.disconnect();
-    };
-  }, [timeRangeBarEl, controlBarEl]);
-
-  const idleOffset = controlBarHeight + timeRangeBarHeight / 2;
-
-  const [isPaused, setIsPaused] = useState(true);
-  useEffect(() => {
-    if (!isHydrated) return;
-    const el = videoRef.current;
-    if (!el) return;
-
-    const handlePause = () => setIsPaused(true);
-    const handlePlay = () => setIsPaused(false);
-
-    el.addEventListener('pause', handlePause);
-    el.addEventListener('play', handlePlay);
-
-    return () => {
-      el.removeEventListener('pause', handlePause);
-      el.removeEventListener('play', handlePlay);
-    };
-  }, [isHydrated]);
 
   // Placeholder reserves layout so theres no shift when the player swaps i
   if (!isHydrated) {
@@ -133,7 +95,9 @@ export default function VideoPlayer({
       className={cn(styles.player, isIdle && 'in-fullscreen:cursor-none')}
       noHotkeys={isTypingComment || undefined}
       onMouseMove={() => resetIdleTimer(isTypingComment)}
-      onMouseLeave={() => setIsIdle(true)}
+      onMouseLeave={() => {
+        if (!isTypingComment) setIsIdle(true);
+      }}
       autohide='-1'
     >
       <MuxVideo
