@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 
 export function useIdleState() {
-  const [isIdle, setIsIdle] = useState<boolean>(false);
+  const [isIdle, setIsIdle] = useState<boolean>(true);
   const idleTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined,
   );

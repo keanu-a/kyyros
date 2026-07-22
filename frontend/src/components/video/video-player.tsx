@@ -1,6 +1,6 @@
 'use client';
 
-import { ComponentRef, useRef, useState } from 'react';
+import { ComponentRef, useEffect, useRef, useState } from 'react';
 import MuxVideo from '@mux/mux-video-react';
 import {
   MediaControlBar,
@@ -16,16 +16,14 @@ import {
 import CommentMarkers from './comment-markers';
 
 import { useIsHydrated } from '@/hooks/use-is-hydrated';
-import { usePostComment } from '@/hooks/use-post-comment';
 import { useIdleState } from '@/hooks/use-idle-state';
 import { useElementSize } from '@/hooks/use-element-size';
 import { useVideoPauseState } from '@/hooks/use-video-pause-state';
-import { useComments } from '@/contexts/comments-context';
-import { formatTimestamp } from '@/lib/format-timestamp';
 import { cn } from '@/lib/utils';
-import { Input } from '../ui/input';
 
 import styles from './video-player.module.css';
+import { useVideoTime } from '@/hooks/use-video-time';
+import VideoCommentInput from './video-comment-input';
 
 type VideoPlayerProps = {
   playbackId: string | null;
@@ -33,6 +31,7 @@ type VideoPlayerProps = {
   title: string;
   videoRef: React.RefObject<ComponentRef<typeof MuxVideo> | null>;
   mediaControllerRef: (el: ComponentRef<typeof MediaController> | null) => void;
+  mediaControllerEl: ComponentRef<typeof MediaController> | null;
 };
 
 export default function VideoPlayer({
@@ -41,16 +40,10 @@ export default function VideoPlayer({
   title,
   videoRef,
   mediaControllerRef,
+  mediaControllerEl,
 }: VideoPlayerProps) {
-  // Context
-  const { handleAddComment, draftTimestamp, setDraftTimestamp } = useComments();
-
   // External hooks
   const isHydrated = useIsHydrated();
-  const { submit, isSubmitting, error } = usePostComment(
-    videoId,
-    handleAddComment,
-  );
 
   // Component-specific hooks
   const { isIdle, setIsIdle, resetIdleTimer } = useIdleState();
@@ -59,26 +52,70 @@ export default function VideoPlayer({
   const { setEl: setControlBarEl, height: controlBarHeight } =
     useElementSize<ComponentRef<typeof MediaControlBar>>();
   const { isPaused } = useVideoPauseState(isHydrated, videoRef);
+  const { currentTime } = useVideoTime(videoRef, isHydrated);
 
   // Local state
   const [isTypingComment, setIsTypingComment] = useState<boolean>(false);
-  const [content, setContent] = useState('');
+
+  useEffect(() => {
+    if (!mediaControllerEl) return;
+
+    const handleUserInactiveChange = () => {
+      // Force it back to false whenever media-chrome tries to set it true
+      mediaControllerEl.userInteractive = false;
+    };
+
+    mediaControllerEl.addEventListener(
+      'userinactivechange',
+      handleUserInactiveChange,
+    );
+
+    // Also clear it immediately on mount, in case it's already true
+    mediaControllerEl.userInteractive = false;
+
+    return () => {
+      mediaControllerEl.removeEventListener(
+        'userinactivechange',
+        handleUserInactiveChange,
+      );
+    };
+  }, [mediaControllerEl]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== '/' && e.code !== 'Space') return;
+      if (isTypingComment) return;
+
+      const active = document.activeElement;
+      const isInsidePlayer = mediaControllerEl?.contains(active);
+      if (e.code === 'Space' && isInsidePlayer) return; // let media-chrome's own hotkey handle it
+
+      const isEditingElsewhere =
+        active instanceof HTMLInputElement ||
+        active instanceof HTMLTextAreaElement ||
+        (active as HTMLElement)?.isContentEditable;
+      if (isEditingElsewhere) return;
+
+      e.preventDefault();
+      if (e.key === '/') {
+        commentInputRef.current?.focus({ preventScroll: true });
+      } else {
+        const el = videoRef.current;
+        if (!el) return;
+        if (el.paused) el.play();
+        else el.pause();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isTypingComment, mediaControllerEl]);
 
   // Refs
   const commentInputRef = useRef<HTMLInputElement>(null);
 
   // Derived
   const idleOffset = controlBarHeight - 2 + timeRangeBarHeight / 2;
-
-  const handleSubmit = async () => {
-    const ok = await submit(content, draftTimestamp);
-    if (ok) {
-      setContent('');
-      setIsTypingComment(false);
-      resetIdleTimer();
-      commentInputRef.current?.blur();
-    }
-  };
 
   // Placeholder reserves layout so theres no shift when the player swaps i
   if (!isHydrated) {
@@ -136,8 +173,11 @@ export default function VideoPlayer({
           </div>
         </MediaControlBar>
 
-        <MediaControlBar ref={setControlBarEl} className={styles.controlBar}>
-          <div className={styles.leftControls}>
+        <MediaControlBar
+          ref={setControlBarEl}
+          className={cn(styles.controlBar, 'gap-1 sm:gap-4 md:gap-12')}
+        >
+          <div className='flex gap-1'>
             <MediaPlayButton />
             <MediaTimeDisplay showDuration />
             <div className={styles.volumeControls}>
@@ -146,33 +186,13 @@ export default function VideoPlayer({
             </div>
           </div>
 
-          <Input
+          <VideoCommentInput
             ref={commentInputRef}
-            className={cn(
-              styles.commentInput,
-              'text-sm px-4 placeholder:text-white',
-            )}
-            placeholder={
-              draftTimestamp !== null
-                ? `Comment at ${formatTimestamp(draftTimestamp)}`
-                : 'Comment'
-            }
-            value={content}
-            onClick={(e) => e.stopPropagation()}
-            onFocus={() => {
-              setIsTypingComment(true);
-              resetIdleTimer(true);
-              setDraftTimestamp(videoRef.current?.currentTime ?? 0);
-            }}
-            onBlur={() => {
-              setIsTypingComment(false);
-              resetIdleTimer();
-              setDraftTimestamp(null);
-            }}
-            onChange={(e) => setContent(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') handleSubmit();
-            }}
+            videoId={videoId}
+            videoRef={videoRef}
+            currentTime={currentTime}
+            resetIdleTimer={resetIdleTimer}
+            onTypingChange={setIsTypingComment}
           />
 
           <div className='flex space-x-2'>

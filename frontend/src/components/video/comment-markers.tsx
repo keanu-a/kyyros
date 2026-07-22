@@ -52,7 +52,7 @@ export default function CommentMarkers({
 
       {draftPosition !== null && (
         <div
-          className='absolute bottom-3 w-6 h-6 rounded-full border-2 border-dashed border-brand animate-spin [animation-duration:3s]'
+          className='absolute bottom-3 w-6 h-6 rounded-full border-2 border-dashed border-brand animate-spin animation-duration-[3s]'
           style={{ left: `clamp(0px, ${draftPosition}%, calc(100% - 24px))` }}
         />
       )}

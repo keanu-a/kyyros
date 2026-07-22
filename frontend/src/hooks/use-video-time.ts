@@ -26,7 +26,10 @@ export function useVideoTime(
       const dur = el.duration;
       setDuration(Number.isFinite(dur) && dur > 0 ? dur : null);
     };
-    const handleTimeUpdate = () => setCurrentTime(el.currentTime);
+    const handleTimeUpdate = () => {
+      const rounded = Math.floor(el.currentTime);
+      setCurrentTime((prev) => (prev === rounded ? prev : rounded));
+    };
 
     el.addEventListener('loadedmetadata', handleDuration);
     el.addEventListener('durationchange', handleDuration);
