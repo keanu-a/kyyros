@@ -21,6 +21,7 @@ import { useIdleState } from '@/hooks/use-idle-state';
 import { useElementSize } from '@/hooks/use-element-size';
 import { useVideoPauseState } from '@/hooks/use-video-pause-state';
 import { useComments } from '@/contexts/comments-context';
+import { formatTimestamp } from '@/lib/format-timestamp';
 import { cn } from '@/lib/utils';
 import { Input } from '../ui/input';
 
@@ -41,14 +42,17 @@ export default function VideoPlayer({
   videoRef,
   mediaControllerRef,
 }: VideoPlayerProps) {
-  const { handleAddComment } = useComments();
+  // Context
+  const { handleAddComment, draftTimestamp, setDraftTimestamp } = useComments();
 
+  // External hooks
   const isHydrated = useIsHydrated();
   const { submit, isSubmitting, error } = usePostComment(
     videoId,
     handleAddComment,
   );
 
+  // Component-specific hooks
   const { isIdle, setIsIdle, resetIdleTimer } = useIdleState();
   const { setEl: setTimeRangeBarEl, height: timeRangeBarHeight } =
     useElementSize<ComponentRef<typeof MediaControlBar>>();
@@ -56,15 +60,18 @@ export default function VideoPlayer({
     useElementSize<ComponentRef<typeof MediaControlBar>>();
   const { isPaused } = useVideoPauseState(isHydrated, videoRef);
 
+  // Local state
   const [isTypingComment, setIsTypingComment] = useState<boolean>(false);
   const [content, setContent] = useState('');
 
+  // Refs
   const commentInputRef = useRef<HTMLInputElement>(null);
 
+  // Derived
   const idleOffset = controlBarHeight - 2 + timeRangeBarHeight / 2;
 
   const handleSubmit = async () => {
-    const ok = await submit(content, videoRef.current?.currentTime ?? 0);
+    const ok = await submit(content, draftTimestamp);
     if (ok) {
       setContent('');
       setIsTypingComment(false);
@@ -123,7 +130,7 @@ export default function VideoPlayer({
         >
           <div className={styles.timeline}>
             <div className={styles.commentStrip}>
-              <CommentMarkers videoRef={videoRef} />
+              <CommentMarkers videoRef={videoRef} isHydrated={isHydrated} />
             </div>
             <MediaTimeRange />
           </div>
@@ -141,17 +148,26 @@ export default function VideoPlayer({
 
           <Input
             ref={commentInputRef}
-            className={cn(styles.commentInput, 'text-sm px-4')}
-            placeholder='Comment...'
+            className={cn(
+              styles.commentInput,
+              'text-sm px-4 placeholder:text-white',
+            )}
+            placeholder={
+              draftTimestamp !== null
+                ? `Comment at ${formatTimestamp(draftTimestamp)}`
+                : 'Comment'
+            }
             value={content}
             onClick={(e) => e.stopPropagation()}
             onFocus={() => {
               setIsTypingComment(true);
               resetIdleTimer(true);
+              setDraftTimestamp(videoRef.current?.currentTime ?? 0);
             }}
             onBlur={() => {
               setIsTypingComment(false);
               resetIdleTimer();
+              setDraftTimestamp(null);
             }}
             onChange={(e) => setContent(e.target.value)}
             onKeyDown={(e) => {

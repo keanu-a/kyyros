@@ -93,17 +93,6 @@
   padding: 4px 10px;
 }
 
-.player .autoHideBtn {
-  border-radius: 999px;
-  padding: 4px 6px;
-  transition: all 0.1s ease-in-out;
-  background: rgb(28 28 30 / 0.6);
-  cursor: pointer;
-}
-.player .autoHideBtn:hover {
-  background: rgb(72 72 74 / 0.7); 
-}
-
 /* Volume Controls */
 
 .player .volumeControls {

@@ -4,10 +4,16 @@ import type MuxVideo from '@mux/mux-video-react';
 
 type MuxVideoEl = ComponentRef<typeof MuxVideo>;
 
-export function useVideoTime(videoRef: RefObject<MuxVideoEl | null>) {
+export function useVideoTime(
+  videoRef: RefObject<MuxVideoEl | null>,
+  isHydrated: boolean,
+) {
   const [duration, setDuration] = useState<number | null>(null);
+  const [currentTime, setCurrentTime] = useState(0);
 
   useEffect(() => {
+    if (!isHydrated) return;
+
     const el = videoRef.current;
     if (!el) return;
 
@@ -20,15 +26,18 @@ export function useVideoTime(videoRef: RefObject<MuxVideoEl | null>) {
       const dur = el.duration;
       setDuration(Number.isFinite(dur) && dur > 0 ? dur : null);
     };
+    const handleTimeUpdate = () => setCurrentTime(el.currentTime);
 
     el.addEventListener('loadedmetadata', handleDuration);
     el.addEventListener('durationchange', handleDuration);
+    el.addEventListener('timeupdate', handleTimeUpdate);
 
     return () => {
       el.removeEventListener('loadedmetadata', handleDuration);
       el.removeEventListener('durationchange', handleDuration);
+      el.removeEventListener('timeupdate', handleTimeUpdate);
     };
-  }, [videoRef]);
+  }, [videoRef, isHydrated]);
 
-  return { duration };
+  return { duration, currentTime };
 }
