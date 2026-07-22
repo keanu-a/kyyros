@@ -8,6 +8,9 @@
 
   --media-font-size: 12px;
 
+  --btn-bg: #1b1b1d99;
+  --btn-bg-hover: rgb(72 72 74 / 0.7); 
+
   width: 100%;
   aspect-ratio: 16 / 9;
   overflow: hidden;
@@ -75,15 +78,9 @@
   transform: translateY(200%);
 }
 
-.player .leftControls {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
 .player :is(media-play-button, media-time-display, media-fullscreen-button) {
-  --media-control-background: rgb(28 28 30 / 0.6);
-  --media-control-hover-background: rgba(114, 114, 114, 0.7);
+  --media-control-background: var(--btn-bg);
+  --media-control-hover-background: var(--btn-bg-hover);
   border-radius: 999px;
   padding: 4px 6px;
   transition: all 0.1s ease-in-out;
@@ -93,28 +90,17 @@
   padding: 4px 10px;
 }
 
-.player .autoHideBtn {
-  border-radius: 999px;
-  padding: 4px 6px;
-  transition: all 0.1s ease-in-out;
-  background: rgb(28 28 30 / 0.6);
-  cursor: pointer;
-}
-.player .autoHideBtn:hover {
-  background: rgb(72 72 74 / 0.7); 
-}
-
 /* Volume Controls */
 
 .player .volumeControls {
-  background: rgb(28 28 30 / 0.6);
+  background: var(--btn-bg);
   border-radius: 999px;
   overflow: hidden;
   padding: 4px 6px;
   transition: all 0.1s ease-in-out;
 }
 .player .volumeControls:hover { 
-  background: rgb(72 72 74 / 0.7); 
+  background: var(--btn-bg-hover); 
 }
 
 /* Mute is transparent so the group pill shows through */
@@ -132,11 +118,4 @@
 .player .volumeControls:hover media-volume-range,
 .player .volumeControls:focus-within media-volume-range {
   width: 90px;
-}
-
-.player .commentInput {
-  width: 30%;
-  background: rgb(28 28 30 / 0.6);
-  border-radius: 999px;
-  border: none;
 }

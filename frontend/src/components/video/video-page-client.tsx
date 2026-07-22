@@ -62,6 +62,7 @@ export default function VideoPageClient({
               title={video.title}
               videoRef={videoRef}
               mediaControllerRef={setMediaControllerEl}
+              mediaControllerEl={mediaControllerEl}
             />
             <FullscreenSidebarSlot />
           </div>

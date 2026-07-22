@@ -11,6 +11,8 @@ type CommentsContextType = {
   seekToTimestamp: (timestampSeconds: number) => void;
   openCommentSidebarAt: (id: string) => void;
   closeCommentSidebar: () => void;
+  draftTimestamp: number | null;
+  setDraftTimestamp: (timestamp: number | null) => void;
 };
 
 const CommentsContext = createContext<CommentsContextType | undefined>(
@@ -31,6 +33,7 @@ export function CommentsProvider({
   const [selectedCommentId, setSelectedCommentId] = useState<string | null>(
     null,
   );
+  const [draftTimestamp, setDraftTimestamp] = useState<number | null>(null);
 
   const timestampedComments = useMemo(
     () =>
@@ -65,6 +68,8 @@ export function CommentsProvider({
         seekToTimestamp,
         openCommentSidebarAt,
         closeCommentSidebar,
+        draftTimestamp,
+        setDraftTimestamp,
       }}
     >
       {children}

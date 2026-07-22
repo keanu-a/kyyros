@@ -11,13 +11,23 @@ import { CommentMarker } from './comment-marker';
 
 type CommentMarkersProps = {
   videoRef: RefObject<ComponentRef<typeof MuxVideo> | null>;
+  isHydrated: boolean;
 };
 
-export default function CommentMarkers({ videoRef }: CommentMarkersProps) {
-  const { duration } = useVideoTime(videoRef);
-  const { timestampedComments, openCommentSidebarAt } = useComments();
+export default function CommentMarkers({
+  videoRef,
+  isHydrated,
+}: CommentMarkersProps) {
+  const { duration } = useVideoTime(videoRef, isHydrated);
+  const { timestampedComments, openCommentSidebarAt, draftTimestamp } =
+    useComments();
 
   const activeId = useActiveComment(videoRef, timestampedComments);
+
+  const draftPosition =
+    draftTimestamp !== null
+      ? getTimelinePosition(draftTimestamp, duration)
+      : null;
 
   return (
     <>
@@ -39,6 +49,13 @@ export default function CommentMarkers({ videoRef }: CommentMarkersProps) {
           />
         );
       })}
+
+      {draftPosition !== null && (
+        <div
+          className='absolute bottom-3 w-6 h-6 rounded-full border-2 border-dashed border-brand animate-spin animation-duration-[3s]'
+          style={{ left: `clamp(0px, ${draftPosition}%, calc(100% - 24px))` }}
+        />
+      )}
     </>
   );
 }
