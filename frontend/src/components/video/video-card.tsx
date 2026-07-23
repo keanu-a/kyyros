@@ -30,25 +30,25 @@ export function VideoCard({ video }: VideoCardProps) {
       </div>
 
       {/* Title + metadata */}
-      <div className='relative flex px-1 py-2 gap-2'>
-        <Avatar
-          style={{ width: AVATAR_SIZE, height: AVATAR_SIZE }}
-          aria-label={`Comment by ${video.uploaderUsername}`}
-        >
-          <AvatarImage src={undefined} alt={video.uploaderUsername} />
-          <AvatarFallback className='text-xs text-background bg-foreground'>
-            {video.uploaderUsername?.charAt(0)}
-          </AvatarFallback>
-        </Avatar>
-        <div>
-          <h3 className='line-clamp-2 font-medium leading-tight'>
-            {video.title}
-          </h3>
-          <p className='text-sm text-muted-foreground flex'>
+      <div className='relative flex flex-col px-1 py-2 gap-2'>
+        <h3 className='line-clamp-2 font-semibold leading-tight'>
+          {video.title}
+        </h3>
+        <div className='flex items-center gap-1.5 text-sm'>
+          <Avatar
+            style={{ width: AVATAR_SIZE, height: AVATAR_SIZE }}
+            aria-label={`Comment by ${video.uploaderUsername}`}
+          >
+            <AvatarImage src={undefined} alt={video.uploaderUsername} />
+            <AvatarFallback className='text-background bg-foreground'>
+              {video.uploaderUsername?.charAt(0)}
+            </AvatarFallback>
+          </Avatar>
+          <p className='text-muted-foreground font-semibold'>
             {video.uploaderUsername}
           </p>
-          <p className='text-sm text-muted-foreground'>
-            Posted{' '}
+          <p className='text-muted-foreground'>
+            &middot;{' '}
             {formatDistanceToNow(new Date(video.createdAt), {
               addSuffix: true,
             })}
