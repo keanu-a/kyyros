@@ -9,22 +9,22 @@ type Marker = {
 const markers: Marker[] = [
   {
     pos: 22,
-    name: 'bestuser',
-    text: 'opening shot goes hard',
+    name: 'ubeluvr',
+    text: 'how???',
     bg: '#7F77DD',
     fg: '#26215C',
   },
   {
     pos: 48,
-    name: 'mrfamous',
-    text: 'how did you edit this?',
+    name: 'matchalvr',
+    text: 'LOLLLL',
     bg: '#5DCAA5',
     fg: '#04342C',
   },
   {
     pos: 74,
-    name: 'kid67',
-    text: 'wow shocking',
+    name: 'thaitealovr',
+    text: 'poetic',
     bg: '#F0997B',
     fg: '#4A1B0C',
   },
@@ -32,23 +32,35 @@ const markers: Marker[] = [
 
 function Bubble({ name, text }: { name: string; text: string }) {
   return (
-    <div className='relative flex w-fit items-center text-white space-x-1 text-center bg-accent-foreground/50 rounded-full shadow-md px-2 py-1'>
+    <div className='w-fit flex items-center gap-1.5 text-white bg-accent-foreground/50 rounded-full shadow-md px-2 py-1 whitespace-nowrap'>
       <div className='text-xs font-bold'>{name}</div>
-      <div className='text-xs leading-snug'>{text}</div>
+      <div className='text-xs'>{text}</div>
     </div>
   );
 }
 
 export default function HeroPreview() {
   return (
-    <div className='relative w-full aspect-video rounded-lg overflow-hidden bg-purple-200'>
-      {/* Bubbles — each pops in when playhead crosses its marker */}
+    <div className='relative w-full h-60 aspect-video rounded-xl overflow-hidden bg-black/10 sm:h-80'>
+      {/* Hero text*/}
+      <div className='absolute inset-0 flex items-center justify-center px-6 pb-24'>
+        <div className='text-center'>
+          <h1 className='text-2xl md:text-4xl font-semibold tracking-tight leading-[1.1] text-black mb-2'>
+            Comment where it happens.
+          </h1>
+          <p className='text-sm md:text-base text-black/70'>
+            Timestamps become conversations.
+          </p>
+        </div>
+      </div>
+
+      {/* Comment bubbles */}
       {markers.map((m, i) => (
         <div
           key={m.name}
           className='absolute pointer-events-none'
           style={{
-            bottom: '5rem',
+            bottom: '4rem',
             left: `${m.pos}%`,
             transform: 'translateX(-50%)',
           }}
@@ -60,7 +72,7 @@ export default function HeroPreview() {
       ))}
 
       {/* Progress bar */}
-      <div className='absolute bottom-4 left-4 right-4 h-6'>
+      <div className='absolute bottom-2 left-4 right-4 h-6'>
         <div className='absolute top-1/2 left-0 right-0 h-0.75 -translate-y-1/2 rounded-full bg-white/25' />
         <div className='absolute top-1/2 left-0 h-0.75 -translate-y-1/2 rounded-full bg-brand hp-progress'>
           <div className='hp-thumb' aria-hidden='true' />
@@ -71,7 +83,7 @@ export default function HeroPreview() {
             className='absolute bottom-6 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold'
             style={{
               left: `${m.pos}%`,
-              transform: 'translate(-50%, -50%)',
+              transform: 'translate(-50%, -10%)',
               backgroundColor: m.bg,
               color: m.fg,
             }}
@@ -87,30 +99,30 @@ export default function HeroPreview() {
           100% { width: 100%; }
         }
         .hp-progress {
-          animation: hp-progress 12s linear infinite;
+          animation: hp-progress 10s linear infinite;
         }
         .hp-bubble {
           opacity: 0;
           will-change: opacity, transform;
         }
         @keyframes hp-bubble-1 {
-          0%, 18%       { opacity: 0; transform: translateY(4px) scale(0.96); }
+          0%, 18%       { opacity: 0; }
           22%, 34%      { opacity: 1; transform: translateY(0) scale(1); }
-          38%, 100%     { opacity: 0; transform: translateY(4px) scale(0.96); }
+          38%, 100%     { opacity: 0; }
         }
         @keyframes hp-bubble-2 {
-          0%, 44%       { opacity: 0; transform: translateY(4px) scale(0.96); }
+          0%, 44%       { opacity: 0; }
           48%, 60%      { opacity: 1; transform: translateY(0) scale(1); }
-          64%, 100%     { opacity: 0; transform: translateY(4px) scale(0.96); }
+          64%, 100%     { opacity: 0; }
         }
         @keyframes hp-bubble-3 {
-          0%, 70%       { opacity: 0; transform: translateY(4px) scale(0.96); }
+          0%, 70%       { opacity: 0; }
           74%, 86%      { opacity: 1; transform: translateY(0) scale(1); }
-          90%, 100%     { opacity: 0; transform: translateY(4px) scale(0.96); }
+          90%, 100%     { opacity: 0; }
         }
-        .hp-bubble-1 { animation: hp-bubble-1 12s ease-out infinite; }
-        .hp-bubble-2 { animation: hp-bubble-2 12s ease-out infinite; }
-        .hp-bubble-3 { animation: hp-bubble-3 12s ease-out infinite; }
+        .hp-bubble-1 { animation: hp-bubble-1 10s ease-out infinite; }
+        .hp-bubble-2 { animation: hp-bubble-2 10s ease-out infinite; }
+        .hp-bubble-3 { animation: hp-bubble-3 10s ease-out infinite; }
 
         @media (prefers-reduced-motion: reduce) {
           .hp-progress { animation: none; width: 40%; }
