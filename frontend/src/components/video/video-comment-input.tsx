@@ -1,5 +1,6 @@
 import { ComponentRef, forwardRef, useState } from 'react';
 import type MuxVideo from '@mux/mux-video-react';
+import { Loader2, Send } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { Input } from '../ui/input';
@@ -7,7 +8,6 @@ import { formatTimestamp } from '@/lib/format-timestamp';
 import { usePostComment } from '@/hooks/use-post-comment';
 import { useComments } from '@/contexts/comments-context';
 import { Button } from '../ui/button';
-import { Loader2, Send, X } from 'lucide-react';
 
 type VideoCommentInputProps = {
   videoId: string;
@@ -60,7 +60,7 @@ const VideoCommentInput = forwardRef<HTMLInputElement, VideoCommentInputProps>(
           placeholder={
             draftTimestamp !== null
               ? `Comment at ${formatTimestamp(draftTimestamp)}`
-              : 'Comment'
+              : ''
           }
           value={content}
           onClick={(e) => e.stopPropagation()}

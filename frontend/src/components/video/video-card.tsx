@@ -37,14 +37,14 @@ export function VideoCard({ video }: VideoCardProps) {
         <div className='flex items-center gap-1.5 text-sm'>
           <Avatar
             style={{ width: AVATAR_SIZE, height: AVATAR_SIZE }}
-            aria-label={`Comment by ${video.uploaderUsername}`}
+            aria-label={`Uploaded by ${video.uploaderUsername}`}
           >
             <AvatarImage src={undefined} alt={video.uploaderUsername} />
             <AvatarFallback className='text-background bg-foreground'>
               {video.uploaderUsername?.charAt(0)}
             </AvatarFallback>
           </Avatar>
-          <p className='text-muted-foreground font-semibold'>
+          <p className='text-muted-foreground font-medium'>
             {video.uploaderUsername}
           </p>
           <p className='text-muted-foreground'>

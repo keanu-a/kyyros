@@ -9,21 +9,21 @@ type Marker = {
 const markers: Marker[] = [
   {
     pos: 22,
-    name: 'ubeluvr',
+    name: 'kc15',
     text: 'how???',
     bg: '#7F77DD',
     fg: '#26215C',
   },
   {
     pos: 48,
-    name: 'matchalvr',
+    name: 'tdio',
     text: 'LOLLLL',
     bg: '#5DCAA5',
     fg: '#04342C',
   },
   {
     pos: 74,
-    name: 'thaitealovr',
+    name: 'ireact',
     text: 'poetic',
     bg: '#F0997B',
     fg: '#4A1B0C',

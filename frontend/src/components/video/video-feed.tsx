@@ -34,7 +34,7 @@ export default function VideoFeed() {
 
   if (error) {
     return (
-      <p className="text-sm text-destructive">
+      <p className='text-sm text-destructive'>
         Failed to load videos. Try refreshing.
       </p>
     );
@@ -42,7 +42,7 @@ export default function VideoFeed() {
 
   return (
     <div>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
         {videos.map((video) => (
           <VideoCard key={video.id} video={video} />
         ))}
@@ -53,16 +53,16 @@ export default function VideoFeed() {
           ))}
       </div>
 
-      {hasMore && <div ref={sentinelRef} className="h-1" />}
+      {hasMore && <div ref={sentinelRef} className='h-1' />}
 
       {!hasMore && videos.length > 0 && (
-        <p className="mt-8 text-center text-sm text-muted-foreground">
+        <p className='my-8 text-center text-sm text-muted-foreground'>
           You&apos;ve reached the end of the videos.
         </p>
       )}
 
       {!hasMore && videos.length === 0 && !isLoading && (
-        <p className="mt-8 text-center text-sm text-muted-foreground">
+        <p className='my-8 text-center text-sm text-muted-foreground'>
           No videos found.
         </p>
       )}

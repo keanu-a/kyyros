@@ -71,6 +71,7 @@ export default function VideoPlayer({
     );
 
     // Also clear it immediately on mount, in case it's already true
+    // eslint-disable-next-line react-hooks/immutability -- setting DOM property, not React state
     mediaControllerEl.userInteractive = false;
 
     return () => {
@@ -109,7 +110,7 @@ export default function VideoPlayer({
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isTypingComment, mediaControllerEl]);
+  }, [isTypingComment, mediaControllerEl, videoRef]);
 
   // Refs
   const commentInputRef = useRef<HTMLInputElement>(null);
