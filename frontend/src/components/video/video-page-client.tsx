@@ -5,7 +5,6 @@ import Image from 'next/image';
 
 import type { MediaController } from 'media-chrome/react';
 import type MuxVideo from '@mux/mux-video-react';
-import { formatDistanceToNow } from 'date-fns';
 
 import { GetVideoResponse } from '@/lib/api/videos';
 import type { Comment } from '@/lib/api/comments';
@@ -47,6 +46,7 @@ export default function VideoPageClient({
   // Handles setting fullscreen ref when DOM is ready
   useEffect(() => {
     if (wrapperEl && mediaControllerEl) {
+      // eslint-disable-next-line react-hooks/immutability -- setting DOM property, not React state
       mediaControllerEl.fullscreenElement = wrapperEl;
     }
   }, [wrapperEl, mediaControllerEl]);
@@ -73,8 +73,11 @@ export default function VideoPageClient({
               {/* Title + timestamp */}
               <h1 className='font-bold text-xl mb-1'>{video.title}</h1>
               <p className='text-sm text-muted-foreground mb-4'>
-                {formatDistanceToNow(new Date(video.createdAt), {
-                  addSuffix: true,
+                {new Date(video.createdAt).toLocaleDateString(undefined, {
+                  timeZone: 'UTC',
+                  month: 'long',
+                  day: '2-digit',
+                  year: 'numeric',
                 })}
               </p>
 
