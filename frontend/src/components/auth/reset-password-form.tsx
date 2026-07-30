@@ -1,11 +1,13 @@
 'use client';
 
-// This form is for CHANGING password for logged-in users
+// This form is for resetting password after redirected from instruction email (sent from forgot password)
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 import { createClient } from '@/lib/supabase/client';
 import {
@@ -18,10 +20,10 @@ import {
 import { Field, FieldError, FieldGroup, FieldLabel } from '../ui/field';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
+import { LoaderCircle } from 'lucide-react';
 
-const changePasswordSchema = z
+const resetPasswordSchema = z
   .object({
-    currentPassword: z.string().min(1, 'Current password is required'),
     newPassword: z.string().min(8, 'Password must be at least 8 characters'),
     confirmPassword: z.string().min(8, 'Please confirm your new password'),
   })
@@ -30,36 +32,62 @@ const changePasswordSchema = z
     path: ['confirmPassword'],
   });
 
-type ChangePasswordValues = z.infer<typeof changePasswordSchema>;
+type ResetPasswordValues = z.infer<typeof resetPasswordSchema>;
 
-export default function ChangePasswordForm() {
+export default function ResetPasswordForm() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [recoveryReady, setRecoveryReady] = useState(false);
 
-  const form = useForm<ChangePasswordValues>({
-    resolver: zodResolver(changePasswordSchema),
+  const router = useRouter();
+  const supabase = createClient();
+
+  useEffect(() => {
+    let recovered = false;
+
+    const { data: listener } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        recovered = true;
+        setRecoveryReady(true);
+      }
+    });
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
+        router.replace('/login');
+        return;
+      }
+
+      setTimeout(() => {
+        if (!recovered) {
+          router.replace('/profile');
+        }
+      }, 500);
+    });
+
+    return () => listener.subscription.unsubscribe();
+  }, [router]);
+
+  const form = useForm<ResetPasswordValues>({
+    resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
-      currentPassword: '',
       newPassword: '',
       confirmPassword: '',
     },
   });
 
-  async function onSubmit(values: ChangePasswordValues) {
+  async function onSubmit(values: ResetPasswordValues) {
     setSubmitError(null);
     setSubmitSuccess(false);
 
-    const supabase = createClient();
-
     const { error } = await supabase.auth.updateUser({
       password: values.newPassword,
-      current_password: values.currentPassword,
     });
 
     if (error) {
       console.log(error);
       setSubmitError(
-        'Could not update password. Check your current password and/or create new stronger password then try again.',
+        'Could not update password. Create new stronger password then try again.',
       );
       return;
     }
@@ -68,46 +96,26 @@ export default function ChangePasswordForm() {
     form.reset();
   }
 
+  if (!recoveryReady)
+    return (
+      <div className='w-full flex items-center justify-center'>
+        <LoaderCircle className='animate-spin' size={24} />;
+      </div>
+    );
+
   return (
     <Card className='w-full max-w-md'>
       <CardHeader>
-        <CardTitle>Change Password</CardTitle>
-        <CardDescription>Update your account password</CardDescription>
+        <CardTitle className='text-xl font-semibold'>Reset Password</CardTitle>
+        <CardDescription>Enter your new password below</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup className='pb-4'>
-            <Controller
-              name='currentPassword'
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field>
-                  <FieldLabel htmlFor='current-password'>
-                    Current Password
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    onChangeCapture={(e) => {
-                      field.onChange(e);
-                      setSubmitSuccess(false);
-                      setSubmitError(null);
-                    }}
-                    type='password'
-                    id='current-password'
-                    aria-invalid={fieldState.invalid}
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-
             <p className='text-xs text-muted-foreground'>
               At least 8 characters, with uppercase, lowercase, a number, and a
               special character
             </p>
-
             <Controller
               name='newPassword'
               control={form.control}
@@ -161,7 +169,14 @@ export default function ChangePasswordForm() {
           </FieldGroup>
 
           {submitError && <p className='text-destructive'>{submitError}</p>}
-          {submitSuccess && <p className='text-blue-600'>Password updated</p>}
+          {submitSuccess && (
+            <p className='text-blue-600'>
+              Password updated.{' '}
+              <Link href='/login' className='hover:underline'>
+                Login here
+              </Link>
+            </p>
+          )}
 
           <Button
             type='submit'
