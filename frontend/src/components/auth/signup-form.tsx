@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import * as z from 'zod';
+import { z } from 'zod';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -82,9 +82,9 @@ export default function SignupForm() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-center text-sm text-muted-foreground">
+          <p className='text-center text-sm text-muted-foreground'>
             Already have an account?{' '}
-            <Link href="/login" className="underline">
+            <Link href='/login' className='underline'>
               Log in
             </Link>
           </p>
@@ -96,26 +96,26 @@ export default function SignupForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-xl font-semibold">
+        <CardTitle className='text-xl font-semibold'>
           Create your account
         </CardTitle>
         <CardDescription>Sign up to get started</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <FieldGroup className="py-4">
+          <FieldGroup className='py-4'>
             <Controller
-              name="email"
+              name='email'
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="signup-email">Email</FieldLabel>
+                  <FieldLabel htmlFor='signup-email'>Email</FieldLabel>
                   <Input
                     {...field}
-                    id="signup-email"
-                    type="email"
-                    placeholder="you@example.com"
-                    autoComplete="email"
+                    id='signup-email'
+                    type='email'
+                    placeholder='you@example.com'
+                    autoComplete='email'
                     aria-invalid={fieldState.invalid}
                   />
                   {fieldState.invalid && (
@@ -125,16 +125,16 @@ export default function SignupForm() {
               )}
             />
             <Controller
-              name="password"
+              name='password'
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="signup-password">Password</FieldLabel>
+                  <FieldLabel htmlFor='signup-password'>Password</FieldLabel>
                   <Input
                     {...field}
-                    id="signup-password"
-                    type="password"
-                    autoComplete="new-password"
+                    id='signup-password'
+                    type='password'
+                    autoComplete='new-password'
                     aria-invalid={fieldState.invalid}
                   />
                   {fieldState.invalid && (
@@ -144,18 +144,18 @@ export default function SignupForm() {
               )}
             />
             <Controller
-              name="confirmPassword"
+              name='confirmPassword'
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="signup-confirm-password">
+                  <FieldLabel htmlFor='signup-confirm-password'>
                     Confirm Password
                   </FieldLabel>
                   <Input
                     {...field}
-                    id="signup-confirm-password"
-                    type="password"
-                    autoComplete="new-password"
+                    id='signup-confirm-password'
+                    type='password'
+                    autoComplete='new-password'
                     aria-invalid={fieldState.invalid}
                   />
                   {fieldState.invalid && (
@@ -167,33 +167,33 @@ export default function SignupForm() {
           </FieldGroup>
 
           {submitError && (
-            <p className="text-sm text-destructive">{submitError}</p>
+            <p className='text-sm text-destructive'>{submitError}</p>
           )}
 
-          <div className="space-y-2">
+          <div className='space-y-2'>
             <Button
-              type="submit"
+              type='submit'
               disabled={form.formState.isSubmitting}
-              className="w-full cursor-pointer"
+              className='w-full cursor-pointer'
             >
               {form.formState.isSubmitting ? 'Creating account...' : 'Sign up'}
             </Button>
 
-            <div className="flex items-center gap-2">
-              <div className="h-px flex-1 bg-border" />
-              <span className="text-xs text-muted-foreground">or</span>
-              <div className="h-px flex-1 bg-border" />
+            <div className='flex items-center gap-2'>
+              <div className='h-px flex-1 bg-border' />
+              <span className='text-xs text-muted-foreground'>or</span>
+              <div className='h-px flex-1 bg-border' />
             </div>
 
-            <GoogleSignInButton mode="signup" />
+            <GoogleSignInButton mode='signup' />
           </div>
         </form>
       </CardContent>
 
       <CardFooter>
-        <p className="text-sm text-muted-foreground mx-auto">
+        <p className='text-sm text-muted-foreground mx-auto'>
           Already have an account?{' '}
-          <Link href="/login" className="text-primary hover:underline">
+          <Link href='/login' className='text-primary hover:underline'>
             Log in
           </Link>
         </p>

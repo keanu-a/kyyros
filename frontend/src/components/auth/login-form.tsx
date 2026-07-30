@@ -1,6 +1,6 @@
 'use client';
 
-import * as z from 'zod';
+import { z } from 'zod';
 import Link from 'next/link';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
@@ -61,24 +61,24 @@ export function LoginForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-xl font-semibold">Log in</CardTitle>
+        <CardTitle className='text-xl font-semibold'>Log in</CardTitle>
         <CardDescription>Welcome back!</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <FieldGroup className="py-4">
+          <FieldGroup className='pt-4'>
             <Controller
-              name="email"
+              name='email'
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="login-email">Email</FieldLabel>
+                  <FieldLabel htmlFor='login-email'>Email</FieldLabel>
                   <Input
                     {...field}
-                    type="email"
-                    id="login-email"
-                    placeholder="you@example.com"
-                    autoComplete="email"
+                    type='email'
+                    id='login-email'
+                    placeholder='you@example.com'
+                    autoComplete='email'
                     aria-invalid={fieldState.invalid}
                   />
                   {fieldState.invalid && (
@@ -88,17 +88,17 @@ export function LoginForm() {
               )}
             />
             <Controller
-              name="password"
+              name='password'
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="login-password">Password</FieldLabel>
+                  <FieldLabel htmlFor='login-password'>Password</FieldLabel>
                   <Input
                     {...field}
-                    type="password"
-                    id="login-password"
-                    placeholder="Enter your password"
-                    autoComplete="current-password"
+                    type='password'
+                    id='login-password'
+                    placeholder='Enter your password'
+                    autoComplete='current-password'
                     aria-invalid={fieldState.invalid}
                   />
                   {fieldState.invalid && (
@@ -109,34 +109,43 @@ export function LoginForm() {
             />
           </FieldGroup>
 
+          <div className='py-4'>
+            <Link
+              href='/forgot-password'
+              className='text-blue-500 text-sm hover:underline'
+            >
+              Forgot password?
+            </Link>
+          </div>
+
           {submitError && (
-            <p className="text-sm text-destructive">{submitError}</p>
+            <p className='text-sm text-destructive'>{submitError}</p>
           )}
 
-          <div className="space-y-2">
+          <div className='space-y-2'>
             <Button
-              type="submit"
+              type='submit'
               disabled={form.formState.isSubmitting}
-              className="w-full cursor-pointer"
+              className='w-full cursor-pointer'
             >
               {form.formState.isSubmitting ? 'Logging in...' : 'Log in'}
             </Button>
 
-            <div className="flex items-center gap-2">
-              <div className="h-px flex-1 bg-border" />
-              <span className="text-xs text-muted-foreground">or</span>
-              <div className="h-px flex-1 bg-border" />
+            <div className='flex items-center gap-2'>
+              <div className='h-px flex-1 bg-border' />
+              <span className='text-xs text-muted-foreground'>or</span>
+              <div className='h-px flex-1 bg-border' />
             </div>
 
-            <GoogleSignInButton mode="login" />
+            <GoogleSignInButton mode='login' />
           </div>
         </form>
       </CardContent>
 
       <CardFooter>
-        <p className="text-sm text-muted-foreground mx-auto">
+        <p className='text-sm text-muted-foreground mx-auto'>
           Don&apos;t have an account?{' '}
-          <Link href="/signup" className="text-primary hover:underline">
+          <Link href='/signup' className='text-primary hover:underline'>
             Sign up
           </Link>
         </p>
