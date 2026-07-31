@@ -1,0 +1,43 @@
+# Maven build output
+target/
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+.eclipse/
+.settings/
+.classpath
+.project
+
+# Environment files
+.env
+.env.properties
+.env.local
+.env.*.local
+*.env
+
+# Git files
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+*.md
+
+# Logs
+*.log
+logs/
+
+# Test sources
+src/test/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Docker files
+Dockerfile
+.dockerignore
