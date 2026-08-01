@@ -91,7 +91,7 @@ public class VideoService {
         String presignedGetUrl = s3Service.generatePresignedGetUrl(video.getS3Key());
 
         // Tell Mux to grab this video from S3
-        Asset asset = muxService.createAsset(presignedGetUrl);
+        Asset asset = muxService.createAsset(presignedGetUrl, video.getTitle(), userId, videoId);
 
         video.setMuxAssetId(asset.getId());
         video.setStatus(VideoStatus.PROCESSING);
