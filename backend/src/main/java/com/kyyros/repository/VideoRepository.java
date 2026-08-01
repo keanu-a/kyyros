@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -17,4 +18,7 @@ public interface VideoRepository extends JpaRepository<Video, UUID> {
     @Query("SELECT v FROM Video v JOIN FETCH v.uploader " +
             "WHERE v.status = com.kyyros.enums.VideoStatus.READY ORDER BY v.createdAt DESC")
     Page<Video> findReadyVideos(Pageable pageable);
+
+    @Query("SELECT v FROM Video v JOIN FETCH v.uploader WHERE v.id = :videoId")
+    Optional<Video> findByIdWithUploader(@Param("videoId") UUID videoId);
 }
