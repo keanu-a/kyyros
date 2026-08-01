@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -24,12 +25,18 @@ public class MuxService {
      * @param sourceUrl Publicly accessible URL
      * @return The created Mux asset
      */
-    public Asset createAsset(String sourceUrl) {
+    public Asset createAsset(String sourceUrl, String title, UUID userId, UUID videoId) {
         AssetsApi assetsApi = new AssetsApi(apiClient);
+
+        AssetMetadata metadata = new AssetMetadata()
+                .title(title)
+                .creatorId(userId.toString())
+                .externalId(videoId.toString());
 
         CreateAssetRequest createAssetRequest = new CreateAssetRequest()
                 .input(List.of(new InputSettings().url(sourceUrl)))
-                .playbackPolicies(List.of(PlaybackPolicy.PUBLIC));
+                .playbackPolicies(List.of(PlaybackPolicy.PUBLIC))
+                .meta(metadata);
 
         try {
             AssetResponse assetResponse = assetsApi.createAsset(createAssetRequest).execute();
