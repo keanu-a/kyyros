@@ -153,7 +153,7 @@ public class VideoService {
     }
 
     public GetVideoResponse getVideoById(UUID videoId) {
-        Video video = videoRepository.findById(videoId)
+        Video video = videoRepository.findByIdWithUploader(videoId)
                 .orElseThrow(() -> new ResourceNotFoundException("Video not found: " + videoId));
 
         User uploader = video.getUploader();
