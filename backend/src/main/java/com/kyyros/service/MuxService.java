@@ -53,4 +53,16 @@ public class MuxService {
             throw new MuxIntegrationException("Failed to create Mux asset.", e);
         }
     }
+
+    public void deleteAsset(String assetId) {
+        AssetsApi assetsApi = new AssetsApi(apiClient);
+
+        try {
+            assetsApi.deleteAsset(assetId).execute();
+            log.info("Deleted Mux asset: {}", assetId);
+        } catch (ApiException e) {
+            log.error("Failed to delete Mux asset: Status={}, Body={}", e.getCode(), e.getResponseBody());
+            throw new MuxIntegrationException("Failed to delete Mux asset.", e);
+        }
+    }
 }
