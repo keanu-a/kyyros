@@ -61,6 +61,16 @@ public class VideoController {
         return ResponseEntity.noContent().build();
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteVideo(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal String userId
+    ) {
+        videoService.deleteVideo(id, UUID.fromString(userId));
+
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping("/{videoId}/comments")
     @RateLimit(name = "comment-create", capacity = 10, periodSeconds = 60)
     public ResponseEntity<CommentResponse> createComment(

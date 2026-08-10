@@ -172,4 +172,18 @@ public class VideoService {
                 video.getCreatedAt()
         );
     }
+
+    public void deleteVideo(UUID videoId, UUID userId) {
+        Video video = videoRepository.findById(videoId)
+                .orElseThrow(() -> new ResourceNotFoundException("Video not found: "+ videoId));
+
+        if (!video.getUploader().getId().equals(userId)) {
+            throw new ForbiddenOperationException("You do not have permission to delete this video");
+        }
+
+        s3Service.deleteObject(video.getS3Key());
+        muxService.deleteAsset(video.getMuxAssetId());
+
+        videoRepository.delete(video);
+    }
 }
