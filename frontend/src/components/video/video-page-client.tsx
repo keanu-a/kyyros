@@ -10,11 +10,13 @@ import { GetVideoResponse } from '@/lib/api/videos';
 import type { Comment } from '@/lib/api/comments';
 import { CommentsProvider } from '@/contexts/comments-context';
 
-import { Button } from '../ui/button';
 import VideoPlayer from './video-player';
 import CommentSection from './comment-section';
 import TimestampCommentSidebar from './timestamp-comment-sidebar';
 import FullscreenSidebarSlot from './fullscreen-sidebar-slot';
+import { Button } from '../ui/button';
+import { Ellipsis } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 
 type VideoPageClientProps = {
   video: GetVideoResponse;
@@ -82,7 +84,7 @@ export default function VideoPageClient({
               </p>
 
               {/* Byline row */}
-              <div className='flex items-center mb-4 space-x-6'>
+              <div className='flex items-center mb-4 space-x-6 justify-between w-full'>
                 <div className='flex items-center gap-2'>
                   <Image
                     src='/default-profile-picture.svg'
@@ -93,9 +95,23 @@ export default function VideoPageClient({
                   />
                   <span className='text-sm'>@{video.uploader?.username}</span>
                 </div>
-                <Button className='text-xs px-3 py-1.5 rounded-full'>
+                <Popover>
+                  <PopoverTrigger>
+                    <Ellipsis className='cursor-pointer' size={20} />
+                  </PopoverTrigger>
+                  <PopoverContent className='p-1' align='end'>
+                    <Button
+                      variant='ghost'
+                      className='w-full justify-start text-sm cursor-pointer'
+                    >
+                      Delete Video
+                    </Button>
+                  </PopoverContent>
+                </Popover>
+                {/* TODO: Add follow button functionality */}
+                {/* <Button className='text-xs px-3 py-1.5 rounded-full'>
                   Follow
-                </Button>
+                </Button> */}
               </div>
 
               {/* Description */}
