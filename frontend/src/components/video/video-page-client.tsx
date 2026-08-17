@@ -2,21 +2,35 @@
 
 import { ComponentRef, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import { Ellipsis, EllipsisIcon, Trash2, Trash2Icon } from 'lucide-react';
 
 import type { MediaController } from 'media-chrome/react';
 import type MuxVideo from '@mux/mux-video-react';
 
-import { GetVideoResponse } from '@/lib/api/videos';
+import { deleteVideo, GetVideoResponse } from '@/lib/api/videos';
 import type { Comment } from '@/lib/api/comments';
 import { CommentsProvider } from '@/contexts/comments-context';
+import { useUser } from '@/contexts/user-context';
 
 import VideoPlayer from './video-player';
 import CommentSection from './comment-section';
 import TimestampCommentSidebar from './timestamp-comment-sidebar';
 import FullscreenSidebarSlot from './fullscreen-sidebar-slot';
-import { Button } from '../ui/button';
-import { Ellipsis } from 'lucide-react';
+import { Button, buttonVariants } from '../ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTrigger,
+} from '../ui/dialog';
+import { cn } from '@/lib/utils';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu';
 
 type VideoPageClientProps = {
   video: GetVideoResponse;
@@ -32,6 +46,11 @@ export default function VideoPageClient({
   const [mediaControllerEl, setMediaControllerEl] = useState<ComponentRef<
     typeof MediaController
   > | null>(null);
+  const { user, isAuthenticated } = useUser();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // Moves video playback to selected timestamp and plays video
   const seekToTimestamp = (timestampSeconds: number) => {
@@ -44,6 +63,23 @@ export default function VideoPageClient({
       behavior: 'smooth',
     });
   };
+
+  const handleOpenDialog = () => {
+    setIsPopoverOpen(false);
+    setIsDialogOpen(true);
+  };
+
+  // const handleDeleteVideo = async () => {
+  //   setIsDeleting(true);
+  //   setDeleteError(null);
+  //   try {
+  //     await deleteVideo(video.id);
+  //   } catch (error) {
+  //     console.error('Error deleting video:', error);
+  //   } finally {
+  //     setIsDeleting(false);
+  //   }
+  // };
 
   // Handles setting fullscreen ref when DOM is ready
   useEffect(() => {
@@ -95,23 +131,35 @@ export default function VideoPageClient({
                   />
                   <span className='text-sm'>@{video.uploader?.username}</span>
                 </div>
-                <Popover>
-                  <PopoverTrigger>
-                    <Ellipsis className='cursor-pointer' size={20} />
-                  </PopoverTrigger>
-                  <PopoverContent className='p-1' align='end'>
-                    <Button
-                      variant='ghost'
-                      className='w-full justify-start text-sm cursor-pointer'
-                    >
-                      Delete Video
-                    </Button>
-                  </PopoverContent>
-                </Popover>
-                {/* TODO: Add follow button functionality */}
-                {/* <Button className='text-xs px-3 py-1.5 rounded-full'>
-                  Follow
-                </Button> */}
+                {isAuthenticated && user?.id === video.uploader?.id && (
+                  <div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger className='cursor-pointer'>
+                        <EllipsisIcon />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align='end'>
+                        <DropdownMenuItem
+                          variant='destructive'
+                          className='cursor-pointer'
+                          onSelect={() => setIsDialogOpen(true)}
+                        >
+                          <Trash2Icon />
+                          Delete Video
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                      <DialogContent>
+                        <DialogHeader>
+                          Are you sure you want to delete this video? This
+                          action cannot be undone.
+                        </DialogHeader>
+                        <div>Wow</div>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                )}
               </div>
 
               {/* Description */}
