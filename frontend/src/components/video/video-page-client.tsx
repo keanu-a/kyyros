@@ -2,7 +2,7 @@
 
 import { ComponentRef, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import { Ellipsis, EllipsisIcon, Trash2, Trash2Icon } from 'lucide-react';
+import { EllipsisIcon, Trash2Icon } from 'lucide-react';
 
 import type { MediaController } from 'media-chrome/react';
 import type MuxVideo from '@mux/mux-video-react';
@@ -16,21 +16,21 @@ import VideoPlayer from './video-player';
 import CommentSection from './comment-section';
 import TimestampCommentSidebar from './timestamp-comment-sidebar';
 import FullscreenSidebarSlot from './fullscreen-sidebar-slot';
-import { Button, buttonVariants } from '../ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
-  DialogTrigger,
+  DialogTitle,
 } from '../ui/dialog';
-import { cn } from '@/lib/utils';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
+import { Button } from '../ui/button';
 
 type VideoPageClientProps = {
   video: GetVideoResponse;
@@ -49,8 +49,20 @@ export default function VideoPageClient({
   const { user, isAuthenticated } = useUser();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  // Countdown timer for delete button
+  const [countdown, setCountdown] = useState(3);
+  useEffect(() => {
+    if (!isDialogOpen) return;
+
+    setCountdown(3);
+    const interval = setInterval(() => {
+      setCountdown((prev) => (prev <= 1 ? 0 : prev - 1));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [isDialogOpen]);
 
   // Moves video playback to selected timestamp and plays video
   const seekToTimestamp = (timestampSeconds: number) => {
@@ -63,23 +75,6 @@ export default function VideoPageClient({
       behavior: 'smooth',
     });
   };
-
-  const handleOpenDialog = () => {
-    setIsPopoverOpen(false);
-    setIsDialogOpen(true);
-  };
-
-  // const handleDeleteVideo = async () => {
-  //   setIsDeleting(true);
-  //   setDeleteError(null);
-  //   try {
-  //     await deleteVideo(video.id);
-  //   } catch (error) {
-  //     console.error('Error deleting video:', error);
-  //   } finally {
-  //     setIsDeleting(false);
-  //   }
-  // };
 
   // Handles setting fullscreen ref when DOM is ready
   useEffect(() => {
@@ -132,10 +127,10 @@ export default function VideoPageClient({
                   <span className='text-sm'>@{video.uploader?.username}</span>
                 </div>
                 {isAuthenticated && user?.id === video.uploader?.id && (
-                  <div>
+                  <div className='flex items-center gap-2'>
                     <DropdownMenu>
                       <DropdownMenuTrigger className='cursor-pointer'>
-                        <EllipsisIcon />
+                        <EllipsisIcon size={20} />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align='end'>
                         <DropdownMenuItem
@@ -152,10 +147,27 @@ export default function VideoPageClient({
                     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                       <DialogContent>
                         <DialogHeader>
-                          Are you sure you want to delete this video? This
-                          action cannot be undone.
+                          <DialogTitle>Delete Video</DialogTitle>
+                          <DialogDescription>
+                            Are you sure? This action cannot be undone.
+                          </DialogDescription>
                         </DialogHeader>
-                        <div>Wow</div>
+                        <DialogFooter>
+                          <Button
+                            variant='outline'
+                            className='cursor-pointer'
+                            onClick={() => setIsDialogOpen(false)}
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            variant='destructive'
+                            className='cursor-pointer'
+                            disabled={countdown > 0}
+                          >
+                            {countdown > 0 ? `Delete (${countdown})` : 'Delete'}
+                          </Button>
+                        </DialogFooter>
                       </DialogContent>
                     </Dialog>
                   </div>

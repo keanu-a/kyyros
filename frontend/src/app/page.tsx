@@ -11,7 +11,6 @@ export default async function Home() {
           </div>
         </div>
       </section>
-
       <section className='container mx-auto'>
         <VideoFeed />
       </section>
