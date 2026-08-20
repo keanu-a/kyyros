@@ -181,8 +181,17 @@ public class VideoService {
             throw new ForbiddenOperationException("You do not have permission to delete this video");
         }
 
-        s3Service.deleteObject(video.getS3Key());
-        muxService.deleteAsset(video.getMuxAssetId());
+        try {
+            muxService.deleteAsset(video.getMuxAssetId());
+        } catch (Exception e) {
+            log.error("Failed to delete asset {}: {}", videoId, e.getMessage());
+        }
+
+        try {
+            s3Service.deleteObject(video.getS3Key());
+        } catch (Exception e) {
+            log.error("Failed to delete object {}: {}", videoId, e.getMessage());
+        }
 
         videoRepository.delete(video);
     }

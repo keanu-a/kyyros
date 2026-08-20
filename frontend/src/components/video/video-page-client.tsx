@@ -2,19 +2,37 @@
 
 import { ComponentRef, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { EllipsisIcon, Loader2, Trash2Icon } from 'lucide-react';
+import { toast } from 'sonner';
 
 import type { MediaController } from 'media-chrome/react';
 import type MuxVideo from '@mux/mux-video-react';
 
-import { GetVideoResponse } from '@/lib/api/videos';
+import { deleteVideo, GetVideoResponse } from '@/lib/api/videos';
 import type { Comment } from '@/lib/api/comments';
 import { CommentsProvider } from '@/contexts/comments-context';
+import { useUser } from '@/contexts/user-context';
 
-import { Button } from '../ui/button';
 import VideoPlayer from './video-player';
 import CommentSection from './comment-section';
 import TimestampCommentSidebar from './timestamp-comment-sidebar';
 import FullscreenSidebarSlot from './fullscreen-sidebar-slot';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '../ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu';
+import { Button } from '../ui/button';
 
 type VideoPageClientProps = {
   video: GetVideoResponse;
@@ -30,6 +48,49 @@ export default function VideoPageClient({
   const [mediaControllerEl, setMediaControllerEl] = useState<ComponentRef<
     typeof MediaController
   > | null>(null);
+  const { user, isAuthenticated } = useUser();
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const router = useRouter();
+
+  // Countdown timer for delete button
+  const [countdown, setCountdown] = useState(3);
+  useEffect(() => {
+    if (!isDialogOpen) return;
+
+    const interval = setInterval(() => {
+      setCountdown((prev) => (prev <= 1 ? 0 : prev - 1));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [isDialogOpen]);
+
+  const handleOpenDeleteDialog = () => {
+    setCountdown(3);
+    setIsDialogOpen(true);
+  };
+
+  const handleDeleteVideo = async () => {
+    setIsDeleting(true);
+    try {
+      await deleteVideo(video.id);
+      setIsDialogOpen(false);
+      router.push('/');
+      toast.success('Video deleted successfully.', {
+        position: 'top-center',
+      });
+    } catch (error) {
+      console.error('Error deleting video:', error);
+      toast.error('Failed to delete video. Please try again later.', {
+        position: 'top-center',
+      });
+      setIsDialogOpen(false);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   // Moves video playback to selected timestamp and plays video
   const seekToTimestamp = (timestampSeconds: number) => {
@@ -82,7 +143,7 @@ export default function VideoPageClient({
               </p>
 
               {/* Byline row */}
-              <div className='flex items-center mb-4 space-x-6'>
+              <div className='flex items-center mb-4 space-x-6 justify-between w-full'>
                 <div className='flex items-center gap-2'>
                   <Image
                     src='/default-profile-picture.svg'
@@ -93,9 +154,59 @@ export default function VideoPageClient({
                   />
                   <span className='text-sm'>@{video.uploader?.username}</span>
                 </div>
-                <Button className='text-xs px-3 py-1.5 rounded-full'>
-                  Follow
-                </Button>
+                {isAuthenticated && user?.id === video.uploader?.id && (
+                  <div className='flex items-center gap-2'>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger className='cursor-pointer'>
+                        <EllipsisIcon size={20} />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align='end'>
+                        <DropdownMenuItem
+                          variant='destructive'
+                          className='cursor-pointer'
+                          onSelect={handleOpenDeleteDialog}
+                        >
+                          <Trash2Icon />
+                          Delete Video
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Delete Video</DialogTitle>
+                          <DialogDescription>
+                            Are you sure? This action cannot be undone.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <DialogFooter>
+                          <Button
+                            variant='outline'
+                            className='cursor-pointer'
+                            onClick={() => setIsDialogOpen(false)}
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            variant='destructive'
+                            className='cursor-pointer'
+                            disabled={countdown > 0 || isDeleting}
+                            onClick={handleDeleteVideo}
+                          >
+                            {isDeleting ? (
+                              <Loader2 className='animate-spin' size={20} />
+                            ) : countdown > 0 ? (
+                              `Delete (${countdown})`
+                            ) : (
+                              'Delete'
+                            )}
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                )}
               </div>
 
               {/* Description */}

@@ -104,3 +104,13 @@ export function getVideos(
     { requireAuth: false },
   );
 }
+
+export function deleteVideo(videoId: string): Promise<void> {
+  return apiFetch(
+    `/api/v1/videos/${videoId}`,
+    {
+      method: 'DELETE',
+    },
+    { requireAuth: true },
+  );
+}
