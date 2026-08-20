@@ -4,6 +4,7 @@ import './globals.css';
 import { cn } from '@/lib/utils';
 import { UserProvider } from '@/contexts/user-context';
 import Navbar from '@/components/navbar';
+import { Toaster } from 'sonner';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -44,6 +45,7 @@ export default function RootLayout({
           <Navbar />
           {children}
         </UserProvider>
+        <Toaster />
       </body>
     </html>
   );
