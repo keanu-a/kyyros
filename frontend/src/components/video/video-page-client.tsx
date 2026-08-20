@@ -77,7 +77,7 @@ export default function VideoPageClient({
     try {
       await deleteVideo(video.id);
       setIsDialogOpen(false);
-      router.push('/'); // Redirect to home page after deletion
+      router.push('/');
       toast.success('Video deleted successfully.', {
         position: 'top-center',
       });
