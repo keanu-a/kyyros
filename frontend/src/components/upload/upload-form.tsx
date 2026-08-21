@@ -3,7 +3,10 @@
 import * as z from 'zod';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import Link from 'next/link';
+import { ArrowLeftToLineIcon, LoaderCircleIcon } from 'lucide-react';
 
+import { cn } from '@/lib/utils';
 import { isContentType } from '@/lib/api/videos';
 import { UploadStatus, useVideoUpload } from '@/hooks/use-video-upload';
 
@@ -18,7 +21,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from '../ui/field';
 import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
 import { Progress } from '../ui/progress';
-import { Button } from '../ui/button';
+import { Button, buttonVariants } from '../ui/button';
 
 const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500MB
 
@@ -47,7 +50,8 @@ const uploadSchema = z.object({
 type UploadFormValues = z.infer<typeof uploadSchema>;
 
 export default function UploadForm() {
-  const { uploadStatus, progress, error, upload } = useVideoUpload();
+  const { uploadStatus, progress, error, playbackId, upload } =
+    useVideoUpload();
 
   const form = useForm<UploadFormValues>({
     resolver: zodResolver(uploadSchema),
@@ -70,12 +74,30 @@ export default function UploadForm() {
     upload(file, { title, description, contentType: file.type });
   };
 
-  // TODO: Currently dead end, need to implement a way to navigate to the uploaded video
   if (uploadStatus === UploadStatus.READY) {
     return (
       <Card>
         <CardContent>
-          <p>Upload complete and processed!</p>
+          <p className='text-md font-semibold'>Upload complete and processed</p>
+          <p className='text-md text-muted-foreground'>
+            Video is ready to view
+          </p>
+
+          <div className='flex gap-2'>
+            <Link
+              className={cn(buttonVariants({ variant: 'secondary' }), 'mt-4')}
+              href='/'
+            >
+              <ArrowLeftToLineIcon className='h-4 w-4' />
+              Return Home
+            </Link>
+            <Link
+              className={cn(buttonVariants({ variant: 'default' }), 'mt-4')}
+              href={`/videos/${playbackId}`}
+            >
+              View Video
+            </Link>
+          </div>
         </CardContent>
       </Card>
     );
@@ -89,17 +111,17 @@ export default function UploadForm() {
       </CardHeader>
       <CardContent>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <FieldGroup>
+          <FieldGroup className='mb-4'>
             <Controller
-              name="title"
+              name='title'
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="upload-title">Title</FieldLabel>
+                  <FieldLabel htmlFor='upload-title'>Title</FieldLabel>
                   <Input
                     {...field}
-                    id="upload-title"
-                    placeholder="Title"
+                    id='upload-title'
+                    placeholder='Title'
                     aria-invalid={fieldState.invalid}
                     disabled={isWorking}
                   />
@@ -111,17 +133,17 @@ export default function UploadForm() {
             />
 
             <Controller
-              name="description"
+              name='description'
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="upload-description">
+                  <FieldLabel htmlFor='upload-description'>
                     Description
                   </FieldLabel>
                   <Textarea
                     {...field}
-                    id="upload-description"
-                    placeholder="Description"
+                    id='upload-description'
+                    placeholder='Description'
                     aria-invalid={fieldState.invalid}
                     disabled={isWorking}
                   />
@@ -133,19 +155,19 @@ export default function UploadForm() {
             />
 
             <Controller
-              name="file"
+              name='file'
               control={form.control}
               render={({
                 field: { value, onChange, ...field },
                 fieldState,
               }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="upload-file">File</FieldLabel>
+                  <FieldLabel htmlFor='upload-file'>File</FieldLabel>
                   <Input
                     {...field}
-                    type="file"
-                    id="upload-file"
-                    accept="video/*"
+                    type='file'
+                    id='upload-file'
+                    accept='video/*'
                     aria-invalid={fieldState.invalid}
                     disabled={isWorking}
                     onChange={(e) => onChange(e.target.files?.item(0))}
@@ -166,19 +188,22 @@ export default function UploadForm() {
           )}
 
           {uploadStatus === UploadStatus.PROCESSING && (
-            <p>Processing... this can take a minute</p>
+            <p className='flex items-center gap-1 text-muted-foreground'>
+              <LoaderCircleIcon size={16} className='animate-spin' />
+              Processing... this can take a minute
+            </p>
           )}
 
           {error && (
-            <p role="alert" className="text-destructive">
+            <p role='alert' className='text-destructive'>
               {error}
             </p>
           )}
 
           <Button
-            type="submit"
+            type='submit'
             disabled={isWorking}
-            className="w-full mt-4 cursor-pointer"
+            className='w-full mt-4 cursor-pointer'
           >
             {isWorking ? 'Uploading...' : 'Upload'}
           </Button>
