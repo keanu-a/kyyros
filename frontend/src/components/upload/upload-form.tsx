@@ -4,7 +4,7 @@ import * as z from 'zod';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
-import { ArrowLeftToLineIcon } from 'lucide-react';
+import { ArrowLeftToLineIcon, LoaderCircleIcon } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { isContentType } from '@/lib/api/videos';
@@ -111,7 +111,7 @@ export default function UploadForm() {
       </CardHeader>
       <CardContent>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <FieldGroup>
+          <FieldGroup className='mb-4'>
             <Controller
               name='title'
               control={form.control}
@@ -188,7 +188,10 @@ export default function UploadForm() {
           )}
 
           {uploadStatus === UploadStatus.PROCESSING && (
-            <p>Processing... this can take a minute</p>
+            <p className='flex items-center gap-1 text-muted-foreground'>
+              <LoaderCircleIcon size={16} className='animate-spin' />
+              Processing... this can take a minute
+            </p>
           )}
 
           {error && (
