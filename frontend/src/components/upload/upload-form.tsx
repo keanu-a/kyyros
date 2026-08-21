@@ -50,8 +50,7 @@ const uploadSchema = z.object({
 type UploadFormValues = z.infer<typeof uploadSchema>;
 
 export default function UploadForm() {
-  const { uploadStatus, progress, error, playbackId, upload } =
-    useVideoUpload();
+  const { uploadStatus, progress, error, videoId, upload } = useVideoUpload();
 
   const form = useForm<UploadFormValues>({
     resolver: zodResolver(uploadSchema),
@@ -93,7 +92,7 @@ export default function UploadForm() {
             </Link>
             <Link
               className={cn(buttonVariants({ variant: 'default' }), 'mt-4')}
-              href={`/videos/${playbackId}`}
+              href={`/videos/${videoId}`}
             >
               View Video
             </Link>
