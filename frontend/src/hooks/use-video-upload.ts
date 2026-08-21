@@ -34,7 +34,7 @@ export function useVideoUpload() {
   const [uploadStatus, setUploadStatus] = useState<UploadStatus>(
     UploadStatus.IDLE,
   );
-  const [playbackId, setPlaybackId] = useState<string | null>(null);
+  const [videoId, setVideoId] = useState<string | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(
@@ -66,7 +66,6 @@ export function useVideoUpload() {
         const video = await getVideo(videoId);
         if (video.status === VideoStatus.READY) {
           clearInterval(pollRef.current!);
-          setPlaybackId(video.playbackId);
           setUploadStatus(UploadStatus.READY);
         } else if (video.status === VideoStatus.FAILED) {
           clearInterval(pollRef.current!);
@@ -96,6 +95,8 @@ export function useVideoUpload() {
           contentType: metadata.contentType,
         });
 
+        setVideoId(videoId);
+
         // Upload the file to S3
         setUploadStatus(UploadStatus.UPLOADING);
         await uploadToS3(presignedUrl, file, setProgress);
@@ -114,5 +115,5 @@ export function useVideoUpload() {
     [pollUntilReady],
   );
 
-  return { uploadStatus, progress, error, playbackId, upload };
+  return { uploadStatus, progress, error, videoId, upload };
 }
