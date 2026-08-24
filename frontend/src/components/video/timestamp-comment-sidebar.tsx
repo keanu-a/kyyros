@@ -8,15 +8,12 @@ export default function TimestampCommentSidebar() {
   const {
     timestampedComments,
     seekToTimestamp,
-    isSidebarOpen,
     closeCommentSidebar,
     selectedCommentId,
   } = useComments();
 
-  if (!isSidebarOpen) return <></>;
-
   return (
-    <div className='hidden landscape:flex sm:flex flex-col h-[90vh] border rounded-md bg-background'>
+    <div className='landscape:flex sm:flex flex-col h-[90vh] border rounded-md bg-background'>
       <div>
         <Button
           className='rounded-full cursor-pointer m-2 shrink-0'

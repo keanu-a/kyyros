@@ -90,11 +90,16 @@ export function getVideo(videoId: string): Promise<GetVideoResponse> {
 export function getVideos(
   page: number,
   size: number,
+  excludeVideoId?: string,
 ): Promise<PagedResponse<VideoSummaryResponse>> {
   const params = new URLSearchParams({
     page: page.toString(),
     size: size.toString(),
   });
+
+  if (excludeVideoId) {
+    params.set('excludeVideoId', excludeVideoId);
+  }
 
   return apiFetch(
     `/api/v1/videos?${params}`,

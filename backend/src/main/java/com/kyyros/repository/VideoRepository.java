@@ -16,8 +16,10 @@ public interface VideoRepository extends JpaRepository<Video, UUID> {
     Optional<Video> findByMuxAssetId(String muxAssetId);
 
     @Query("SELECT v FROM Video v JOIN FETCH v.uploader " +
-            "WHERE v.status = com.kyyros.enums.VideoStatus.READY ORDER BY v.createdAt DESC")
-    Page<Video> findReadyVideos(Pageable pageable);
+            "WHERE v.status = com.kyyros.enums.VideoStatus.READY " +
+            "AND (:excludeVideoId IS NULL OR v.id != :excludeVideoId) " +
+            "ORDER BY v.createdAt DESC")
+    Page<Video> findReadyVideos(Pageable pageable, UUID excludeVideoId);
 
     @Query("SELECT v FROM Video v JOIN FETCH v.uploader WHERE v.id = :videoId")
     Optional<Video> findByIdWithUploader(@Param("videoId") UUID videoId);

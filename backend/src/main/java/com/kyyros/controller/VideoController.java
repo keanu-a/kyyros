@@ -37,9 +37,10 @@ public class VideoController {
 
     @GetMapping
     public ResponseEntity<Page<VideoSummaryResponse>> getAllVideos(
-            @PageableDefault(size = 10) Pageable pageable
+            @PageableDefault(size = 10) Pageable pageable,
+            @RequestParam(required = false) UUID excludeVideoId
     ) {
-        Page<VideoSummaryResponse> response = videoService.getVideos(pageable);
+        Page<VideoSummaryResponse> response = videoService.getVideos(pageable, excludeVideoId);
         return ResponseEntity.ok(response);
     }
 
