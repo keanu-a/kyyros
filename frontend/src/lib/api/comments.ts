@@ -43,3 +43,15 @@ export function createComment(
     },
   );
 }
+
+export function deleteComment(commentId: string): Promise<void> {
+  return apiFetch(
+    `/api/v1/comments/${commentId}`,
+    {
+      method: 'DELETE',
+    },
+    {
+      requireAuth: true,
+    },
+  );
+}
