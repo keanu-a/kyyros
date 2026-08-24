@@ -5,6 +5,7 @@ import { Comment } from '@/lib/api/comments';
 type CommentsContextType = {
   allComments: Comment[];
   handleAddComment: (newComment: Comment) => void;
+  handleDeleteComment: (commentId: string) => void;
   timestampedComments: Comment[];
   isSidebarOpen: boolean;
   selectedCommentId: string | null;
@@ -57,11 +58,18 @@ export function CommentsProvider({
     setAllComments((prev) => [newComment, ...prev]);
   };
 
+  const handleDeleteComment = (commentId: string) => {
+    setAllComments((prev) =>
+      prev.filter((comment) => comment.id !== commentId),
+    );
+  };
+
   return (
     <CommentsContext.Provider
       value={{
         allComments,
         handleAddComment,
+        handleDeleteComment,
         timestampedComments,
         isSidebarOpen,
         selectedCommentId,
