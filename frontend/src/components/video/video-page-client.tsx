@@ -15,7 +15,6 @@ import { useUser } from '@/contexts/user-context';
 
 import VideoPlayer from './video-player';
 import CommentSection from './comment-section';
-import TimestampCommentSidebar from './timestamp-comment-sidebar';
 import FullscreenSidebarSlot from './fullscreen-sidebar-slot';
 import {
   DropdownMenu,
@@ -24,6 +23,7 @@ import {
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
 import ConfirmDialog from '../confirm-dialog';
+import VideoPageClientAside from './video-page-client-aside';
 
 type VideoPageClientProps = {
   video: GetVideoResponse;
@@ -171,7 +171,7 @@ export default function VideoPageClient({
         </div>
 
         <div className='hidden sm:w-64 md:w-72 lg:w-96 shrink-0 sm:flex flex-col'>
-          <TimestampCommentSidebar />
+          <VideoPageClientAside videoId={video.id} />
         </div>
       </div>
     </CommentsProvider>

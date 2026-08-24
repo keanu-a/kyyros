@@ -4,7 +4,7 @@ import { getVideos, type VideoSummaryResponse } from '@/lib/api/videos';
 
 const PAGE_SIZE = 12;
 
-export function useInfiniteVideos() {
+export function useInfiniteVideos(pageSize?: number, excludeVideoId?: string) {
   const [videos, setVideos] = useState<VideoSummaryResponse[]>([]);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
@@ -22,7 +22,11 @@ export function useInfiniteVideos() {
     setError(null);
 
     try {
-      const response = await getVideos(page, PAGE_SIZE);
+      const response = await getVideos(
+        page,
+        pageSize ?? PAGE_SIZE,
+        excludeVideoId,
+      );
 
       setVideos((prev) => [...prev, ...response.content]);
       setHasMore(page + 1 < response.page.totalPages);
@@ -33,7 +37,7 @@ export function useInfiniteVideos() {
       setIsLoading(false);
       isFetchingRef.current = false;
     }
-  }, [page, hasMore]);
+  }, [page, hasMore, pageSize, excludeVideoId]);
 
   useEffect(() => {
     if (hasFetchedRef.current) return;
