@@ -31,18 +31,19 @@ export default function Navbar() {
   };
 
   return (
-    <nav className='flex items-center justify-between py-3 px-4 sticky top-0 z-50 bg-background'>
+    <nav className='flex items-center justify-between py-3 px-2 sticky top-0 z-50 bg-background text-foreground md:px-4'>
       <Link href='/'>
         <span>Kyyros</span>
       </Link>
 
-      <div className='relative'>
+      {/* TODO: Add search bar when feature is implemented. For now, we can just have a placeholder for the search bar. */}
+      {/* <div className='relative'>
         <Search
           size={18}
           className='absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground'
         />
         <Input placeholder='Search...' className='pl-10 w-auto rounded-full' />
-      </div>
+      </div> */}
 
       <div>
         {isLoading ? null : isAuthenticated && user ? (
