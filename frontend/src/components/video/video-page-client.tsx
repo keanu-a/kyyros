@@ -3,9 +3,8 @@
 import { ComponentRef, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { EllipsisIcon, Loader2, Trash2Icon } from 'lucide-react';
+import { EllipsisIcon, Trash2Icon } from 'lucide-react';
 import { toast } from 'sonner';
-
 import type { MediaController } from 'media-chrome/react';
 import type MuxVideo from '@mux/mux-video-react';
 
@@ -19,20 +18,12 @@ import CommentSection from './comment-section';
 import TimestampCommentSidebar from './timestamp-comment-sidebar';
 import FullscreenSidebarSlot from './fullscreen-sidebar-slot';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '../ui/dialog';
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
-import { Button } from '../ui/button';
+import ConfirmDialog from '../confirm-dialog';
 
 type VideoPageClientProps = {
   video: GetVideoResponse;
@@ -55,24 +46,7 @@ export default function VideoPageClient({
 
   const router = useRouter();
 
-  // Countdown timer for delete button
-  const [countdown, setCountdown] = useState(3);
-  useEffect(() => {
-    if (!isDialogOpen) return;
-
-    const interval = setInterval(() => {
-      setCountdown((prev) => (prev <= 1 ? 0 : prev - 1));
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [isDialogOpen]);
-
-  const handleOpenDeleteDialog = () => {
-    setCountdown(3);
-    setIsDialogOpen(true);
-  };
-
-  const handleDeleteVideo = async () => {
+  const handleConfirmDeleteVideo = async () => {
     setIsDeleting(true);
     try {
       await deleteVideo(video.id);
@@ -164,7 +138,7 @@ export default function VideoPageClient({
                         <DropdownMenuItem
                           variant='destructive'
                           className='cursor-pointer'
-                          onSelect={handleOpenDeleteDialog}
+                          onSelect={() => setIsDialogOpen(true)}
                         >
                           <Trash2Icon />
                           Delete Video
@@ -172,39 +146,13 @@ export default function VideoPageClient({
                       </DropdownMenuContent>
                     </DropdownMenu>
 
-                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Delete Video</DialogTitle>
-                          <DialogDescription>
-                            Are you sure? This action cannot be undone.
-                          </DialogDescription>
-                        </DialogHeader>
-                        <DialogFooter>
-                          <Button
-                            variant='outline'
-                            className='cursor-pointer'
-                            onClick={() => setIsDialogOpen(false)}
-                          >
-                            Cancel
-                          </Button>
-                          <Button
-                            variant='destructive'
-                            className='cursor-pointer'
-                            disabled={countdown > 0 || isDeleting}
-                            onClick={handleDeleteVideo}
-                          >
-                            {isDeleting ? (
-                              <Loader2 className='animate-spin' size={20} />
-                            ) : countdown > 0 ? (
-                              `Delete (${countdown})`
-                            ) : (
-                              'Delete'
-                            )}
-                          </Button>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
+                    <ConfirmDialog
+                      title='Delete Video'
+                      open={isDialogOpen}
+                      onOpenChange={setIsDialogOpen}
+                      onConfirm={handleConfirmDeleteVideo}
+                      isPending={isDeleting}
+                    />
                   </div>
                 )}
               </div>
