@@ -141,8 +141,8 @@ public class VideoService {
     }
 
     @Transactional(readOnly = true)
-    public Page<VideoSummaryResponse> getVideos(Pageable pageable) {
-        return videoRepository.findReadyVideos(pageable)
+    public Page<VideoSummaryResponse> getVideos(Pageable pageable, UUID excludeVideoId) {
+        return videoRepository.findReadyVideos(pageable, excludeVideoId)
                 .map(video -> new VideoSummaryResponse(
                         video.getId(),
                         video.getTitle(),
