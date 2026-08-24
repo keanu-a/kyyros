@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
-import { EllipsisIcon, Loader2, Trash2Icon } from 'lucide-react';
+import { EllipsisIcon, Trash2Icon } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { deleteComment, type Comment } from '@/lib/api/comments';
