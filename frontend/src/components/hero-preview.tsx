@@ -41,9 +41,9 @@ function Bubble({ name, text }: { name: string; text: string }) {
 
 export default function HeroPreview() {
   return (
-    <div className='relative w-full h-60 aspect-video rounded-xl overflow-hidden bg-black/10 sm:h-80'>
+    <div className='relative w-full h-60 aspect-video overflow-hidden bg-black/10 sm:h-80 sm:rounded-xl'>
       {/* Hero text*/}
-      <div className='absolute inset-0 flex items-center justify-center px-6 pb-24'>
+      <div className='absolute inset-0 flex items-center justify-center px-6 pb-20'>
         <div className='text-center'>
           <h1 className='text-2xl md:text-4xl font-semibold tracking-tight leading-[1.1] text-black mb-2'>
             Comment where it happens.
