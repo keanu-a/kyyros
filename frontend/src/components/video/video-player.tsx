@@ -118,7 +118,7 @@ export default function VideoPlayer({
   // Derived
   const idleOffset = controlBarHeight - 2 + timeRangeBarHeight / 2;
 
-  // Placeholder reserves layout so theres no shift when the player swaps i
+  // Placeholder reserves layout so theres no shift when the player swaps in
   if (!isHydrated) {
     return (
       <div
@@ -137,7 +137,11 @@ export default function VideoPlayer({
   return (
     <MediaController
       ref={mediaControllerRef}
-      className={cn(styles.player, isIdle && 'in-fullscreen:cursor-none')}
+      className={cn(
+        styles.player,
+        isIdle && 'in-fullscreen:cursor-none',
+        'sm:rounded-md',
+      )}
       noHotkeys={isTypingComment || undefined}
       onMouseMove={() => resetIdleTimer(isTypingComment)}
       onMouseLeave={() => {
@@ -187,14 +191,16 @@ export default function VideoPlayer({
             </div>
           </div>
 
-          <VideoCommentInput
-            ref={commentInputRef}
-            videoId={videoId}
-            videoRef={videoRef}
-            currentTime={currentTime}
-            resetIdleTimer={resetIdleTimer}
-            onTypingChange={setIsTypingComment}
-          />
+          <div className='hidden sm:flex w-1/2'>
+            <VideoCommentInput
+              ref={commentInputRef}
+              videoId={videoId}
+              videoRef={videoRef}
+              currentTime={currentTime}
+              resetIdleTimer={resetIdleTimer}
+              onTypingChange={setIsTypingComment}
+            />
+          </div>
 
           <div className='flex space-x-2'>
             <MediaFullscreenButton />
