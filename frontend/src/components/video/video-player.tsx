@@ -24,6 +24,7 @@ import { cn } from '@/lib/utils';
 import styles from './video-player.module.css';
 import { useVideoTime } from '@/hooks/use-video-time';
 import VideoCommentInput from './video-comment-input';
+import MobileCommentMarker from './mobile-comment-marker';
 
 type VideoPlayerProps = {
   playbackId: string | null;
@@ -168,9 +169,13 @@ export default function VideoPlayer({
         }}
       />
 
+      <div className='md:hidden'>
+        <MobileCommentMarker videoRef={videoRef} />
+      </div>
+
       <div
         className={cn(
-          'w-full flex flex-col-reverse md:flex-col',
+          'w-full flex md:flex-col',
           'transition-opacity duration-300 md:transition-transform',
           isIdle && !isPaused && 'md:translate-y-(--idle-offset)',
           isIdle && !isPaused && 'max-md:opacity-0 max-md:pointer-events-none',
