@@ -58,6 +58,7 @@ export default function ProfileForm() {
       if (error instanceof Error && error.message.includes('409')) {
         setSubmitError('That username is already taken');
       } else {
+        console.error('Error updating profile:', error);
         setSubmitError('Something went wrong');
       }
     }

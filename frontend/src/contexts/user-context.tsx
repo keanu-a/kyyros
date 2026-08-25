@@ -38,7 +38,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
         userIdRef.current = userData?.id ?? null;
         setUser(userData);
       } catch (e) {
-        console.log('Error fetching user data');
+        if (e instanceof Error && e.name === 'AbortError') return; // Abort is cleanup, not an error
+        console.error('Error fetching user data:', e);
         userIdRef.current = null;
         setUser(null);
       } finally {

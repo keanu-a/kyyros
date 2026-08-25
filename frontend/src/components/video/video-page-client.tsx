@@ -88,7 +88,7 @@ export default function VideoPageClient({
 
   return (
     <CommentsProvider comments={comments} seekToTimestamp={seekToTimestamp}>
-      <div className='max-w-[1850px] mx-auto flex landscape:space-x-2 px-2'>
+      <div className='max-w-[1850px] mx-auto flex landscape:space-x-2 px-4'>
         <div className='flex flex-col w-full flex-1'>
           <div ref={setWrapperEl} className='flex items-center'>
             <VideoPlayer

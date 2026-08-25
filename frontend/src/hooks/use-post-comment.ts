@@ -46,6 +46,7 @@ export function usePostComment(
         });
         setError('rate-limit');
       } else {
+        console.error('Error posting comment:', e);
         toast.error('Failed to post comment. Please try again.', {
           position: 'top-center',
         });
