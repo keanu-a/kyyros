@@ -56,6 +56,7 @@ export default function VideoPageClient({
         position: 'top-center',
       });
     } catch (error) {
+      console.error('Error deleting video:', error);
       toast.error('Failed to delete video. Please try again later.', {
         position: 'top-center',
       });

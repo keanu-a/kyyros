@@ -32,6 +32,7 @@ export function useInfiniteVideos(pageSize?: number, excludeVideoId?: string) {
       setHasMore(page + 1 < response.page.totalPages);
       setPage((prev) => prev + 1);
     } catch (err) {
+      console.error('Error fetching videos:', err);
       setError('Failed to fetch videos');
     } finally {
       setIsLoading(false);

@@ -44,6 +44,7 @@ export function CommentRow({ comment, onSeek, isSelected }: CommentRowProps) {
         position: 'top-center',
       });
     } catch (error) {
+      console.error('Error deleting comment:', error);
       toast.error('Failed to delete comment. Please try again later.', {
         position: 'top-center',
       });

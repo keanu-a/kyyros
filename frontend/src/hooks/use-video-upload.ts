@@ -73,6 +73,7 @@ export function useVideoUpload() {
           setUploadStatus(UploadStatus.ERROR);
         }
       } catch (e) {
+        console.error('Error polling video status: ', e);
         clearInterval(pollRef.current!);
         setError('Error occurred while polling video status');
         setUploadStatus(UploadStatus.ERROR);
@@ -108,6 +109,7 @@ export function useVideoUpload() {
         // Poll for video processing status `READY` set by Mux
         pollUntilReady(videoId);
       } catch (e) {
+        console.error('Error uploading video:', e);
         setError('Error occurred while uploading video');
         setUploadStatus(UploadStatus.ERROR);
       }
