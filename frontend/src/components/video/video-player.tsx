@@ -169,38 +169,55 @@ export default function VideoPlayer({
       />
 
       <div
-        className='w-full transition-transform duration-300'
-        style={{
-          transform:
-            isIdle && !isPaused ? `translateY(${idleOffset}px)` : undefined,
-        }}
+        className={cn(
+          'w-full flex flex-col-reverse md:flex-col',
+          'transition-opacity duration-300 md:transition-transform',
+          isIdle && !isPaused && 'md:translate-y-(--idle-offset)',
+          isIdle && !isPaused && 'max-md:opacity-0 max-md:pointer-events-none',
+        )}
+        style={{ '--idle-offset': `${idleOffset}px` } as React.CSSProperties}
       >
         <MediaControlBar
           ref={setTimeRangeBarEl}
           className={cn(styles.timeRangeBar, 'w-full')}
         >
           <div className={styles.timeline}>
-            <div className={styles.commentStrip}>
+            <div className={cn(styles.commentStrip, 'hidden md:flex')}>
               <CommentMarkers videoRef={videoRef} isHydrated={isHydrated} />
             </div>
             <MediaTimeRange />
           </div>
         </MediaControlBar>
 
+        {/* Mobile only controls */}
+        <div className='md:hidden transition-all'>
+          <div className='absolute inset-0 flex items-center justify-center pointer-events-none'>
+            <MediaPlayButton
+              className={cn(styles.centerPlayButton, 'pointer-events-auto')}
+            />
+          </div>
+          <div className='absolute top-2 left-2 flex'>
+            <MediaTimeDisplay showDuration />
+          </div>
+          <div className='absolute top-2 right-2 flex'>
+            <MediaFullscreenButton />
+          </div>
+        </div>
+
         <MediaControlBar
           ref={setControlBarEl}
           className={cn(styles.controlBar, 'gap-1 sm:gap-4 md:gap-12')}
         >
           <div className='flex gap-1'>
-            <MediaPlayButton />
-            <MediaTimeDisplay showDuration />
-            <div className={styles.volumeControls}>
+            <MediaPlayButton className='hidden md:flex' />
+            <MediaTimeDisplay showDuration className='hidden md:flex' />
+            <div className={cn(styles.volumeControls, 'hidden md:flex')}>
               <MediaMuteButton />
               <MediaVolumeRange />
             </div>
           </div>
 
-          <div className='hidden sm:flex w-1/2'>
+          <div className='hidden lg:flex w-1/2'>
             <VideoCommentInput
               ref={commentInputRef}
               videoId={videoId}
@@ -211,7 +228,7 @@ export default function VideoPlayer({
             />
           </div>
 
-          <div className='flex space-x-2'>
+          <div className='space-x-2 hidden md:flex'>
             <MediaFullscreenButton />
           </div>
         </MediaControlBar>
