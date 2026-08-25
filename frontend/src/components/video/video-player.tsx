@@ -57,11 +57,11 @@ export default function VideoPlayer({
   // Local state
   const [isTypingComment, setIsTypingComment] = useState<boolean>(false);
 
+  // Prevents media-chromes native hide/show transition and to only use our custom transitions
   useEffect(() => {
     if (!mediaControllerEl) return;
 
     const handleUserInactiveChange = () => {
-      // Force it back to false whenever media-chrome tries to set it true
       mediaControllerEl.userInteractive = false;
     };
 
@@ -69,9 +69,6 @@ export default function VideoPlayer({
       'userinactivechange',
       handleUserInactiveChange,
     );
-
-    // Also clear it immediately on mount, in case it's already true
-    // eslint-disable-next-line react-hooks/immutability -- setting DOM property, not React state
     mediaControllerEl.userInteractive = false;
 
     return () => {
@@ -88,9 +85,6 @@ export default function VideoPlayer({
       if (isTypingComment) return;
 
       const active = document.activeElement;
-      const isInsidePlayer = mediaControllerEl?.contains(active);
-      if (e.code === 'Space' && isInsidePlayer) return; // let media-chrome's own hotkey handle it
-
       const isEditingElsewhere =
         active instanceof HTMLInputElement ||
         active instanceof HTMLTextAreaElement ||
@@ -98,13 +92,20 @@ export default function VideoPlayer({
       if (isEditingElsewhere) return;
 
       e.preventDefault();
-      if (e.key === '/') {
-        commentInputRef.current?.focus({ preventScroll: true });
-      } else {
+
+      if (e.code === 'Space') {
+        const focusInsidePlayer =
+          mediaControllerEl && active && mediaControllerEl.contains(active);
+        if (focusInsidePlayer) return; // media-chrome's own hotkey already handles this
+
         const el = videoRef.current;
         if (!el) return;
         if (el.paused) el.play();
         else el.pause();
+      }
+
+      if (e.key === '/') {
+        commentInputRef.current?.focus({ preventScroll: true });
       }
     };
 
@@ -157,6 +158,14 @@ export default function VideoPlayer({
         crossOrigin=''
         playsInline
         style={{ width: '100%', height: '100%' }}
+        onPointerUp={(e) => {
+          if (e.pointerType !== 'touch') return; // let media-chrome native click-to-toggle handle mouse
+
+          const el = videoRef.current;
+          if (!el) return;
+          if (el.paused) el.play();
+          else el.pause();
+        }}
       />
 
       <div
