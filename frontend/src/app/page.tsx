@@ -4,14 +4,16 @@ import HeroPreview from '@/components/hero-preview';
 export default async function Home() {
   return (
     <main className='min-h-screen md:px-4'>
-      <section>
-        <div className='container mx-auto pb-8 md:py-20'>
-          <HeroPreview />
-        </div>
-      </section>
-      <section className='container mx-auto'>
-        <VideoFeed />
-      </section>
+      <div className='max-w-[1850px] mx-auto'>
+        <section>
+          <div className='mx-auto pb-8 md:py-20'>
+            <HeroPreview />
+          </div>
+        </section>
+        <section className='mx-auto'>
+          <VideoFeed />
+        </section>
+      </div>
     </main>
   );
 }

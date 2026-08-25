@@ -88,7 +88,7 @@ export default function VideoPageClient({
 
   return (
     <CommentsProvider comments={comments} seekToTimestamp={seekToTimestamp}>
-      <div className='max-w-[1600px] mx-auto flex landscape:space-x-2 sm:px-2'>
+      <div className='max-w-[1850px] mx-auto flex landscape:space-x-2 px-2'>
         <div className='flex flex-col w-full flex-1'>
           <div ref={setWrapperEl} className='flex items-center'>
             <VideoPlayer
@@ -102,7 +102,7 @@ export default function VideoPageClient({
             <FullscreenSidebarSlot />
           </div>
 
-          <div className='px-4 my-4'>
+          <div className='my-4'>
             {/* Video Details */}
             <div className='border rounded-lg p-4 w-full'>
               {/* Title + timestamp */}
