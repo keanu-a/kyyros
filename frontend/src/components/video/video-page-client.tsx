@@ -24,6 +24,10 @@ import {
 } from '../ui/dropdown-menu';
 import ConfirmDialog from '../confirm-dialog';
 import VideoPageClientAside from './video-page-client-aside';
+import VideoCommentInput from './video-comment-input';
+import { useVideoTime } from '@/hooks/use-video-time';
+import { useIsHydrated } from '@/hooks/use-is-hydrated';
+import { useIdleState } from '@/hooks/use-idle-state';
 
 type VideoPageClientProps = {
   video: GetVideoResponse;
@@ -40,6 +44,10 @@ export default function VideoPageClient({
     typeof MediaController
   > | null>(null);
   const { user, isAuthenticated } = useUser();
+  const isHydrated = useIsHydrated();
+  const { currentTime } = useVideoTime(videoRef, isHydrated);
+  const { resetIdleTimer } = useIdleState();
+  const [isTypingComment, setIsTypingComment] = useState<boolean>(false);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -88,7 +96,7 @@ export default function VideoPageClient({
 
   return (
     <CommentsProvider comments={comments} seekToTimestamp={seekToTimestamp}>
-      <div className='max-w-[1850px] mx-auto flex landscape:space-x-2 px-4'>
+      <div className='max-w-[1850px] mx-auto flex landscape:space-x-2 sm:px-4'>
         <div className='flex flex-col w-full flex-1'>
           <div ref={setWrapperEl} className='flex items-center'>
             <VideoPlayer
@@ -102,9 +110,19 @@ export default function VideoPageClient({
             <FullscreenSidebarSlot />
           </div>
 
-          <div className='my-4'>
+          <div className='w-full px-1 py-2 sm:hidden'>
+            <VideoCommentInput
+              videoId={video.id}
+              videoRef={videoRef}
+              currentTime={currentTime}
+              resetIdleTimer={resetIdleTimer}
+              onTypingChange={setIsTypingComment}
+            />
+          </div>
+
+          <div className='sm:py-4'>
             {/* Video Details */}
-            <div className='border rounded-lg p-4 w-full'>
+            <div className='border p-4 w-full sm:rounded-lg'>
               {/* Title + timestamp */}
               <h1 className='font-bold text-xl mb-1'>{video.title}</h1>
               <p className='text-sm text-muted-foreground mb-4'>
