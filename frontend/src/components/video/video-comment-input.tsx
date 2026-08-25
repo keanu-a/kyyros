@@ -104,6 +104,7 @@ const VideoCommentInput = forwardRef<HTMLInputElement, VideoCommentInputProps>(
             variant={null}
             onClick={handleSubmit}
             disabled={isSubmitting}
+            onMouseDown={(e) => e.preventDefault()} // Prevents input `onBlur`
           >
             {isSubmitting ? (
               <Loader2 className='w-4 h-4 animate-spin animation-duration-[2s]' />
