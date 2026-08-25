@@ -23,7 +23,7 @@ export default function TimestampCommentSidebar() {
           <ChevronsRightIcon />
         </Button>
       </div>
-      <div className='flex-1 min-h-0 overflow-scroll px-4 pb-6'>
+      <div className='flex-1 min-h-0 overflow-y-scroll px-4 pb-6'>
         <CommentList
           comments={timestampedComments}
           onSeek={seekToTimestamp}
