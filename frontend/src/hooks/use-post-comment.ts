@@ -1,7 +1,10 @@
 import { useState } from 'react';
 
+import { toast } from 'sonner';
+
 import { createClient } from '@/lib/supabase/client';
 import { createComment, type Comment } from '@/lib/api/comments';
+import { RateLimitError } from '@/lib/api/errors';
 
 export function usePostComment(
   videoId: string,
@@ -21,8 +24,9 @@ export function usePostComment(
     } = await supabase.auth.getSession();
 
     if (!session) {
-      // TODO: Create better UX for non-logged in users
-      alert('Log in to commment');
+      toast.error('Log in to comment', {
+        position: 'top-center',
+      });
       setError('auth');
       return false;
     }
@@ -36,8 +40,17 @@ export function usePostComment(
       onAddComment(newComment);
       return true;
     } catch (e) {
-      console.error('Failed to post comment', e);
-      setError('failed');
+      if (e instanceof RateLimitError) {
+        toast.error('Rate limit exceeded. Please try again later.', {
+          position: 'top-center',
+        });
+        setError('rate-limit');
+      } else {
+        toast.error('Failed to post comment. Please try again.', {
+          position: 'top-center',
+        });
+        setError('failed');
+      }
       return false;
     } finally {
       setIsSubmitting(false);
