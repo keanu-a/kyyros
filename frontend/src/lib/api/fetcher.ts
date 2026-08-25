@@ -1,4 +1,5 @@
 import { createClient } from '../supabase/client';
+import { RateLimitError } from './errors';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -28,8 +29,11 @@ export async function apiFetch<T>(
     },
   });
 
-  // TODO: Send better error messages to the client since body is not used
   if (!res.ok) {
+    if (res.status === 429) {
+      throw new RateLimitError();
+    }
+
     throw new Error(`Request failed: ${res.status}`);
   }
 
