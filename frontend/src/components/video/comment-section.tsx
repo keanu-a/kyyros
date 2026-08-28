@@ -8,7 +8,7 @@ export default function CommentSection({ videoId }: { videoId: string }) {
   const { allComments, handleAddComment, seekToTimestamp } = useComments();
 
   return (
-    <div className='w-full'>
+    <div className='w-full px-2 md:px-0'>
       <h2 className='font-semibold mb-4'>Comments</h2>
 
       <div className='mb-10 flex space-x-2 w-full'>

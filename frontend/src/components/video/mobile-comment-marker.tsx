@@ -1,8 +1,10 @@
 import { ComponentRef, RefObject } from 'react';
-import type MuxVideo from '@mux/mux-video-react';
+import MuxVideo from '@mux/mux-video-react';
 
 import { useActiveComment } from '@/hooks/use-active-comment';
 import { useComments } from '@/contexts/comments-context';
+import { cn } from '@/lib/utils';
+import { Comment } from '@/lib/api/comments';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 
 const MAX_BUBBLE_COMMENT_LENGTH = 30;
@@ -17,29 +19,55 @@ export default function MobileCommentBubble({
   const { timestampedComments, openCommentSidebarAt } = useComments();
   const activeId = useActiveComment(videoRef, timestampedComments);
 
-  const activeComment = timestampedComments.find((c) => c.id === activeId);
-  if (!activeComment) return null;
+  return (
+    <>
+      {timestampedComments.map((comment) => (
+        <MobileBubbleItem
+          key={comment.id}
+          comment={comment}
+          isActive={comment.id === activeId}
+          onSelect={openCommentSidebarAt}
+        />
+      ))}
+    </>
+  );
+}
 
+type MobileBubbleItemProps = {
+  comment: Comment;
+  isActive: boolean;
+  onSelect: (id: string) => void;
+};
+
+function MobileBubbleItem({
+  comment,
+  isActive,
+  onSelect,
+}: MobileBubbleItemProps) {
   const commentContent =
-    activeComment.content.length > MAX_BUBBLE_COMMENT_LENGTH
-      ? activeComment.content.slice(0, MAX_BUBBLE_COMMENT_LENGTH) + '...'
-      : activeComment.content;
+    comment.content.length > MAX_BUBBLE_COMMENT_LENGTH
+      ? comment.content.slice(0, MAX_BUBBLE_COMMENT_LENGTH) + '...'
+      : comment.content;
 
   return (
     <div
-      className='absolute bottom-6 text-background left-2 flex items-center gap-1.5 bg-accent-foreground/50 py-1 pl-1 pr-2 rounded-2xl text-xs max-w-[80%] cursor-pointer'
-      onClick={() => openCommentSidebarAt(activeComment.id)}
+      className={cn(
+        'absolute text-background bottom-6 left-2 flex items-center gap-1.5 bg-accent-foreground/50 px-2 py-1 rounded-2xl text-xs max-w-[80%] cursor-pointer',
+        'transition-opacity duration-300',
+        isActive ? 'opacity-100' : 'opacity-0 pointer-events-none',
+      )}
+      onClick={() => onSelect(comment.id)}
     >
       <Avatar style={{ width: 20, height: 20 }} className='shrink-0'>
         <AvatarImage
-          src={activeComment.user.profilePictureUrl ?? undefined}
-          alt={activeComment.user.username}
+          src={comment.user.profilePictureUrl ?? undefined}
+          alt={comment.user.username}
         />
         <AvatarFallback className='text-xs text-background bg-foreground'>
-          {activeComment.user.username?.charAt(0)}
+          {comment.user.username?.charAt(0)}
         </AvatarFallback>
       </Avatar>
-      <span className='font-bold truncate'>{activeComment.user.username}</span>
+      <span className='font-bold truncate'>{comment.user.username}</span>
       <span className='truncate'>{commentContent}</span>
     </div>
   );
