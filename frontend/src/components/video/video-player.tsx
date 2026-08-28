@@ -162,10 +162,11 @@ export default function VideoPlayer({
         onPointerUp={(e) => {
           if (e.pointerType !== 'touch') return; // let media-chrome native click-to-toggle handle mouse
 
-          const el = videoRef.current;
-          if (!el) return;
-          if (el.paused) el.play();
-          else el.pause();
+          if (isIdle) {
+            resetIdleTimer(isTypingComment);
+          } else {
+            setIsIdle(true);
+          }
         }}
       />
 
