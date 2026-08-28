@@ -24,6 +24,7 @@ import { cn } from '@/lib/utils';
 import styles from './video-player.module.css';
 import { useVideoTime } from '@/hooks/use-video-time';
 import VideoCommentInput from './video-comment-input';
+import MobileCommentMarker from './mobile-comment-marker';
 
 type VideoPlayerProps = {
   playbackId: string | null;
@@ -57,11 +58,11 @@ export default function VideoPlayer({
   // Local state
   const [isTypingComment, setIsTypingComment] = useState<boolean>(false);
 
+  // Prevents media-chromes native hide/show transition and to only use our custom transitions
   useEffect(() => {
     if (!mediaControllerEl) return;
 
     const handleUserInactiveChange = () => {
-      // Force it back to false whenever media-chrome tries to set it true
       mediaControllerEl.userInteractive = false;
     };
 
@@ -69,9 +70,6 @@ export default function VideoPlayer({
       'userinactivechange',
       handleUserInactiveChange,
     );
-
-    // Also clear it immediately on mount, in case it's already true
-    // eslint-disable-next-line react-hooks/immutability -- setting DOM property, not React state
     mediaControllerEl.userInteractive = false;
 
     return () => {
@@ -88,9 +86,6 @@ export default function VideoPlayer({
       if (isTypingComment) return;
 
       const active = document.activeElement;
-      const isInsidePlayer = mediaControllerEl?.contains(active);
-      if (e.code === 'Space' && isInsidePlayer) return; // let media-chrome's own hotkey handle it
-
       const isEditingElsewhere =
         active instanceof HTMLInputElement ||
         active instanceof HTMLTextAreaElement ||
@@ -98,13 +93,20 @@ export default function VideoPlayer({
       if (isEditingElsewhere) return;
 
       e.preventDefault();
-      if (e.key === '/') {
-        commentInputRef.current?.focus({ preventScroll: true });
-      } else {
+
+      if (e.code === 'Space') {
+        const focusInsidePlayer =
+          mediaControllerEl && active && mediaControllerEl.contains(active);
+        if (focusInsidePlayer) return; // media-chrome's own hotkey already handles this
+
         const el = videoRef.current;
         if (!el) return;
         if (el.paused) el.play();
         else el.pause();
+      }
+
+      if (e.key === '/') {
+        commentInputRef.current?.focus({ preventScroll: true });
       }
     };
 
@@ -118,7 +120,7 @@ export default function VideoPlayer({
   // Derived
   const idleOffset = controlBarHeight - 2 + timeRangeBarHeight / 2;
 
-  // Placeholder reserves layout so theres no shift when the player swaps i
+  // Placeholder reserves layout so theres no shift when the player swaps in
   if (!isHydrated) {
     return (
       <div
@@ -137,7 +139,11 @@ export default function VideoPlayer({
   return (
     <MediaController
       ref={mediaControllerRef}
-      className={cn(styles.player, isIdle && 'in-fullscreen:cursor-none')}
+      className={cn(
+        styles.player,
+        isIdle && 'in-fullscreen:cursor-none',
+        'sm:rounded-md',
+      )}
       noHotkeys={isTypingComment || undefined}
       onMouseMove={() => resetIdleTimer(isTypingComment)}
       onMouseLeave={() => {
@@ -153,50 +159,81 @@ export default function VideoPlayer({
         crossOrigin=''
         playsInline
         style={{ width: '100%', height: '100%' }}
+        onPointerUp={(e) => {
+          if (e.pointerType !== 'touch') return; // let media-chrome native click-to-toggle handle mouse
+
+          const el = videoRef.current;
+          if (!el) return;
+          if (el.paused) el.play();
+          else el.pause();
+        }}
       />
 
+      <div className='md:hidden'>
+        <MobileCommentMarker videoRef={videoRef} />
+      </div>
+
       <div
-        className='w-full transition-transform duration-300'
-        style={{
-          transform:
-            isIdle && !isPaused ? `translateY(${idleOffset}px)` : undefined,
-        }}
+        className={cn(
+          'w-full flex md:flex-col',
+          'transition-opacity duration-300 md:transition-transform',
+          isIdle && !isPaused && 'md:translate-y-(--idle-offset)',
+          isIdle && !isPaused && 'max-md:opacity-0 max-md:pointer-events-none',
+        )}
+        style={{ '--idle-offset': `${idleOffset}px` } as React.CSSProperties}
       >
         <MediaControlBar
           ref={setTimeRangeBarEl}
           className={cn(styles.timeRangeBar, 'w-full')}
         >
           <div className={styles.timeline}>
-            <div className={styles.commentStrip}>
+            <div className={cn(styles.commentStrip, 'hidden md:flex')}>
               <CommentMarkers videoRef={videoRef} isHydrated={isHydrated} />
             </div>
             <MediaTimeRange />
           </div>
         </MediaControlBar>
 
+        {/* Mobile only controls */}
+        <div className='md:hidden transition-all'>
+          <div className='absolute inset-0 flex items-center justify-center pointer-events-none'>
+            <MediaPlayButton
+              className={cn(styles.centerPlayButton, 'pointer-events-auto')}
+            />
+          </div>
+          <div className='absolute top-2 left-2 flex'>
+            <MediaTimeDisplay showDuration />
+          </div>
+          <div className='absolute top-2 right-2 flex'>
+            <MediaFullscreenButton />
+          </div>
+        </div>
+
         <MediaControlBar
           ref={setControlBarEl}
           className={cn(styles.controlBar, 'gap-1 sm:gap-4 md:gap-12')}
         >
           <div className='flex gap-1'>
-            <MediaPlayButton />
-            <MediaTimeDisplay showDuration />
-            <div className={styles.volumeControls}>
+            <MediaPlayButton className='hidden md:flex' />
+            <MediaTimeDisplay showDuration className='hidden md:flex' />
+            <div className={cn(styles.volumeControls, 'hidden md:flex')}>
               <MediaMuteButton />
               <MediaVolumeRange />
             </div>
           </div>
 
-          <VideoCommentInput
-            ref={commentInputRef}
-            videoId={videoId}
-            videoRef={videoRef}
-            currentTime={currentTime}
-            resetIdleTimer={resetIdleTimer}
-            onTypingChange={setIsTypingComment}
-          />
+          <div className='hidden lg:flex w-1/2'>
+            <VideoCommentInput
+              ref={commentInputRef}
+              videoId={videoId}
+              videoRef={videoRef}
+              currentTime={currentTime}
+              resetIdleTimer={resetIdleTimer}
+              onTypingChange={setIsTypingComment}
+            />
+          </div>
 
-          <div className='flex space-x-2'>
+          <div className='space-x-2 hidden md:flex'>
             <MediaFullscreenButton />
           </div>
         </MediaControlBar>

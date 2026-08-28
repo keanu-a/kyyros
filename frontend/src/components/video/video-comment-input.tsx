@@ -50,12 +50,12 @@ const VideoCommentInput = forwardRef<HTMLInputElement, VideoCommentInputProps>(
     };
 
     return (
-      <div className='relative w-1/2'>
+      <div className='relative w-full'>
         <Input
           ref={ref}
           className={cn(
-            'w-full rounded-full border-none bg-[#1b1b1d99]',
-            'text-sm px-4 placeholder:text-white',
+            'w-full rounded-md border-none bg-[#1b1b1d99]',
+            'text-sm px-4 placeholder:text-white text-white',
           )}
           placeholder={
             draftTimestamp !== null
@@ -88,13 +88,13 @@ const VideoCommentInput = forwardRef<HTMLInputElement, VideoCommentInputProps>(
         {content === '' && !isFocused && (
           <div className='absolute left-4 top-1/2 -translate-y-1/2 text-sm text-white pointer-events-none flex items-center gap-2'>
             Comment at {formatTimestamp(currentTime)}{' '}
-            <span className='px-1 text-xs rounded border border-white/20 bg-white/5'>
+            <span className='px-1 text-xs rounded border border-white/20 bg-white/5 hidden md:flex'>
               /
             </span>
           </div>
         )}
 
-        <div className='absolute right-1 top-1/2 -translate-y-1/2 flex justify-center items-center'>
+        <div className='absolute right-1.5 top-1/2 -translate-y-1/2 flex justify-center items-center md:right-1'>
           <Button
             className={cn(
               'cursor-pointer text-white/50',
@@ -104,6 +104,7 @@ const VideoCommentInput = forwardRef<HTMLInputElement, VideoCommentInputProps>(
             variant={null}
             onClick={handleSubmit}
             disabled={isSubmitting}
+            onMouseDown={(e) => e.preventDefault()} // Prevents input `onBlur`
           >
             {isSubmitting ? (
               <Loader2 className='w-4 h-4 animate-spin animation-duration-[2s]' />
