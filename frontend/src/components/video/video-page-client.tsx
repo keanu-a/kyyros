@@ -50,6 +50,9 @@ export default function VideoPageClient({
   const { currentTime } = useVideoTime(videoRef, isHydrated);
   const { resetIdleTimer } = useIdleState();
   const [isTypingComment, setIsTypingComment] = useState<boolean>(false);
+  const [drawerMode, setDrawerMode] = useState<'all' | 'timestamped' | null>(
+    null,
+  );
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -190,10 +193,8 @@ export default function VideoPageClient({
               <CommentSection videoId={video.id} />
             </div>
 
-            <div className='p-2 md:hidden'>
-              <MobileCommentSection>
-                <div>hidssda</div>
-              </MobileCommentSection>
+            <div className='px-2 md:hidden'>
+              <MobileCommentSection videoId={video.id} />
             </div>
           </div>
         </div>
