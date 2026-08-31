@@ -52,7 +52,7 @@ function MobileBubbleItem({
   return (
     <div
       className={cn(
-        'absolute text-background bottom-6 left-2 flex items-center gap-1.5 bg-accent-foreground/50 px-2 py-1 rounded-2xl text-xs max-w-[80%] cursor-pointer',
+        'absolute text-background bottom-8 right-2 flex items-center gap-1.5 bg-accent-foreground/50 px-2 py-1 rounded-2xl text-xs max-w-[80%] cursor-pointer',
         'transition-opacity duration-300',
         isActive ? 'opacity-100' : 'opacity-0 pointer-events-none',
       )}

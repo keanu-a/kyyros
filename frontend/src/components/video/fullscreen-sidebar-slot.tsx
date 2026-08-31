@@ -1,7 +1,7 @@
 'use client';
 
 import { useComments } from '@/contexts/comments-context';
-import TimestampCommentSidebar from './timestamp-comment-sidebar';
+import TimestampCommentSidebar from '../comment/timestamp-comment-sidebar';
 
 export default function FullscreenSidebarSlot() {
   const { isSidebarOpen } = useComments();

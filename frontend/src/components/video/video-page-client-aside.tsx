@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react';
 import { useComments } from '@/contexts/comments-context';
 import { useInfiniteVideos } from '@/hooks/use-infinite-videos';
 
-import TimestampCommentSidebar from './timestamp-comment-sidebar';
+import TimestampCommentSidebar from '../comment/timestamp-comment-sidebar';
 import { VideoCard } from './video-card';
 import { VideoCardSkeleton } from './video-card-skeleton';
 

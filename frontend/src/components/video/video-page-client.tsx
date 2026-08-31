@@ -14,7 +14,7 @@ import { CommentsProvider } from '@/contexts/comments-context';
 import { useUser } from '@/contexts/user-context';
 
 import VideoPlayer from './video-player';
-import CommentSection from './comment-section';
+import CommentSection from '../comment/comment-section';
 import FullscreenSidebarSlot from './fullscreen-sidebar-slot';
 import {
   DropdownMenu,
@@ -28,6 +28,8 @@ import VideoCommentInput from './video-comment-input';
 import { useVideoTime } from '@/hooks/use-video-time';
 import { useIsHydrated } from '@/hooks/use-is-hydrated';
 import { useIdleState } from '@/hooks/use-idle-state';
+import MobileCommentSection from '../comment/mobile-comment-section';
+import CommentList from '../comment/comment-list';
 
 type VideoPageClientProps = {
   video: GetVideoResponse;
@@ -48,6 +50,9 @@ export default function VideoPageClient({
   const { currentTime } = useVideoTime(videoRef, isHydrated);
   const { resetIdleTimer } = useIdleState();
   const [isTypingComment, setIsTypingComment] = useState<boolean>(false);
+  const [drawerMode, setDrawerMode] = useState<'all' | 'timestamped' | null>(
+    null,
+  );
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -94,6 +99,26 @@ export default function VideoPageClient({
     }
   }, [wrapperEl, mediaControllerEl]);
 
+  const [commentInputWrapperEl, setCommentInputWrapperEl] =
+    useState<HTMLDivElement | null>(null);
+  const [dockTop, setDockTop] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!commentInputWrapperEl) return;
+
+    const update = () => {
+      setDockTop(commentInputWrapperEl.getBoundingClientRect().bottom);
+    };
+
+    update();
+    window.addEventListener('resize', update);
+    window.addEventListener('orientationchange', update);
+    return () => {
+      window.removeEventListener('resize', update);
+      window.removeEventListener('orientationchange', update);
+    };
+  }, [commentInputWrapperEl]);
+
   return (
     <CommentsProvider comments={comments} seekToTimestamp={seekToTimestamp}>
       <div className='max-w-[1850px] mx-auto flex sm:px-4 sm:gap-2'>
@@ -110,7 +135,11 @@ export default function VideoPageClient({
             <FullscreenSidebarSlot />
           </div>
 
-          <div className='w-full px-1 py-2 lg:hidden sm:px-0'>
+          {/* Timestamp comment input for small screens */}
+          <div
+            ref={setCommentInputWrapperEl}
+            className='w-full px-1 py-2 lg:hidden sm:px-0'
+          >
             <VideoCommentInput
               videoId={video.id}
               videoRef={videoRef}
@@ -122,7 +151,7 @@ export default function VideoPageClient({
 
           <div className='lg:py-4'>
             {/* Video Details */}
-            <div className='border p-4 w-full sm:rounded-lg'>
+            <div className='border p-4 w-full sm:rounded-lg mb-4 md:mb-8'>
               {/* Title + timestamp */}
               <h1 className='font-bold text-xl mb-1'>{video.title}</h1>
               <p className='text-sm text-muted-foreground mb-4'>
@@ -182,13 +211,18 @@ export default function VideoPageClient({
                 </p>
               </div>
             </div>
-            <br />
 
-            <CommentSection videoId={video.id} />
+            <div className='hidden md:flex'>
+              <CommentSection videoId={video.id} />
+            </div>
+
+            <div className='px-2 md:hidden'>
+              <MobileCommentSection videoId={video.id} dockTop={dockTop} />
+            </div>
           </div>
         </div>
 
-        <div className='hidden sm:w-64 md:w-72 lg:w-96 shrink-0 sm:flex flex-col'>
+        <div className='hidden sm:w-64 md:w-72 lg:w-96 shrink-0 md:flex flex-col'>
           <VideoPageClientAside videoId={video.id} />
         </div>
       </div>
