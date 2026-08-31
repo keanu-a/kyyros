@@ -13,7 +13,7 @@ import {
   MediaVolumeRange,
 } from 'media-chrome/react';
 
-import CommentMarkers from './comment-markers';
+import CommentMarkers from '../comment/comment-markers';
 
 import { useIsHydrated } from '@/hooks/use-is-hydrated';
 import { useIdleState } from '@/hooks/use-idle-state';
@@ -24,7 +24,7 @@ import { cn } from '@/lib/utils';
 import styles from './video-player.module.css';
 import { useVideoTime } from '@/hooks/use-video-time';
 import VideoCommentInput from './video-comment-input';
-import MobileCommentMarker from './mobile-comment-marker';
+import MobileCommentMarker from '../comment/mobile-comment-marker';
 
 type VideoPlayerProps = {
   playbackId: string | null;
@@ -212,7 +212,10 @@ export default function VideoPlayer({
 
         <MediaControlBar
           ref={setControlBarEl}
-          className={cn(styles.controlBar, 'gap-1 sm:gap-4 md:gap-12')}
+          className={cn(
+            styles.controlBar,
+            'hidden sm:flex md:px-2 md:pb-2 md:gap-12',
+          )}
         >
           <div className='flex gap-1'>
             <MediaPlayButton className='hidden md:flex' />

@@ -1,6 +1,6 @@
 import Image from 'next/image';
 
-import CommentInput from '../comment/comment-input';
+import CommentInput from './comment-input';
 import { useComments } from '@/contexts/comments-context';
 import CommentList from './comment-list';
 

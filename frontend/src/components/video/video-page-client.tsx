@@ -14,7 +14,7 @@ import { CommentsProvider } from '@/contexts/comments-context';
 import { useUser } from '@/contexts/user-context';
 
 import VideoPlayer from './video-player';
-import CommentSection from './comment-section';
+import CommentSection from '../comment/comment-section';
 import FullscreenSidebarSlot from './fullscreen-sidebar-slot';
 import {
   DropdownMenu,
@@ -28,6 +28,8 @@ import VideoCommentInput from './video-comment-input';
 import { useVideoTime } from '@/hooks/use-video-time';
 import { useIsHydrated } from '@/hooks/use-is-hydrated';
 import { useIdleState } from '@/hooks/use-idle-state';
+import MobileCommentSection from '../comment/mobile-comment-section';
+import CommentList from '../comment/comment-list';
 
 type VideoPageClientProps = {
   video: GetVideoResponse;
@@ -184,7 +186,15 @@ export default function VideoPageClient({
             </div>
             <br />
 
-            <CommentSection videoId={video.id} />
+            <div className='hidden md:flex'>
+              <CommentSection videoId={video.id} />
+            </div>
+
+            <div className='p-2 md:hidden'>
+              <MobileCommentSection>
+                <div>hidssda</div>
+              </MobileCommentSection>
+            </div>
           </div>
         </div>
 
