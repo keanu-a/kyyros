@@ -14,7 +14,9 @@ import { CommentsProvider } from '@/contexts/comments-context';
 import { useUser } from '@/contexts/user-context';
 
 import VideoPlayer from './video-player';
+import VideoList from './video-list';
 import CommentSection from '../comment/comment-section';
+import MobileCommentSection from '../comment/mobile-comment-section';
 import FullscreenSidebarSlot from './fullscreen-sidebar-slot';
 import {
   DropdownMenu,
@@ -28,8 +30,9 @@ import VideoCommentInput from './video-comment-input';
 import { useVideoTime } from '@/hooks/use-video-time';
 import { useIsHydrated } from '@/hooks/use-is-hydrated';
 import { useIdleState } from '@/hooks/use-idle-state';
-import MobileCommentSection from '../comment/mobile-comment-section';
-import CommentList from '../comment/comment-list';
+import { useInfiniteVideos } from '@/hooks/use-infinite-videos';
+
+const PAGE_SIZE = 5;
 
 type VideoPageClientProps = {
   video: GetVideoResponse;
@@ -49,9 +52,10 @@ export default function VideoPageClient({
   const isHydrated = useIsHydrated();
   const { currentTime } = useVideoTime(videoRef, isHydrated);
   const { resetIdleTimer } = useIdleState();
-  const [isTypingComment, setIsTypingComment] = useState<boolean>(false);
-  const [drawerMode, setDrawerMode] = useState<'all' | 'timestamped' | null>(
-    null,
+
+  const { videos, loadMore, hasMore, isLoading, error } = useInfiniteVideos(
+    PAGE_SIZE,
+    video.id,
   );
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -135,7 +139,7 @@ export default function VideoPageClient({
             <FullscreenSidebarSlot />
           </div>
 
-          {/* Timestamp comment input for small screens */}
+          {/* Mobile timestamp comment input */}
           <div
             ref={setCommentInputWrapperEl}
             className='w-full px-1 py-2 lg:hidden sm:px-0'
@@ -145,7 +149,6 @@ export default function VideoPageClient({
               videoRef={videoRef}
               currentTime={currentTime}
               resetIdleTimer={resetIdleTimer}
-              onTypingChange={setIsTypingComment}
             />
           </div>
 
@@ -216,14 +219,28 @@ export default function VideoPageClient({
               <CommentSection videoId={video.id} />
             </div>
 
-            <div className='px-2 md:hidden'>
+            {/* Mobile comment section and video list */}
+            <div className='px-2 flex flex-col gap-2 md:hidden'>
               <MobileCommentSection videoId={video.id} dockTop={dockTop} />
+              <VideoList
+                videos={videos}
+                loadMore={loadMore}
+                hasMore={hasMore}
+                isLoading={isLoading}
+                error={error}
+              />
             </div>
           </div>
         </div>
 
         <div className='hidden sm:w-64 md:w-72 lg:w-96 shrink-0 md:flex flex-col'>
-          <VideoPageClientAside videoId={video.id} />
+          <VideoPageClientAside
+            videos={videos}
+            loadMore={loadMore}
+            hasMore={hasMore}
+            isLoading={isLoading}
+            error={error}
+          />
         </div>
       </div>
     </CommentsProvider>

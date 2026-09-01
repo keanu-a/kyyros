@@ -14,7 +14,7 @@ type VideoCommentInputProps = {
   videoRef: React.RefObject<ComponentRef<typeof MuxVideo> | null>;
   currentTime: number;
   resetIdleTimer: (skipSchedule?: boolean) => void;
-  onTypingChange: (isTyping: boolean) => void;
+  onTypingChange?: (isTyping: boolean) => void;
 };
 
 const VideoCommentInput = forwardRef<HTMLInputElement, VideoCommentInputProps>(
@@ -43,7 +43,7 @@ const VideoCommentInput = forwardRef<HTMLInputElement, VideoCommentInputProps>(
       const ok = await submit(content, draftTimestamp);
       if (ok) {
         setContent('');
-        onTypingChange(false);
+        if (onTypingChange) onTypingChange(false);
         resetIdleTimer();
         blurInput();
       }
@@ -66,13 +66,13 @@ const VideoCommentInput = forwardRef<HTMLInputElement, VideoCommentInputProps>(
           onClick={(e) => e.stopPropagation()}
           onFocus={() => {
             setIsFocused(true);
-            onTypingChange(true);
+            if (onTypingChange) onTypingChange(true);
             resetIdleTimer(true);
             setDraftTimestamp(videoRef.current?.currentTime ?? 0);
           }}
           onBlur={() => {
             setIsFocused(false);
-            onTypingChange(false);
+            if (onTypingChange) onTypingChange(false);
             resetIdleTimer();
             setDraftTimestamp(null);
           }}
