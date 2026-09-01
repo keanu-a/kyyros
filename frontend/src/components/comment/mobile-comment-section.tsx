@@ -68,9 +68,12 @@ export default function MobileCommentSection({
           buttonVariants({ variant: 'outline' }),
         )}
       >
-        <h2 className='font-bold flex items-center gap-2'>
+        <h2 className='font-bold flex items-center gap-1'>
           <MessageSquareMoreIcon />
-          {allComments.length} Comments
+          Comments{' '}
+          <span className='font-medium text-muted-foreground'>
+            ({allComments.length})
+          </span>
         </h2>
       </DrawerTrigger>
       <DrawerContent
