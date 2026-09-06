@@ -4,7 +4,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Search } from 'lucide-react';
-import { useIsMobile } from '@/hooks/use-is-mobile';
 
 import { useUser } from '@/contexts/user-context';
 import { Input } from './ui/input';
@@ -21,13 +20,11 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { cn } from '@/lib/utils';
 import { createClient } from '@/lib/supabase/client';
 
-const MOBILE_LOGO_SIZE = 40;
-const DESKTOP_LOGO_SIZE = 48;
+const LOGO_SIZE = 40;
 
 export default function Navbar() {
   const router = useRouter();
   const supabase = createClient();
-  const isMobile = useIsMobile();
 
   const { user, isLoading, isAuthenticated } = useUser();
 
@@ -42,8 +39,8 @@ export default function Navbar() {
         <Image
           src='/logo.svg'
           alt='Kyyros'
-          width={isMobile ? MOBILE_LOGO_SIZE : DESKTOP_LOGO_SIZE}
-          height={isMobile ? MOBILE_LOGO_SIZE : DESKTOP_LOGO_SIZE}
+          width={LOGO_SIZE}
+          height={LOGO_SIZE}
         />
       </Link>
 
