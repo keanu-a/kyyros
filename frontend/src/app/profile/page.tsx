@@ -15,7 +15,7 @@ export default async function ProfilePage() {
   }
 
   return (
-    <div className='flex flex-col items-center justify-center space-y-4 py-12 px-4'>
+    <div className='flex flex-col items-center justify-center space-y-4 my-auto p-4'>
       <ProfileForm />
       <ChangePasswordForm />
     </div>
