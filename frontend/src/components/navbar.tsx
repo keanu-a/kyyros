@@ -1,8 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Search } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-is-mobile';
 
 import { useUser } from '@/contexts/user-context';
 import { Input } from './ui/input';
@@ -19,9 +21,13 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { cn } from '@/lib/utils';
 import { createClient } from '@/lib/supabase/client';
 
+const MOBILE_LOGO_SIZE = 40;
+const DESKTOP_LOGO_SIZE = 48;
+
 export default function Navbar() {
   const router = useRouter();
   const supabase = createClient();
+  const isMobile = useIsMobile();
 
   const { user, isLoading, isAuthenticated } = useUser();
 
@@ -33,7 +39,12 @@ export default function Navbar() {
   return (
     <nav className='flex items-center justify-between py-3 px-2 sticky top-0 z-50 bg-background text-foreground md:px-4'>
       <Link href='/'>
-        <span>Kyyros</span>
+        <Image
+          src='/logo.svg'
+          alt='Kyyros'
+          width={isMobile ? MOBILE_LOGO_SIZE : DESKTOP_LOGO_SIZE}
+          height={isMobile ? MOBILE_LOGO_SIZE : DESKTOP_LOGO_SIZE}
+        />
       </Link>
 
       {/* TODO: Add search bar when feature is implemented. For now, we can just have a placeholder for the search bar. */}
