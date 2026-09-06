@@ -127,29 +127,31 @@ export default function VideoPageClient({
     <CommentsProvider comments={comments} seekToTimestamp={seekToTimestamp}>
       <div className='max-w-[1850px] mx-auto flex sm:px-4 sm:gap-2'>
         <div className='flex flex-col w-full flex-1'>
-          <div ref={setWrapperEl} className='flex items-center'>
-            <VideoPlayer
-              playbackId={video.playbackId}
-              videoId={video.id}
-              title={video.title}
-              videoRef={videoRef}
-              mediaControllerRef={setMediaControllerEl}
-              mediaControllerEl={mediaControllerEl}
-            />
-            <FullscreenSidebarSlot />
-          </div>
+          <div className='sticky top-14 z-10 md:static'>
+            <div ref={setWrapperEl} className='flex items-center'>
+              <VideoPlayer
+                playbackId={video.playbackId}
+                videoId={video.id}
+                title={video.title}
+                videoRef={videoRef}
+                mediaControllerRef={setMediaControllerEl}
+                mediaControllerEl={mediaControllerEl}
+              />
+              <FullscreenSidebarSlot />
+            </div>
 
-          {/* Mobile timestamp comment input */}
-          <div
-            ref={setCommentInputWrapperEl}
-            className='w-full px-1 py-2 lg:hidden sm:px-0'
-          >
-            <VideoCommentInput
-              videoId={video.id}
-              videoRef={videoRef}
-              currentTime={currentTime}
-              resetIdleTimer={resetIdleTimer}
-            />
+            {/* Mobile timestamp comment input */}
+            <div
+              ref={setCommentInputWrapperEl}
+              className='w-full px-1 py-2 bg-background lg:hidden sm:px-0'
+            >
+              <VideoCommentInput
+                videoId={video.id}
+                videoRef={videoRef}
+                currentTime={currentTime}
+                resetIdleTimer={resetIdleTimer}
+              />
+            </div>
           </div>
 
           <div className='lg:py-4'>

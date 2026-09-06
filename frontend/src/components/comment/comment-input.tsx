@@ -1,11 +1,12 @@
 import { useRef, useState } from 'react';
-import { X } from 'lucide-react';
+import { Send, X } from 'lucide-react';
 
 import { usePostComment } from '@/hooks/use-post-comment';
 import type { Comment } from '@/lib/api/comments';
 
 import { Textarea } from '../ui/textarea';
 import { Button } from '../ui/button';
+import { useIsMobile } from '@/hooks/use-is-mobile';
 
 type CommentInputProps = {
   videoId: string;
@@ -16,6 +17,7 @@ export default function CommentInput({
   videoId,
   onAddComment,
 }: CommentInputProps) {
+  const isMobile = useIsMobile();
   const [content, setContent] = useState<string>('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -55,7 +57,7 @@ export default function CommentInput({
         value={content}
         placeholder='Comment...'
         onChange={handleContentChange}
-        className='resize-none overflow-hidden pb-14 min-h-17.5'
+        className='resize-none overflow-hidden min-h-17.5 pr-14 md:pb-14'
         rows={1}
         onKeyDown={(e) => {
           if (e.key === 'Enter' && !e.shiftKey) {
@@ -64,15 +66,15 @@ export default function CommentInput({
           }
         }}
       />
-      <div className='absolute bottom-2 left-2 flex space-x-2'>
+      <div className='absolute right-2 top-2 flex md:space-x-2 md:left-2 md:bottom-2 md:top-auto'>
         <Button
-          className='cursor-pointer'
+          className='cursor-pointer rounded-full md:rounded-md'
           onClick={handleSubmit}
           disabled={isSubmitting || !content.trim().length}
         >
-          Comment
+          {isMobile ? <Send /> : 'Comment'}
         </Button>
-        {content.trim().length > 0 && (
+        {content.trim().length > 0 && !isMobile && (
           <Button
             variant='outline'
             className='cursor-pointer p-1.5'
