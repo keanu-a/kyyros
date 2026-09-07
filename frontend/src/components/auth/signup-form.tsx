@@ -124,6 +124,12 @@ export default function SignupForm() {
                 </Field>
               )}
             />
+
+            <p className='text-xs text-muted-foreground'>
+              Your password must contain at least 8 characters, with uppercase,
+              lowercase, a number, and a special character
+            </p>
+
             <Controller
               name='password'
               control={form.control}
