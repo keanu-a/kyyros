@@ -9,7 +9,7 @@ export default function FullscreenSidebarSlot() {
   if (!isSidebarOpen) return null;
 
   return (
-    <div className='hidden in-fullscreen:landscape:flex px-2 w-56 sm:w-64 md:w-72 lg:w-80 shrink-0'>
+    <div className='hidden in-fullscreen:landscape:flex px-2 w-56 sm:w-64 md:w-72 lg:w-96 shrink-0'>
       <TimestampCommentSidebar />
     </div>
   );
