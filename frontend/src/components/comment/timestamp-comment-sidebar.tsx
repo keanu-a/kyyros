@@ -13,7 +13,7 @@ export default function TimestampCommentSidebar() {
   } = useComments();
 
   return (
-    <div className='landscape:flex sm:flex flex-col h-[90vh] border rounded-md bg-background'>
+    <div className='landscape:flex sm:flex flex-col h-[90vh] border rounded-md bg-background w-full'>
       <div>
         <Button
           className='rounded-full cursor-pointer m-2 shrink-0'

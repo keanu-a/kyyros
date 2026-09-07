@@ -127,7 +127,7 @@ export default function VideoPageClient({
     <CommentsProvider comments={comments} seekToTimestamp={seekToTimestamp}>
       <div className='max-w-[1850px] mx-auto flex sm:px-4 sm:gap-2'>
         <div className='flex flex-col w-full flex-1'>
-          <div className='sticky top-14 z-10 md:static'>
+          <div className='sticky top-14 z-10 md:static landscape:static'>
             <div ref={setWrapperEl} className='flex items-center'>
               <VideoPlayer
                 playbackId={video.playbackId}

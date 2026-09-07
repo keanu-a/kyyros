@@ -8,7 +8,7 @@ export function useIsMobile() {
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const query = `(max-width: ${MOBILE_BREAKPOINT - 1}px) and (orientation: portrait)`;
+    const query = `(max-width: ${MOBILE_BREAKPOINT - 1}px)`;
     const mql = window.matchMedia(query);
 
     const update = () => setIsMobile(mql.matches);
