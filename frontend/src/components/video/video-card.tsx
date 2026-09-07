@@ -4,13 +4,11 @@ import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 
 import type { VideoSummaryResponse } from '@/lib/api/videos';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import UserAvatar from '../user-avatar';
 
 type VideoCardProps = {
   video: VideoSummaryResponse;
 };
-
-const AVATAR_SIZE = 24;
 
 export function VideoCard({ video }: VideoCardProps) {
   return (
@@ -35,15 +33,7 @@ export function VideoCard({ video }: VideoCardProps) {
           {video.title}
         </h3>
         <div className='flex items-center gap-1.5 text-sm'>
-          <Avatar
-            style={{ width: AVATAR_SIZE, height: AVATAR_SIZE }}
-            aria-label={`Uploaded by ${video.uploaderUsername}`}
-          >
-            <AvatarImage src={undefined} alt={video.uploaderUsername} />
-            <AvatarFallback className='text-background bg-foreground'>
-              {video.uploaderUsername?.charAt(0)}
-            </AvatarFallback>
-          </Avatar>
+          <UserAvatar name={video.uploaderUsername} />
           <p className='text-muted-foreground font-medium'>
             {video.uploaderUsername}
           </p>

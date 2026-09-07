@@ -94,7 +94,8 @@ export default function ProfileForm() {
                 </Field>
               )}
             />
-            <Controller
+            {/* TODO: Uncomment when profile picture URL input is implemented */}
+            {/* <Controller
               name='profilePictureUrl'
               control={form.control}
               render={({ field, fieldState }) => (
@@ -115,7 +116,7 @@ export default function ProfileForm() {
                   )}
                 </Field>
               )}
-            />
+            /> */}
           </FieldGroup>
 
           {submitError && (
