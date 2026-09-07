@@ -96,7 +96,8 @@ export default function Navbar() {
               href='/signup'
               className={cn(
                 buttonVariants({ variant: 'default' }),
-                'rounded-full px-3',
+                'rounded-full px-3 bg-brand text-brand-secondary',
+                'hover:bg-brand/90',
               )}
             >
               Sign up

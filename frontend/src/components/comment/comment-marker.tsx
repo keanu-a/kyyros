@@ -2,7 +2,7 @@ import { memo } from 'react';
 
 import { cn } from '@/lib/utils';
 import { Comment } from '@/lib/api/comments';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import UserAvatar from '../user-avatar';
 
 const AVATAR_SIZE = 24;
 const MAX_BUBBLE_COMMENT_LENGTH = 30;
@@ -44,7 +44,7 @@ function CommentMarkerComponent({
       {/* Comment bubble */}
       <div
         className={cn(
-          'absolute flex space-x-1 items-center bottom-7 text-xs bg-accent-foreground/50 px-2 rounded-2xl py-1',
+          'absolute flex space-x-1 items-center bottom-7 text-xs bg-accent-foreground/70 px-2 rounded-2xl py-1',
           'pointer-events-none transition-opacity w-fit whitespace-nowrap',
           isLeftHalf ? 'left-0' : 'right-0',
           isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100',
@@ -54,20 +54,15 @@ function CommentMarkerComponent({
         <span>{commentContent}</span>
       </div>
 
-      <Avatar
-        style={{ width: AVATAR_SIZE, height: AVATAR_SIZE }}
+      <span
         className='opacity-20 cursor-pointer transition-opacity group-hover:opacity-100'
-        aria-label={`Comment by ${comment.user.username}`}
         onClick={() => onSelect(comment.id)}
       >
-        <AvatarImage
-          src={comment.user.profilePictureUrl ?? undefined}
-          alt={comment.user.username}
+        <UserAvatar
+          name={comment.user.username}
+          avatarUrl={comment.user.profilePictureUrl ?? undefined}
         />
-        <AvatarFallback className='text-xs text-background bg-foreground'>
-          {comment.user.username?.charAt(0)}
-        </AvatarFallback>
-      </Avatar>
+      </span>
     </div>
   );
 }

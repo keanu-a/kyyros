@@ -75,7 +75,7 @@ export default function HeroPreview() {
       <div className='absolute bottom-2 left-4 right-4 h-6'>
         <div className='absolute top-1/2 left-0 right-0 h-0.75 -translate-y-1/2 rounded-full bg-white/25' />
         <div className='absolute top-1/2 left-0 h-0.75 -translate-y-1/2 rounded-full bg-brand hp-progress'>
-          <div className='hp-thumb' aria-hidden='true' />
+          <div className='hp-thumb bg-brand-secondary' aria-hidden='true' />
         </div>
         {markers.map((m) => (
           <div

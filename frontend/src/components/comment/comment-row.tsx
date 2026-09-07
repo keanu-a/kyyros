@@ -9,7 +9,6 @@ import { cn } from '@/lib/utils';
 import { useUser } from '@/contexts/user-context';
 import { useComments } from '@/contexts/comments-context';
 
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,8 +16,7 @@ import {
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
 import ConfirmDialog from '../confirm-dialog';
-
-const AVATAR_SIZE = 24;
+import UserAvatar from '../user-avatar';
 
 type CommentRowProps = {
   comment: Comment;
@@ -61,18 +59,10 @@ export function CommentRow({ comment, onSeek, isSelected }: CommentRowProps) {
         'flex space-x-2 px-2 py-4 rounded-md',
       )}
     >
-      <Avatar
-        style={{ width: AVATAR_SIZE, height: AVATAR_SIZE }}
-        aria-label={`Comment by ${comment.user.username}`}
-      >
-        <AvatarImage
-          src={comment.user.profilePictureUrl ?? undefined}
-          alt={comment.user.username}
-        />
-        <AvatarFallback className='text-xs text-background bg-foreground'>
-          {comment.user.username?.charAt(0)}
-        </AvatarFallback>
-      </Avatar>
+      <UserAvatar
+        name={comment.user.username}
+        avatarUrl={comment.user.profilePictureUrl ?? undefined}
+      />
 
       <div className='flex flex-col w-full'>
         <div className='flex justify-between'>

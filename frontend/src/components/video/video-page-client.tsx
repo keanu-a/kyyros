@@ -31,6 +31,7 @@ import { useVideoTime } from '@/hooks/use-video-time';
 import { useIsHydrated } from '@/hooks/use-is-hydrated';
 import { useIdleState } from '@/hooks/use-idle-state';
 import { useInfiniteVideos } from '@/hooks/use-infinite-videos';
+import UserAvatar from '../user-avatar';
 
 const PAGE_SIZE = 5;
 
@@ -171,12 +172,9 @@ export default function VideoPageClient({
               {/* Byline row */}
               <div className='flex items-center mb-4 space-x-6 justify-between w-full'>
                 <div className='flex items-center gap-2'>
-                  <Image
-                    src='/default-profile-picture.svg'
-                    alt={video.uploader?.username ?? 'uploader'}
-                    width={32}
-                    height={32}
-                    className='rounded-full'
+                  <UserAvatar
+                    name={video.uploader?.username ?? 'uploader'}
+                    avatarUrl={video.uploader?.profilePictureUrl ?? undefined}
                   />
                   <span className='text-sm'>@{video.uploader?.username}</span>
                 </div>
