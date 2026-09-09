@@ -6,7 +6,7 @@ export default async function Home() {
     <main className='min-h-screen md:px-4'>
       <div className='max-w-[1850px] mx-auto'>
         <section>
-          <div className='mx-auto pb-8 md:py-20'>
+          <div className='mx-auto pb-8'>
             <HeroPreview />
           </div>
         </section>
