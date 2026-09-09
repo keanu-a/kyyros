@@ -41,15 +41,19 @@ function Bubble({ name, text }: { name: string; text: string }) {
 
 export default function HeroPreview() {
   return (
-    <div className='relative w-full h-60 aspect-video overflow-hidden bg-black/10 sm:h-80 sm:rounded-xl'>
+    <div className='relative text-brand-secondary w-full h-60 aspect-video overflow-hidden bg-brand sm:h-112 sm:rounded-xl'>
+      <p className='absolute font-heading -bottom-14 right-1/4 transform font-extrabold text-[12dvh] sm:translate-0 sm:left-1/4 sm:-bottom-42 md:text-[32dvh] opacity-10'>
+        KYYROS
+      </p>
+
       {/* Hero text*/}
-      <div className='absolute inset-0 flex items-center justify-center px-6 pb-20'>
-        <div className='text-center'>
-          <h1 className='text-2xl md:text-4xl font-semibold tracking-tight leading-[1.1] text-black mb-2'>
-            Comment where it happens.
+      <div className='absolute inset-0 flex items-center justify-center px-6 pb-20 md:justify-start md:w-2/3'>
+        <div className='text-center md:text-left'>
+          <h1 className='text-4xl sm:text-6xl md:text-8xl font-heading font-extrabold tracking-tight leading-[1.1] mb-2 md:w-full'>
+            Comment where it happens
           </h1>
-          <p className='text-sm md:text-base text-black/70'>
-            Timestamps become conversations.
+          <p className='text-sm md:text-lg'>
+            Kyyros turns timestamps into conversations
           </p>
         </div>
       </div>
@@ -74,7 +78,7 @@ export default function HeroPreview() {
       {/* Progress bar */}
       <div className='absolute bottom-2 left-4 right-4 h-6'>
         <div className='absolute top-1/2 left-0 right-0 h-0.75 -translate-y-1/2 rounded-full bg-white/25' />
-        <div className='absolute top-1/2 left-0 h-0.75 -translate-y-1/2 rounded-full bg-brand hp-progress'>
+        <div className='absolute top-1/2 left-0 h-0.75 -translate-y-1/2 rounded-full bg-brand/50 hp-progress'>
           <div className='hp-thumb bg-brand-secondary' aria-hidden='true' />
         </div>
         {markers.map((m) => (

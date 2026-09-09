@@ -34,7 +34,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className='flex items-center justify-between py-3 px-2 h-14 sticky top-0 z-50 bg-background text-foreground md:px-4'>
+    <nav className='flex items-center justify-between py-6 px-2 h-14 sticky top-0 z-50 bg-background text-foreground md:px-4'>
       <Link href='/'>
         <Image
           src='/logo.svg'
