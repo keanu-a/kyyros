@@ -41,18 +41,18 @@ function Bubble({ name, text }: { name: string; text: string }) {
 
 export default function HeroPreview() {
   return (
-    <div className='relative text-brand-secondary w-full h-60 aspect-video overflow-hidden bg-brand sm:h-112 sm:rounded-xl'>
+    <div className='relative text-white w-full h-60 aspect-video overflow-hidden bg-brand sm:h-112 sm:rounded-xl'>
       <p className='absolute font-heading -bottom-14 right-1/4 transform font-extrabold text-[12dvh] sm:translate-0 sm:left-1/4 sm:-bottom-42 md:text-[32dvh] opacity-10'>
         KYYROS
       </p>
 
       {/* Hero text*/}
-      <div className='absolute inset-0 flex items-center justify-center px-6 pb-20 md:justify-start md:w-2/3'>
+      <div className='absolute inset-0 flex items-center justify-center px-6 pb-20 md:justify-start md:w-5/12'>
         <div className='text-center md:text-left'>
-          <h1 className='text-4xl sm:text-6xl md:text-8xl font-heading font-extrabold tracking-tight leading-[1.1] mb-2 md:w-full'>
+          <h1 className='text-4xl sm:text-6xl md:text-8xl font-heading font-extrabold tracking-tighter leading-[1.1] mb-2 md:w-full'>
             Comment where it happens
           </h1>
-          <p className='text-sm md:text-lg'>
+          <p className='text-sm font-semibold font-heading tracking-wide md:text-lg'>
             Kyyros turns timestamps into conversations
           </p>
         </div>
