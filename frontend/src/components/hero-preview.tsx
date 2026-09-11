@@ -47,12 +47,12 @@ export default function HeroPreview() {
       </p>
 
       {/* Hero text*/}
-      <div className='absolute inset-0 flex items-center justify-center px-6 pb-20 md:justify-start md:w-5/12'>
+      <div className='absolute inset-0 flex items-center justify-center pl-6 pb-20 md:justify-start md:w-3/4 xl:w-7/12'>
         <div className='text-center md:text-left'>
-          <h1 className='text-4xl sm:text-6xl md:text-8xl font-heading font-extrabold tracking-tighter leading-[1.1] mb-2 md:w-full'>
+          <h1 className='text-4xl sm:text-6xl md:text-7xl xl:text-8xl font-heading font-extrabold tracking-tighter leading-[1.1] mb-2 md:w-full'>
             Comment where it happens
           </h1>
-          <p className='text-sm font-semibold font-heading tracking-wide md:text-lg'>
+          <p className='text-sm font-semibold font-heading tracking-wide sm:text-base md:text-lg'>
             Kyyros turns timestamps into conversations
           </p>
         </div>
