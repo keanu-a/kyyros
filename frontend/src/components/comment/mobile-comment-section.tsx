@@ -81,7 +81,9 @@ export default function MobileCommentSection({
         style={dockTop != null ? { top: dockTop } : undefined}
       >
         <DrawerHeader>
-          <DrawerTitle>{comments.length} Comments</DrawerTitle>
+          <DrawerTitle>
+            {comments.length} Comment{comments.length !== 1 ? 's' : ''}
+          </DrawerTitle>
         </DrawerHeader>
         <div className='px-2 pb-2'>
           <CommentInput videoId={videoId} onAddComment={handleAddComment} />
