@@ -8,6 +8,7 @@ import { formatTimestamp } from '@/lib/format-timestamp';
 import { usePostComment } from '@/hooks/use-post-comment';
 import { useComments } from '@/contexts/comments-context';
 import { Button } from '../ui/button';
+import { useIsMobile } from '@/hooks/use-is-mobile';
 
 type VideoCommentInputProps = {
   videoId: string;
@@ -33,6 +34,8 @@ const VideoCommentInput = forwardRef<HTMLInputElement, VideoCommentInputProps>(
     const [content, setContent] = useState('');
     const [isFocused, setIsFocused] = useState(false);
 
+    const isMobile = useIsMobile();
+
     const blurInput = () => {
       if (typeof ref === 'function') return;
       ref?.current?.blur();
@@ -50,12 +53,19 @@ const VideoCommentInput = forwardRef<HTMLInputElement, VideoCommentInputProps>(
     };
 
     return (
-      <div className='relative w-full'>
+      <form
+        className='relative w-full'
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (isSubmitting) return;
+          handleSubmit();
+        }}
+      >
         <Input
           ref={ref}
           className={cn(
             'w-full rounded-md border-none bg-[#1b1b1d99]',
-            'text-sm px-4 placeholder:text-white text-white',
+            'text-sm px-4 pr-18 placeholder:text-white text-white',
           )}
           placeholder={
             draftTimestamp !== null
@@ -78,7 +88,6 @@ const VideoCommentInput = forwardRef<HTMLInputElement, VideoCommentInputProps>(
           }}
           onChange={(e) => setContent(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === 'Enter') handleSubmit();
             if (e.key === 'Escape') {
               setContent('');
               blurInput();
@@ -87,33 +96,41 @@ const VideoCommentInput = forwardRef<HTMLInputElement, VideoCommentInputProps>(
         />
         {content === '' && !isFocused && (
           <div className='absolute left-4 top-1/2 -translate-y-1/2 text-sm text-white pointer-events-none flex items-center gap-2'>
-            Comment at {formatTimestamp(currentTime)}{' '}
+            Comment {!isMobile && `at ${formatTimestamp(currentTime)} `}
             <span className='px-1 text-xs rounded border border-white/20 bg-white/5 hidden md:flex'>
               /
             </span>
           </div>
         )}
 
-        <div className='absolute right-1.5 top-1/2 -translate-y-1/2 flex justify-center items-center md:right-1'>
-          <Button
-            className={cn(
-              'cursor-pointer text-white/50',
-              content.trim().length > 0 && 'text-white',
-              'hover:text-white/50',
-            )}
-            variant={null}
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-            onMouseDown={(e) => e.preventDefault()} // Prevents input `onBlur`
-          >
-            {isSubmitting ? (
-              <Loader2 className='w-4 h-4 animate-spin animation-duration-[2s]' />
-            ) : (
-              <Send className='w-4 h-4' />
-            )}
-          </Button>
+        <div className='absolute right-3 top-1/2 -translate-y-1/2 flex justify-center items-center md:right-1'>
+          {isMobile ? (
+            <span className='text-sm text-white text-center border border-white/20 bg-white/5 px-2 rounded-full'>
+              {isFocused
+                ? formatTimestamp(draftTimestamp ?? currentTime)
+                : formatTimestamp(currentTime)}
+            </span>
+          ) : (
+            <Button
+              className={cn(
+                'cursor-pointer text-white/50',
+                content.trim().length > 0 && 'text-white',
+                'hover:text-white/50',
+              )}
+              variant={null}
+              type='submit'
+              disabled={isSubmitting}
+              onMouseDown={(e) => e.preventDefault()}
+            >
+              {isSubmitting ? (
+                <Loader2 className='w-4 h-4 animate-spin animation-duration-[2s]' />
+              ) : (
+                <Send className='w-4 h-4' />
+              )}
+            </Button>
+          )}
         </div>
-      </div>
+      </form>
     );
   },
 );
