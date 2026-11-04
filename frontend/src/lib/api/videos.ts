@@ -47,8 +47,14 @@ export interface GetVideoResponse {
   uploader: UserSummary;
   status: VideoStatus;
   playbackId: string | null;
+  likeCount: number;
   createdAt: string;
 }
+
+export type LikeStatusResponse = {
+  likeCount: number;
+  likedByMe: boolean;
+};
 
 export type VideoSummaryResponse = {
   id: string;
@@ -107,6 +113,40 @@ export function getVideos(
       method: 'GET',
     },
     { requireAuth: false },
+  );
+}
+
+export function getLikeStatus(
+  videoId: string,
+  signal?: AbortSignal,
+): Promise<LikeStatusResponse> {
+  return apiFetch(
+    `/api/v1/videos/${videoId}/like`,
+    {
+      method: 'GET',
+      signal,
+    },
+    { requireAuth: false },
+  );
+}
+
+export function likeVideo(videoId: string): Promise<LikeStatusResponse> {
+  return apiFetch(
+    `/api/v1/videos/${videoId}/like`,
+    {
+      method: 'PUT',
+    },
+    { requireAuth: true },
+  );
+}
+
+export function unlikeVideo(videoId: string): Promise<LikeStatusResponse> {
+  return apiFetch(
+    `/api/v1/videos/${videoId}/like`,
+    {
+      method: 'DELETE',
+    },
+    { requireAuth: true },
   );
 }
 

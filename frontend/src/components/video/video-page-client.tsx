@@ -27,6 +27,7 @@ import {
 import ConfirmDialog from '../confirm-dialog';
 import VideoPageClientAside from './video-page-client-aside';
 import VideoCommentInput from './video-comment-input';
+import LikeButton from './like-button';
 import { useVideoTime } from '@/hooks/use-video-time';
 import { useIsHydrated } from '@/hooks/use-is-hydrated';
 import { useIdleState } from '@/hooks/use-idle-state';
@@ -178,33 +179,39 @@ export default function VideoPageClient({
                   />
                   <span className='text-sm'>@{video.uploader?.username}</span>
                 </div>
-                {isAuthenticated && user?.id === video.uploader?.id && (
-                  <div className='flex items-center gap-2'>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger className='cursor-pointer'>
-                        <EllipsisIcon size={20} />
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align='end'>
-                        <DropdownMenuItem
-                          variant='destructive'
-                          className='cursor-pointer'
-                          onSelect={() => setIsDialogOpen(true)}
-                        >
-                          <Trash2Icon />
-                          Delete Video
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                <div className='flex items-center gap-2'>
+                  <LikeButton
+                    videoId={video.id}
+                    initialLikeCount={video.likeCount}
+                  />
+                  {isAuthenticated && user?.id === video.uploader?.id && (
+                    <>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger className='cursor-pointer'>
+                          <EllipsisIcon size={20} />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align='end'>
+                          <DropdownMenuItem
+                            variant='destructive'
+                            className='cursor-pointer'
+                            onSelect={() => setIsDialogOpen(true)}
+                          >
+                            <Trash2Icon />
+                            Delete Video
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
 
-                    <ConfirmDialog
-                      title='Delete Video'
-                      open={isDialogOpen}
-                      onOpenChange={setIsDialogOpen}
-                      onConfirm={handleConfirmDeleteVideo}
-                      isPending={isDeleting}
-                    />
-                  </div>
-                )}
+                      <ConfirmDialog
+                        title='Delete Video'
+                        open={isDialogOpen}
+                        onOpenChange={setIsDialogOpen}
+                        onConfirm={handleConfirmDeleteVideo}
+                        isPending={isDeleting}
+                      />
+                    </>
+                  )}
+                </div>
               </div>
 
               {/* Description */}
