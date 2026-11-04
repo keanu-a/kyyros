@@ -2,6 +2,12 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Workflow
+
+- Start every feature with a plan; wait for approval before implementing
+- Work one file at a time and pause for review before moving to the next.
+- Stay in scope: no unrelated refactors or formatting changes. Note follow-ups as suggested Linear tickets instead.
+
 ## Project
 
 Kyyros is a video platform where comments can be pinned to a moment in the video. Timestamped comments show up as markers on the progress bar, and each one starts a thread. It's a monorepo with two independently deployed apps:
@@ -55,12 +61,20 @@ There is no frontend test runner. Env lives in `frontend/.env.local`: `NEXT_PUBL
 - `GET /videos/{id}/comments` returns root comments with replies nested, loaded with a fetch-join query (`findCommentByVideoIdWithRepliesAndUsers`) to avoid N+1.
 - On the frontend, `contexts/comments-context.tsx` holds client-side comment state: optimistic add/delete, the derived `timestampedComments` list that drives the progress-bar markers, sidebar selection, and the draft timestamp. The video page (`app/videos/[id]/page.tsx`) is an RSC that fetches the video and comments, then hands off to `VideoPageClient`. Desktop and mobile have separate marker and comment-section components (`mobile-*`, `use-is-mobile`).
 
+### Likes
+- `video_likes`: composite PK `(user_id, video_id)`, inserted via native `ON CONFLICT DO NOTHING` (a failed insert would abort the Postgres transaction).
+- `PUT`/`DELETE /api/v1/videos/{id}/like` are idempotent and return `LikeStatusResponse(likeCount, likedByMe)`. GET is public; `likedByMe` is false for anonymous callers.
+- Counts use `COUNT(*)`, not a denormalized column.
+- Comment likes (future) get a separate `comment_likes` table, not a polymorphic one.
+
 ### Backend conventions
 - Layering: controller → service (`@Transactional`, ownership checks) → Spring Data repository. Request and response DTOs are Java records in `dto/`. Entities use Lombok `@Getter/@Setter`, never `@Data`.
 - Errors: throw the custom exceptions in `exception/` (`ResourceNotFoundException`, `BadRequestException`, `ForbiddenOperationException`, etc.). `GlobalExceptionHandler` maps them to `ErrorResponse` with the right status, and the 500 catch-all hides internal details. Add a handler there for any new exception type.
 - Rate limiting: put `@RateLimit(name, capacity, periodSeconds)` on a controller method. `RateLimitAspect` enforces it per user with in-memory Bucket4j buckets and skips unauthenticated requests.
 - The schema is managed by Hibernate `ddl-auto=update` (there are no migration files). Column names are explicit because the physical naming strategy is `PhysicalNamingStrategyStandardImpl`. `open-in-view` is off, so lazy associations must be loaded inside the service transaction (use fetch-join repository queries such as `findByIdWithUploader`).
 - Spring Boot 4 uses Jackson 3 (`tools.jackson.databind`), not `com.fasterxml`.
+- FK cascades: `comments.video_id` has `ON DELETE CASCADE` set directly in Supabase (not visible in entities). New tables use `@OnDelete(action = OnDeleteAction.CASCADE)`. `ddl-auto=update` does NOT alter existing FKs. Verify with `information_schema.referential_constraints.delete_rule`.
+- JDK 25 everywhere (terminal, IntelliJ, Dockerfile). "class file has wrong version" means mixed JDKs wrote to `target/`; run `mvnw clean`.
 
 ## CI
 
