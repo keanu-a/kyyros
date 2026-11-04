@@ -3,6 +3,7 @@ package com.kyyros.controller;
 import com.kyyros.dto.*;
 import com.kyyros.security.ratelimit.RateLimit;
 import com.kyyros.service.CommentService;
+import com.kyyros.service.LikeService;
 import com.kyyros.service.VideoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,6 +26,7 @@ public class VideoController {
 
     private final VideoService videoService;
     private final CommentService commentService;
+    private final LikeService likeService;
 
     @PostMapping
     @RateLimit(name = "upload-init", capacity = 4, periodSeconds = 3600)
@@ -87,5 +90,37 @@ public class VideoController {
     public ResponseEntity<List<CommentResponse>> getVideoComments(@PathVariable UUID videoId) {
         List<CommentResponse> comments = commentService.getVideoComments(videoId);
         return ResponseEntity.ok(comments);
+    }
+
+    @PutMapping("/{videoId}/like")
+    @RateLimit(name = "video-like", capacity = 30, periodSeconds = 60)
+    public ResponseEntity<LikeStatusResponse> likeVideo(
+            @PathVariable UUID videoId,
+            @AuthenticationPrincipal String userId
+    ) {
+        LikeStatusResponse response = likeService.likeVideo(videoId, UUID.fromString(userId));
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{videoId}/like")
+    @RateLimit(name = "video-like", capacity = 30, periodSeconds = 60)
+    public ResponseEntity<LikeStatusResponse> unlikeVideo(
+            @PathVariable UUID videoId,
+            @AuthenticationPrincipal String userId
+    ) {
+        LikeStatusResponse response = likeService.unlikeVideo(videoId, UUID.fromString(userId));
+        return ResponseEntity.ok(response);
+    }
+
+    // Public endpoint: uses Principal because @AuthenticationPrincipal resolves to "anonymousUser"
+    // for anonymous requests, while Principal is null
+    @GetMapping("/{videoId}/like")
+    public ResponseEntity<LikeStatusResponse> getLikeStatus(
+            @PathVariable UUID videoId,
+            Principal principal
+    ) {
+        UUID userId = principal == null ? null : UUID.fromString(principal.getName());
+        LikeStatusResponse response = likeService.getLikeStatus(videoId, userId);
+        return ResponseEntity.ok(response);
     }
 }

@@ -12,6 +12,7 @@ public record GetVideoResponse(
         UserSummary uploader,
         VideoStatus status,
         String playbackId,
+        long likeCount,
         Instant createdAt
 ) {
 }

@@ -8,6 +8,7 @@ import com.kyyros.exception.ResourceNotFoundException;
 import com.kyyros.model.S3PresignedResult;
 import com.kyyros.model.User;
 import com.kyyros.repository.UserRepository;
+import com.kyyros.repository.VideoLikeRepository;
 import com.kyyros.repository.VideoRepository;
 import com.mux.sdk.models.Asset;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,7 @@ public class VideoService {
 
     private final VideoRepository videoRepository;
     private final UserRepository userRepository;
+    private final VideoLikeRepository videoLikeRepository;
 
     @Transactional
     public CreateVideoResponse initiateUpload(CreateVideoRequest request, UUID userId) {
@@ -169,6 +171,7 @@ public class VideoService {
                 ),
                 video.getStatus(),
                 video.getMuxPlaybackId(),
+                videoLikeRepository.countByVideoId(videoId),
                 video.getCreatedAt()
         );
     }
