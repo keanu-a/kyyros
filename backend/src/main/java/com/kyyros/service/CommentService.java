@@ -7,6 +7,8 @@ import com.kyyros.exception.ResourceNotFoundException;
 import com.kyyros.model.Comment;
 import com.kyyros.model.User;
 import com.kyyros.model.Video;
+import com.kyyros.repository.CommentLikeRepository;
+import com.kyyros.repository.CommentLikeRepository.CommentLikeStats;
 import com.kyyros.repository.CommentRepository;
 import com.kyyros.repository.UserRepository;
 import com.kyyros.repository.VideoRepository;
@@ -16,7 +18,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +31,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final VideoRepository videoRepository;
     private final UserRepository userRepository;
+    private final CommentLikeRepository commentLikeRepository;
 
     @Transactional
     public CommentResponse createComment(UUID videoId, CreateCommentRequest request, UUID userId) {
@@ -44,7 +50,8 @@ public class CommentService {
 
         Comment savedComment = commentRepository.saveAndFlush(comment);
 
-        return toResponse(savedComment, savedComment.getTimestampSeconds());
+        // A new comment has no likes yet
+        return toResponse(savedComment, savedComment.getTimestampSeconds(), Map.of());
     }
 
     @Transactional
@@ -68,11 +75,12 @@ public class CommentService {
         reply.setParentComment(parent);
 
         Comment savedComment = commentRepository.saveAndFlush(reply);
-        return toResponse(savedComment, parent.getTimestampSeconds());
+        return toResponse(savedComment, parent.getTimestampSeconds(), Map.of());
     }
 
+    // userId is null for anonymous viewers
     @Transactional(readOnly = true)
-    public List<CommentResponse> getVideoComments(UUID videoId) {
+    public List<CommentResponse> getVideoComments(UUID videoId, UUID userId) {
         if (!videoRepository.existsById(videoId)) {
             throw new ResourceNotFoundException("Video not found: " + videoId);
         }
@@ -80,8 +88,14 @@ public class CommentService {
         List<Comment> rootComments = commentRepository
                 .findCommentByVideoIdWithRepliesAndUsers(videoId);
 
+        // One query for the like stats of every comment and reply on the video
+        Map<UUID, CommentLikeStats> likeStats = commentLikeRepository
+                .findLikeStatsByVideoId(videoId, userId)
+                .stream()
+                .collect(Collectors.toMap(CommentLikeStats::getCommentId, Function.identity()));
+
         return rootComments.stream()
-                .map(c -> toResponse(c, c.getTimestampSeconds()))
+                .map(c -> toResponse(c, c.getTimestampSeconds(), likeStats))
                 .toList();
     }
 
@@ -125,7 +139,12 @@ public class CommentService {
         commentRepository.delete(comment);
     }
 
-    private CommentResponse toResponse(Comment comment, Double effectiveTimestamp) {
+    // likeStats has no entry for comments with zero likes
+    private CommentResponse toResponse(
+            Comment comment,
+            Double effectiveTimestamp,
+            Map<UUID, CommentLikeStats> likeStats
+    ) {
         User user = comment.getUser();
         UserSummary userSummary = new UserSummary(
                 user.getId(),
@@ -135,7 +154,13 @@ public class CommentService {
 
         List<CommentResponse> replyResponses = comment.getReplies() == null
                 ? List.of()
-                : comment.getReplies().stream().map(reply -> toResponse(reply, effectiveTimestamp)).toList();
+                : comment.getReplies().stream()
+                        .map(reply -> toResponse(reply, effectiveTimestamp, likeStats))
+                        .toList();
+
+        CommentLikeStats stats = likeStats.get(comment.getId());
+        long likeCount = stats == null ? 0 : stats.getLikeCount();
+        boolean likedByMe = stats != null && Boolean.TRUE.equals(stats.getLikedByMe());
 
         return new CommentResponse(
                 comment.getId(),
@@ -144,6 +169,8 @@ public class CommentService {
                 userSummary,
                 comment.getCreatedAt(),
                 comment.getUpdatedAt(),
+                likeCount,
+                likedByMe,
                 replyResponses
         );
     }

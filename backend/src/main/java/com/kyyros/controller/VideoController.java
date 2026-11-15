@@ -86,9 +86,14 @@ public class VideoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    // Public endpoint: Principal is null for anonymous requests, so likedByMe is false for them
     @GetMapping("/{videoId}/comments")
-    public ResponseEntity<List<CommentResponse>> getVideoComments(@PathVariable UUID videoId) {
-        List<CommentResponse> comments = commentService.getVideoComments(videoId);
+    public ResponseEntity<List<CommentResponse>> getVideoComments(
+            @PathVariable UUID videoId,
+            Principal principal
+    ) {
+        UUID userId = principal == null ? null : UUID.fromString(principal.getName());
+        List<CommentResponse> comments = commentService.getVideoComments(videoId, userId);
         return ResponseEntity.ok(comments);
     }
 

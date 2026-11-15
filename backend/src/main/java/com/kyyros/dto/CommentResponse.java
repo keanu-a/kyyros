@@ -11,5 +11,7 @@ public record CommentResponse(
         UserSummary user,
         Instant createdAt,
         Instant updatedAt,
+        long likeCount,
+        boolean likedByMe,
         List<CommentResponse> replies
 ) {}

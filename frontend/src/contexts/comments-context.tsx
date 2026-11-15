@@ -6,6 +6,11 @@ type CommentsContextType = {
   allComments: Comment[];
   handleAddComment: (newComment: Comment) => void;
   handleDeleteComment: (commentId: string) => void;
+  setCommentLikeStatus: (
+    commentId: string,
+    likeCount: number,
+    likedByMe: boolean,
+  ) => void;
   timestampedComments: Comment[];
   isSidebarOpen: boolean;
   selectedCommentId: string | null;
@@ -64,12 +69,31 @@ export function CommentsProvider({
     );
   };
 
+  // Lives here (not in each row) so every row rendering the same comment stays in sync.
+  // Checks replies too, so reply likes work once replies are shown.
+  const setCommentLikeStatus = (
+    commentId: string,
+    likeCount: number,
+    likedByMe: boolean,
+  ) => {
+    const applyLike = (comment: Comment): Comment =>
+      comment.id === commentId ? { ...comment, likeCount, likedByMe } : comment;
+
+    setAllComments((prev) =>
+      prev.map((comment) => ({
+        ...applyLike(comment),
+        replies: comment.replies.map(applyLike),
+      })),
+    );
+  };
+
   return (
     <CommentsContext.Provider
       value={{
         allComments,
         handleAddComment,
         handleDeleteComment,
+        setCommentLikeStatus,
         timestampedComments,
         isSidebarOpen,
         selectedCommentId,
