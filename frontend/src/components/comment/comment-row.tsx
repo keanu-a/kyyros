@@ -17,6 +17,7 @@ import {
 } from '../ui/dropdown-menu';
 import ConfirmDialog from '../confirm-dialog';
 import UserAvatar from '../user-avatar';
+import CommentLikeButton from './comment-like-button';
 
 type CommentRowProps = {
   comment: Comment;
@@ -124,15 +125,14 @@ export function CommentRow({ comment, onSeek, isSelected }: CommentRowProps) {
 
         <p className='whitespace-pre-wrap'>{comment.content}</p>
 
-        {/* TODO: Add like and reply comment feature */}
-        {/* <div className='flex space-x-6 *:mt-4 text-muted-foreground'>
-          <Button variant='link' className='p-0 mt-2 cursor-pointer'>
-            Like
-          </Button>
-          <Button variant='link' className='p-0 mt-2 cursor-pointer'>
+        <div className='mt-2 flex items-center space-x-6'>
+          <CommentLikeButton comment={comment} />
+
+          {/* TODO: Add reply comment feature */}
+          {/* <Button variant='link' className='p-0 cursor-pointer'>
             Reply
-          </Button>
-        </div> */}
+          </Button> */}
+        </div>
       </div>
     </div>
   );
