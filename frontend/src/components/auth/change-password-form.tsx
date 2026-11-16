@@ -32,7 +32,13 @@ const changePasswordSchema = z
 
 type ChangePasswordValues = z.infer<typeof changePasswordSchema>;
 
-export default function ChangePasswordForm() {
+interface ChangePasswordFormProps {
+  disabled?: boolean;
+}
+
+export default function ChangePasswordForm({
+  disabled = false,
+}: ChangePasswordFormProps) {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
@@ -46,6 +52,8 @@ export default function ChangePasswordForm() {
   });
 
   async function onSubmit(values: ChangePasswordValues) {
+    if (disabled) return;
+
     setSubmitError(null);
     setSubmitSuccess(false);
 
@@ -72,10 +80,15 @@ export default function ChangePasswordForm() {
     <Card className='w-full max-w-md'>
       <CardHeader>
         <CardTitle>Change Password</CardTitle>
-        <CardDescription>Update your account password</CardDescription>
+        <CardDescription>
+          {disabled
+            ? 'You signed in with Google, so your password is managed by Google.'
+            : 'Update your account password'}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={form.handleSubmit(onSubmit)}>
+          <fieldset disabled={disabled}>
           <FieldGroup className='pb-4'>
             <Controller
               name='currentPassword'
@@ -170,6 +183,7 @@ export default function ChangePasswordForm() {
           >
             {form.formState.isSubmitting ? 'Saving...' : 'Save changes'}
           </Button>
+          </fieldset>
         </form>
       </CardContent>
     </Card>

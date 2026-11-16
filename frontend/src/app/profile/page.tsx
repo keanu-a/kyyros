@@ -14,10 +14,13 @@ export default async function ProfilePage() {
     redirect('/login');
   }
 
+  // OAuth-only users (e.g. Google) have no password to change
+  const hasPassword = user.app_metadata.providers?.includes('email') ?? false;
+
   return (
     <div className='flex flex-col items-center justify-center space-y-4 my-auto p-4'>
       <ProfileForm />
-      <ChangePasswordForm />
+      <ChangePasswordForm disabled={!hasPassword} />
     </div>
   );
 }
