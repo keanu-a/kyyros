@@ -19,6 +19,10 @@ export type CreateCommentRequest = {
   timestampSeconds: number | null;
 };
 
+export type CreateReplyRequest = {
+  content: string;
+};
+
 // accessToken lets the RSC fetch include likedByMe, since apiFetch has no session on the server
 export function getComments(
   videoId: string,
@@ -44,6 +48,23 @@ export function createComment(
 ): Promise<Comment> {
   return apiFetch(
     `/api/v1/videos/${videoId}/comments`,
+    {
+      method: 'POST',
+      body: JSON.stringify(request),
+    },
+    {
+      requireAuth: true,
+    },
+  );
+}
+
+// Always pass the thread's root id; the backend flattens replies-to-replies onto the root anyway
+export function createReply(
+  rootCommentId: string,
+  request: CreateReplyRequest,
+): Promise<Comment> {
+  return apiFetch(
+    `/api/v1/comments/${rootCommentId}/replies`,
     {
       method: 'POST',
       body: JSON.stringify(request),

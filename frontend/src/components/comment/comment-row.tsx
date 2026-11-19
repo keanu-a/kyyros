@@ -4,6 +4,7 @@ import { EllipsisIcon, Trash2Icon } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { deleteComment, type Comment } from '@/lib/api/comments';
+import { NotFoundError } from '@/lib/api/errors';
 import { formatTimestamp } from '@/lib/format-timestamp';
 import { cn } from '@/lib/utils';
 import { useUser } from '@/contexts/user-context';
@@ -15,6 +16,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
+import { Button } from '../ui/button';
 import ConfirmDialog from '../confirm-dialog';
 import UserAvatar from '../user-avatar';
 import CommentLikeButton from './comment-like-button';
@@ -22,10 +24,18 @@ import CommentLikeButton from './comment-like-button';
 type CommentRowProps = {
   comment: Comment;
   onSeek: (timestampSeconds: number) => void;
+  onReply: (comment: Comment) => void;
+  isReply?: boolean;
   isSelected?: boolean;
 };
 
-export function CommentRow({ comment, onSeek, isSelected }: CommentRowProps) {
+export function CommentRow({
+  comment,
+  onSeek,
+  onReply,
+  isReply = false,
+  isSelected,
+}: CommentRowProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -33,16 +43,41 @@ export function CommentRow({ comment, onSeek, isSelected }: CommentRowProps) {
 
   const { handleDeleteComment } = useComments();
 
+  const label = isReply ? 'Reply' : 'Comment';
+  // Replies inherit the root's timestamp, which the root already shows
+  // A local const (not a property access) so the null check narrows it to number in the JSX below
+  const timestamp = isReply ? null : comment.timestampSeconds;
+  const showTimestamp = timestamp !== null;
+
+  const handleReplyClick = () => {
+    if (!isAuthenticated) {
+      toast.error('Log in to reply', {
+        position: 'top-center',
+      });
+      return;
+    }
+    onReply(comment);
+  };
+
   const handleConfirmDeleteComment = async () => {
     setIsDeleting(true);
     try {
       await deleteComment(comment.id);
       handleDeleteComment(comment.id);
       setIsDialogOpen(false);
-      toast.success('Comment deleted successfully.', {
+      toast.success(`${label} deleted successfully.`, {
         position: 'top-center',
       });
     } catch (error) {
+      if (error instanceof NotFoundError) {
+        // Already gone (e.g. deleted in another tab, or its root was deleted)
+        handleDeleteComment(comment.id);
+        setIsDialogOpen(false);
+        toast.success(`${label} deleted successfully.`, {
+          position: 'top-center',
+        });
+        return;
+      }
       console.error('Error deleting comment:', error);
       toast.error('Failed to delete comment. Please try again later.', {
         position: 'top-center',
@@ -70,19 +105,15 @@ export function CommentRow({ comment, onSeek, isSelected }: CommentRowProps) {
           <div className='flex flex-col lg:gap-2 lg:flex-row'>
             <h1 className='font-bold'>{comment.user.username}</h1>
             <div className='space-x-1'>
-              {comment.timestampSeconds !== null && (
+              {timestamp !== null && (
                 <span
                   className='text-sm text-muted-foreground hover:underline cursor-pointer'
-                  onClick={() => onSeek(comment.timestampSeconds ?? 0)}
+                  onClick={() => onSeek(timestamp)}
                 >
-                  {formatTimestamp(comment.timestampSeconds)}
+                  {formatTimestamp(timestamp)}
                 </span>
               )}
-              <span
-                className={cn(
-                  comment.timestampSeconds !== null ? '' : 'hidden lg:inline',
-                )}
-              >
+              <span className={cn(showTimestamp ? '' : 'hidden lg:inline')}>
                 &middot;
               </span>
               <span className='text-sm text-muted-foreground'>
@@ -106,13 +137,13 @@ export function CommentRow({ comment, onSeek, isSelected }: CommentRowProps) {
                     onSelect={() => setIsDialogOpen(true)}
                   >
                     <Trash2Icon size={16} className='shrink-0' />
-                    Delete Comment
+                    Delete {label}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
 
               <ConfirmDialog
-                title='Delete Comment'
+                title={`Delete ${label}`}
                 onConfirm={handleConfirmDeleteComment}
                 open={isDialogOpen}
                 onOpenChange={setIsDialogOpen}
@@ -123,15 +154,19 @@ export function CommentRow({ comment, onSeek, isSelected }: CommentRowProps) {
           )}
         </div>
 
-        <p className='whitespace-pre-wrap'>{comment.content}</p>
+        <p className='whitespace-pre-wrap mt-1'>{comment.content}</p>
 
         <div className='mt-2 flex items-center space-x-6'>
           <CommentLikeButton comment={comment} />
 
-          {/* TODO: Add reply comment feature */}
-          {/* <Button variant='link' className='p-0 cursor-pointer'>
+          <Button
+            variant='ghost'
+            size='sm'
+            className='h-6 cursor-pointer px-2 py-1 text-muted-foreground rounded-full'
+            onClick={handleReplyClick}
+          >
             Reply
-          </Button> */}
+          </Button>
         </div>
       </div>
     </div>
