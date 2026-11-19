@@ -1,7 +1,6 @@
 package com.kyyros.service;
 
 import com.kyyros.dto.*;
-import com.kyyros.exception.BadRequestException;
 import com.kyyros.exception.ForbiddenOperationException;
 import com.kyyros.exception.ResourceNotFoundException;
 import com.kyyros.model.Comment;
@@ -14,6 +13,7 @@ import com.kyyros.repository.UserRepository;
 import com.kyyros.repository.VideoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,25 +57,31 @@ public class CommentService {
     @Transactional
     public CommentResponse createReply(UUID parentCommentId, CreateReplyRequest request, UUID userId) {
 
-        Comment parent = commentRepository.findById(parentCommentId)
+        Comment target = commentRepository.findById(parentCommentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Comment not found: " + parentCommentId));
 
-        // Enforce one-level nesting
-        if (parent.getParentComment() != null) {
-            throw new BadRequestException("Cannot reply to a reply. Replies can only be made to root comments");
-        }
+        // Enforce one-level nesting: a reply to a reply attaches to the thread's root
+        Comment root = target.getParentComment() != null ? target.getParentComment() : target;
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
 
         Comment reply = new Comment();
-        reply.setVideo(parent.getVideo());
+        reply.setVideo(root.getVideo());
         reply.setUser(user);
         reply.setContent(request.content());
-        reply.setParentComment(parent);
+        reply.setParentComment(root);
 
-        Comment savedComment = commentRepository.saveAndFlush(reply);
-        return toResponse(savedComment, parent.getTimestampSeconds(), Map.of());
+        Comment savedComment;
+        try {
+            savedComment = commentRepository.saveAndFlush(reply);
+        } catch (DataIntegrityViolationException e) {
+            // The root was deleted after we loaded it, so the parent FK no longer resolves
+            log.info("Reply insert failed, parent comment {} was deleted concurrently", root.getId());
+            throw new ResourceNotFoundException("Comment not found: " + root.getId());
+        }
+
+        return toResponse(savedComment, root.getTimestampSeconds(), Map.of());
     }
 
     // userId is null for anonymous viewers
