@@ -1,5 +1,5 @@
 import type { Comment } from '@/lib/api/comments';
-import { CommentRow } from '../comment/comment-row';
+import CommentThread from './comment-thread';
 import { useEffect, useRef } from 'react';
 
 type CommentListProps = {
@@ -38,7 +38,7 @@ export default function CommentList({
             else rowRefs.current.delete(comment.id);
           }}
         >
-          <CommentRow
+          <CommentThread
             comment={comment}
             onSeek={onSeek}
             isSelected={comment.id === selectedCommentId}

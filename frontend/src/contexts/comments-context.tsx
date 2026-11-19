@@ -4,7 +4,9 @@ import { Comment } from '@/lib/api/comments';
 
 type CommentsContextType = {
   allComments: Comment[];
+  totalCommentCount: number;
   handleAddComment: (newComment: Comment) => void;
+  handleAddReply: (rootCommentId: string, reply: Comment) => void;
   handleDeleteComment: (commentId: string) => void;
   setCommentLikeStatus: (
     commentId: string,
@@ -49,6 +51,16 @@ export function CommentsProvider({
     [allComments],
   );
 
+  // Root comments plus all of their replies
+  const totalCommentCount = useMemo(
+    () =>
+      allComments.reduce(
+        (count, comment) => count + 1 + comment.replies.length,
+        0,
+      ),
+    [allComments],
+  );
+
   const openCommentSidebarAt = (id: string) => {
     setSelectedCommentId(id);
     setIsSidebarOpen(true);
@@ -63,14 +75,38 @@ export function CommentsProvider({
     setAllComments((prev) => [newComment, ...prev]);
   };
 
+  // Replies are oldest first, so a new reply goes at the end of its thread
+  const handleAddReply = (rootCommentId: string, reply: Comment) => {
+    setAllComments((prev) =>
+      prev.map((comment) =>
+        comment.id === rootCommentId
+          ? { ...comment, replies: [...comment.replies, reply] }
+          : comment,
+      ),
+    );
+  };
+
+  // Handles both roots and replies. Deleting a root drops its whole thread,
+  // matching the backend cascade.
   const handleDeleteComment = (commentId: string) => {
     setAllComments((prev) =>
-      prev.filter((comment) => comment.id !== commentId),
+      prev
+        .filter((comment) => comment.id !== commentId)
+        .map((comment) =>
+          comment.replies.some((reply) => reply.id === commentId)
+            ? {
+                ...comment,
+                replies: comment.replies.filter(
+                  (reply) => reply.id !== commentId,
+                ),
+              }
+            : comment,
+        ),
     );
   };
 
   // Lives here (not in each row) so every row rendering the same comment stays in sync.
-  // Checks replies too, so reply likes work once replies are shown.
+  // Checks replies too, so reply likes stay in sync.
   const setCommentLikeStatus = (
     commentId: string,
     likeCount: number,
@@ -91,7 +127,9 @@ export function CommentsProvider({
     <CommentsContext.Provider
       value={{
         allComments,
+        totalCommentCount,
         handleAddComment,
+        handleAddReply,
         handleDeleteComment,
         setCommentLikeStatus,
         timestampedComments,

@@ -25,6 +25,7 @@ export default function MobileCommentSection({
 }: MobileCommentSectionProps) {
   const {
     allComments,
+    totalCommentCount,
     isSidebarOpen,
     timestampedComments,
     seekToTimestamp,
@@ -39,6 +40,15 @@ export default function MobileCommentSection({
   const open = !!isMobile && (isSidebarOpen || manualOpen);
   const mode: 'all' | 'timestamped' = isSidebarOpen ? 'timestamped' : 'all';
   const comments = mode === 'timestamped' ? timestampedComments : allComments;
+
+  // Counts include replies, so the timestamped view adds up its threads too
+  const visibleCount =
+    mode === 'timestamped'
+      ? timestampedComments.reduce(
+          (count, comment) => count + 1 + comment.replies.length,
+          0,
+        )
+      : totalCommentCount;
 
   // Stops page scrolling when comment drawer is open
   useEffect(() => {
@@ -72,7 +82,7 @@ export default function MobileCommentSection({
           <MessageSquareMoreIcon />
           Comments{' '}
           <span className='font-medium text-muted-foreground'>
-            ({allComments.length})
+            ({totalCommentCount})
           </span>
         </h2>
       </DrawerTrigger>
@@ -82,7 +92,7 @@ export default function MobileCommentSection({
       >
         <DrawerHeader>
           <DrawerTitle>
-            {comments.length} Comment{comments.length !== 1 ? 's' : ''}
+            {visibleCount} Comment{visibleCount !== 1 ? 's' : ''}
           </DrawerTitle>
         </DrawerHeader>
         <div className='px-2 pb-2'>

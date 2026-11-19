@@ -1,5 +1,5 @@
 import { createClient } from '../supabase/client';
-import { RateLimitError } from './errors';
+import { NotFoundError, RateLimitError } from './errors';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -32,6 +32,10 @@ export async function apiFetch<T>(
   if (!res.ok) {
     if (res.status === 429) {
       throw new RateLimitError();
+    }
+
+    if (res.status === 404) {
+      throw new NotFoundError();
     }
 
     throw new Error(`Request failed: ${res.status}`);
